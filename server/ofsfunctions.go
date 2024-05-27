@@ -7,7 +7,7 @@ import (
 
 	"github.com/thomas-osgood/OGOR/output"
 	"github.com/thomas-osgood/ofs/common"
-	"github.com/thomas-osgood/ofs/server/internal/utils"
+	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
 )
 
 // create, initialize and return a new instance of a file server object.
@@ -35,7 +35,7 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 		}
 	}
 
-	err = utils.CheckDirPerms(defaults.Rootdir)
+	err = ofsutils.CheckDirPerms(defaults.Rootdir)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func WithDirRoot(dirpath string) FSrvOptFunc {
 
 		absdir = filepath.Clean(absdir)
 
-		err = utils.CheckDirPerms(absdir)
+		err = ofsutils.CheckDirPerms(absdir)
 		if err != nil {
 			return err
 		}

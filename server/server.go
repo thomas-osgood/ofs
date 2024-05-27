@@ -12,7 +12,7 @@ import (
 	"github.com/thomas-osgood/OGOR/protobufs/definitions/filehandler"
 	"github.com/thomas-osgood/OGOR/protobufs/general"
 	ofsc "github.com/thomas-osgood/ofs/common"
-	"github.com/thomas-osgood/ofs/server/internal/utils"
+	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
 )
 
 // function designed to clean an uploaded filename and return
@@ -42,7 +42,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 
 	fs.debugMessage("server in download file function ...")
 
-	filename, err = utils.ReadFilenameMD(srv.Context())
+	filename, err = ofsutils.ReadFilenameMD(srv.Context())
 	if err != nil {
 		fs.debugMessage(fmt.Sprintf("[MD] %s", err.Error()))
 		return err
