@@ -25,6 +25,12 @@ func RunServer(srv *FServer, cfg *GrpcConfig) (err error) {
 	var srvaddr string = fmt.Sprintf("%s:%d", cfg.listenaddr, cfg.listenport)
 	var wg sync.WaitGroup
 
+	// setup the directory structure the fileserver will use.
+	err = srv.buildDirStructure()
+	if err != nil {
+		return err
+	}
+
 	// this will be used to wait for CTRL+C. if this gets triggered,
 	// a signal will be sent to shutdownChan and the listener will
 	// be shutdown.

@@ -15,6 +15,25 @@ import (
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
 )
 
+// function designed to build the directory structure the fileserver
+// will use to save and server files.
+func (fs *FServer) buildDirStructure() (err error) {
+	var downloaddir string = filepath.Join(fs.rootdir, DIR_DOWNLOADS)
+	var uploaddir string = filepath.Join(fs.rootdir, DIR_UPLOADS)
+
+	err = os.MkdirAll(downloaddir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	err = os.MkdirAll(uploaddir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // function designed to clean an uploaded filename and return
 // only the filename portion of it. this will strip the directory
 // information.
