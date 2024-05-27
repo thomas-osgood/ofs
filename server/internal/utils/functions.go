@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/thomas-osgood/ofs/common"
+	"github.com/thomas-osgood/ofs/server/internal/messages"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -24,7 +25,7 @@ func CheckDirPerms(dirpath string) (err error) {
 		if os.IsNotExist(err) {
 			err = os.MkdirAll(dirpath, os.FileMode(0755))
 			if err != nil {
-				log.Printf("mkdir error: %s\n", err.Error())
+				log.Printf(messages.ERR_MKDIR, err.Error())
 				return err
 			}
 			return nil
@@ -34,9 +35,9 @@ func CheckDirPerms(dirpath string) (err error) {
 	}
 
 	if !fi.IsDir() {
-		return fmt.Errorf("specified path is not a directory")
+		return fmt.Errorf(messages.ERR_PATH_DIR)
 	} else if (fi.Mode() & os.ModePerm) == os.ModePerm {
-		return fmt.Errorf("insufficient permissions to write to directory")
+		return fmt.Errorf(messages.ERR_PRIVS_DIR)
 	}
 
 	return nil
@@ -52,12 +53,12 @@ func ReadFilenameMD(ctx context.Context) (string, error) {
 
 	md, ok = metadata.FromIncomingContext(ctx)
 	if !ok {
-		return "", fmt.Errorf("unable to read metadata")
+		return "", fmt.Errorf(messages.ERR_HEADER_METADATA)
 	}
 
 	tmp = md.Get(common.HEADER_FILENAME)
 	if (tmp == nil) || (len(tmp) < 1) {
-		return "", fmt.Errorf("filename not found in metadata")
+		return "", fmt.Errorf(messages.ERR_HEADER_FILENAME)
 	}
 
 	return tmp[0], nil
