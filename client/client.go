@@ -11,6 +11,7 @@ import (
 	"github.com/thomas-osgood/OGOR/protobufs/definitions/common"
 	"github.com/thomas-osgood/OGOR/protobufs/definitions/filehandler"
 	"github.com/thomas-osgood/OGOR/protobufs/general"
+	"github.com/thomas-osgood/ofs/client/internal/messages"
 	"google.golang.org/grpc"
 )
 
@@ -47,7 +48,7 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 
 	fptr, err = os.OpenFile(req.GetFilename(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0644))
 	if err != nil {
-		log.Printf("[OPENFILE] %s\n", err.Error())
+		log.Printf(messages.ERR_OPEN_FILE, err.Error())
 		return err
 	}
 	defer fptr.Close()
@@ -57,7 +58,7 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 
 	uploader, err = client.UploadFile(ctx, req)
 	if err != nil {
-		log.Printf("[UPLOAD] %s\n", err.Error())
+		log.Printf(messages.ERR_UPLOAD_FILE, err.Error())
 		return err
 	}
 
@@ -122,7 +123,7 @@ func (fc *FClient) UploadFile(filename string) (err error) {
 	if err != nil {
 		return err
 	} else if status.GetCode() != http.StatusOK {
-		return fmt.Errorf("error transmitting file: %s", status.GetMessage())
+		return fmt.Errorf(messages.ERR_TRANSMIT_FILE, status.GetMessage())
 	}
 
 	return nil
