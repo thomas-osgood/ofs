@@ -42,6 +42,9 @@ func CheckDirPerms(dirpath string) (err error) {
 	return nil
 }
 
+// function designed to read the filename header value from
+// the given context's metadata. if the header cannot be found,
+// or is empty, an error will be returned.
 func ReadFilenameMD(ctx context.Context) (string, error) {
 	var md metadata.MD
 	var ok bool
