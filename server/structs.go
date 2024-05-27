@@ -19,7 +19,9 @@ type FServer struct {
 
 type FServerOption struct {
 	Chunksize int
-	Debug     bool
+	// if this is set to true, output will be printed to
+	// STDOUT while the server is running.
+	Debug bool
 	// subdirectory within the rootdir where uploaded
 	// files will be saved.
 	Downloadsdir string
