@@ -58,6 +58,8 @@ func (fs *FServer) cleanFilename(filename string, ftype string) (cleaned string)
 	return cleaned
 }
 
+// helper function for outputting a debug message to STDOUT. this
+// will only print output if the debug flag is set.
 func (fs *FServer) debugMessage(message string) {
 	if fs.debug {
 		fs.printer.InfMsg(message)
@@ -70,9 +72,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 	var tmpfile *os.File
 	var tmpname string
 
-	if fs.debug {
-		fs.debugMessage(ofsmessages.DBG_IN_DOWNLOAD)
-	}
+	fs.debugMessage(ofsmessages.DBG_IN_DOWNLOAD)
 
 	filename, err = ofsutils.ReadFilenameMD(srv.Context())
 	if err != nil {
