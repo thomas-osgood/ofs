@@ -19,8 +19,8 @@ import (
 // function designed to build the directory structure the fileserver
 // will use to save and server files.
 func (fs *FServer) buildDirStructure() (err error) {
-	var downloaddir string = filepath.Join(fs.rootdir, DIR_DOWNLOADS)
-	var uploaddir string = filepath.Join(fs.rootdir, DIR_UPLOADS)
+	var downloaddir string = filepath.Join(fs.rootdir, fs.downloadsdir)
+	var uploaddir string = filepath.Join(fs.rootdir, fs.uploadsdir)
 
 	err = os.MkdirAll(downloaddir, os.ModePerm)
 	if err != nil {
@@ -69,7 +69,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 		fs.debugMessage(fmt.Sprintf(messages.ERR_MD, err.Error()))
 		return err
 	}
-	filename = filepath.Join(DIR_DOWNLOADS, filename)
+	filename = filepath.Join(fs.downloadsdir, filename)
 	filename = fs.cleanFilename(filename)
 
 	if fs.debug {
@@ -151,7 +151,7 @@ func (fs *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.File
 	var fptr *os.File
 	var targetfile string = fs.cleanFilename(req.GetFilename())
 
-	abspath = filepath.Join(fs.rootdir, DIR_UPLOADS, targetfile)
+	abspath = filepath.Join(fs.rootdir, fs.uploadsdir, targetfile)
 
 	if fs.debug {
 		fs.debugMessage(fmt.Sprintf(messages.DBG_FILE_REQUEST, abspath))
