@@ -159,9 +159,7 @@ func (fs *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.File
 	var fptr *os.File
 	var targetfile string = fs.cleanFilename(req.GetFilename(), FTYPE_UPLOAD)
 
-	if fs.debug {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILE_REQUEST, targetfile))
-	}
+	fs.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILE_REQUEST, targetfile))
 
 	fptr, err = os.Open(targetfile)
 	if err != nil {
