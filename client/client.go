@@ -46,6 +46,9 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 	}
 	defer conn.Close()
 
+	// get a file pointer pointing to the destination. this will
+	// open the destination file in WRITE mode and TRUNC mode, clearing
+	// out any data if the file already exists.
 	fptr, err = os.OpenFile(req.GetFilename(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0644))
 	if err != nil {
 		log.Printf(messages.ERR_OPEN_FILE, err.Error())
@@ -56,12 +59,15 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
 	defer cancel()
 
+	// get object used to download data from the server.
 	uploader, err = client.UploadFile(ctx, req)
 	if err != nil {
 		log.Printf(messages.ERR_UPLOAD_FILE, err.Error())
 		return err
 	}
 
+	// read content streamed down from the server and save it
+	// in the file specified in the request message.
 	err = general.ReceiveFileBytes(uploader, fptr)
 	if err != nil {
 		// close the file pointer and remove the empty file,
@@ -72,6 +78,7 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 		return err
 	}
 
+	// close the stream.
 	err = uploader.CloseSend()
 	if err != nil {
 		return err
@@ -105,20 +112,25 @@ func (fc *FClient) UploadFile(filename string) (err error) {
 	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
 	defer cancel()
 
+	// add the filename to the header information.
 	ctx, err = addFilenameMD(ctx, filename)
 	if err != nil {
 		return err
 	}
+
+	// get object used to stream data up to the server.
 	srv, err = client.DownloadFile(ctx)
 	if err != nil {
 		return err
 	}
 
+	// stream the contents of the target file up to the server.
 	err = general.TransmitFileBytes(srv, bufio.NewReader(fptr))
 	if err != nil {
 		return err
 	}
 
+	// close the stream and get the server's status response message.
 	status, err = srv.CloseAndRecv()
 	if err != nil {
 		return err
