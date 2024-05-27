@@ -2,10 +2,8 @@ package server
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/thomas-osgood/OGOR/output"
 	"github.com/thomas-osgood/ofs/common"
@@ -103,8 +101,7 @@ func WithDirRoot(dirpath string) FSrvOptFunc {
 			absdir = filepath.Join(curdir, dirpath)
 		}
 
-		absdir = strings.ReplaceAll(absdir, "..", "")
-		log.Printf("absolute path: %s\n", absdir)
+		absdir = filepath.Clean(absdir)
 
 		err = utils.CheckDirPerms(absdir)
 		if err != nil {
