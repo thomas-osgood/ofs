@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/thomas-osgood/ofs/client/internal/messages"
+	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -52,7 +52,7 @@ func WithSrvAddr(addr string) FClientOptFunc {
 	return func(fo *FClientOption) error {
 		addr = strings.TrimSpace(addr)
 		if len(addr) < 1 {
-			return fmt.Errorf(messages.ERR_EMPTY_ADDR)
+			return fmt.Errorf(ofcmessages.ERR_EMPTY_ADDR)
 		}
 
 		fo.Srvaddr = addr
@@ -65,7 +65,7 @@ func WithSrvAddr(addr string) FClientOptFunc {
 func WithTimeout(timeout time.Duration) FClientOptFunc {
 	return func(fo *FClientOption) error {
 		if timeout < (1 * time.Second) {
-			return fmt.Errorf(messages.ERR_NEGATIVE_TIMEOUT)
+			return fmt.Errorf(ofcmessages.ERR_NEGATIVE_TIMEOUT)
 		}
 
 		fo.Timeout = timeout

@@ -11,7 +11,7 @@ import (
 	"github.com/thomas-osgood/OGOR/protobufs/definitions/common"
 	"github.com/thomas-osgood/OGOR/protobufs/definitions/filehandler"
 	"github.com/thomas-osgood/OGOR/protobufs/general"
-	"github.com/thomas-osgood/ofs/client/internal/messages"
+	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
 	"google.golang.org/grpc"
 )
 
@@ -51,7 +51,7 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 	// out any data if the file already exists.
 	fptr, err = os.OpenFile(req.GetFilename(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0644))
 	if err != nil {
-		log.Printf(messages.ERR_OPEN_FILE, err.Error())
+		log.Printf(ofcmessages.ERR_OPEN_FILE, err.Error())
 		return err
 	}
 	defer fptr.Close()
@@ -62,7 +62,7 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 	// get object used to download data from the server.
 	uploader, err = client.UploadFile(ctx, req)
 	if err != nil {
-		log.Printf(messages.ERR_UPLOAD_FILE, err.Error())
+		log.Printf(ofcmessages.ERR_UPLOAD_FILE, err.Error())
 		return err
 	}
 
@@ -135,7 +135,7 @@ func (fc *FClient) UploadFile(filename string) (err error) {
 	if err != nil {
 		return err
 	} else if status.GetCode() != http.StatusOK {
-		return fmt.Errorf(messages.ERR_TRANSMIT_FILE, status.GetMessage())
+		return fmt.Errorf(ofcmessages.ERR_TRANSMIT_FILE, status.GetMessage())
 	}
 
 	return nil
