@@ -1,4 +1,4 @@
-package server
+package utils
 
 import (
 	"context"
@@ -16,7 +16,7 @@ import (
 //
 // if the directory does not exist, the function will attempt to
 // create the directory.
-func checkDirPerms(dirpath string) (err error) {
+func CheckDirPerms(dirpath string) (err error) {
 	var fi fs.FileInfo
 
 	fi, err = os.Stat(dirpath)
@@ -42,7 +42,7 @@ func checkDirPerms(dirpath string) (err error) {
 	return nil
 }
 
-func readFilenameMD(ctx context.Context) (string, error) {
+func ReadFilenameMD(ctx context.Context) (string, error) {
 	var md metadata.MD
 	var ok bool
 	var tmp []string
