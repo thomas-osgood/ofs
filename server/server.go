@@ -12,7 +12,7 @@ import (
 	"github.com/thomas-osgood/OGOR/protobufs/definitions/filehandler"
 	"github.com/thomas-osgood/OGOR/protobufs/general"
 	ofscommon "github.com/thomas-osgood/ofs/common"
-	"github.com/thomas-osgood/ofs/server/internal/messages"
+	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
 )
 
@@ -61,25 +61,25 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 	var tmpname string
 
 	if fs.debug {
-		fs.debugMessage(messages.DBG_IN_DOWNLOAD)
+		fs.debugMessage(ofsmessages.DBG_IN_DOWNLOAD)
 	}
 
 	filename, err = ofsutils.ReadFilenameMD(srv.Context())
 	if err != nil {
-		fs.debugMessage(fmt.Sprintf(messages.ERR_MD, err.Error()))
+		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_MD, err.Error()))
 		return err
 	}
 	filename = filepath.Join(fs.downloadsdir, filename)
 	filename = fs.cleanFilename(filename)
 
 	if fs.debug {
-		fs.printer.SucMsg(fmt.Sprintf(messages.DBG_FILENAME, filename))
+		fs.printer.SucMsg(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
 	}
 
 	// create a temporary file to hold the uploaded information.
 	tmpfile, err = os.CreateTemp("", "download")
 	if err != nil {
-		fs.debugMessage(fmt.Sprintf(messages.ERR_TEMP, err.Error()))
+		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_TEMP, err.Error()))
 		return err
 	}
 	defer tmpfile.Close()
@@ -87,23 +87,23 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 	tmpname = tmpfile.Name()
 
 	if fs.debug {
-		fs.printer.SysMsgNB(fmt.Sprintf(messages.UPLOAD_IN_PROGRESS, tmpname))
+		fs.printer.SysMsgNB(fmt.Sprintf(ofsmessages.UPLOAD_IN_PROGRESS, tmpname))
 	}
 
 	// stream the file contents from the client and write them
 	// to the temp file.
 	err = general.ReceiveFileBytes(srv, tmpfile)
 	if err != nil {
-		fs.debugMessage(fmt.Sprintf(messages.ERR_RECV, err.Error()))
+		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_RECV, err.Error()))
 		return err
 	}
-	err = srv.SendAndClose(&common.StatusMessage{Message: messages.UPLOAD_COMPLETE, Code: http.StatusOK})
+	err = srv.SendAndClose(&common.StatusMessage{Message: ofsmessages.UPLOAD_COMPLETE, Code: http.StatusOK})
 	if err != nil {
-		fs.debugMessage(fmt.Sprintf(messages.ERR_ACK, err.Error()))
+		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_ACK, err.Error()))
 	}
 
 	if fs.debug {
-		fs.printer.SucMsg(messages.UPLOAD_COMPLETE)
+		fs.printer.SucMsg(ofsmessages.UPLOAD_COMPLETE)
 	}
 
 	// close and re-open the temp file in read mode. if this
@@ -117,17 +117,17 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 	defer tmpfile.Close()
 
 	if fs.debug {
-		fs.printer.SysMsgNB(messages.COPY_IN_PROGRESS)
+		fs.printer.SysMsgNB(ofsmessages.COPY_IN_PROGRESS)
 	}
 
 	err = ofscommon.CopyFile(tmpfile, filename)
 	if err != nil {
-		fs.debugMessage(fmt.Sprintf(messages.ERR_COPY_FILE, err.Error()))
+		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_COPY_FILE, err.Error()))
 		return err
 	}
 
 	if fs.debug {
-		fs.printer.SucMsg(messages.COPY_COMPLETE)
+		fs.printer.SucMsg(ofsmessages.COPY_COMPLETE)
 	}
 
 	tmpfile.Close()
@@ -135,11 +135,11 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 	// delete the temporary file used during the upload process.
 	err = os.Remove(tmpname)
 	if err != nil {
-		fs.debugMessage(fmt.Sprintf(messages.ERR_REMOVE_TEMP, err.Error()))
+		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_REMOVE_TEMP, err.Error()))
 	}
 
 	if fs.debug {
-		fs.printer.SucMsg(messages.TEMP_REMOVED)
+		fs.printer.SucMsg(ofsmessages.TEMP_REMOVED)
 	}
 
 	return nil
@@ -154,7 +154,7 @@ func (fs *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.File
 	abspath = filepath.Join(fs.rootdir, fs.uploadsdir, targetfile)
 
 	if fs.debug {
-		fs.debugMessage(fmt.Sprintf(messages.DBG_FILE_REQUEST, abspath))
+		fs.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILE_REQUEST, abspath))
 	}
 
 	fptr, err = os.Open(targetfile)

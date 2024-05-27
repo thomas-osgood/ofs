@@ -12,8 +12,8 @@ import (
 	"syscall"
 
 	"github.com/thomas-osgood/OGOR/protobufs/definitions/filehandler"
-	"github.com/thomas-osgood/ofs/server/internal/interrupts"
-	"github.com/thomas-osgood/ofs/server/internal/messages"
+	ofsinterrupts "github.com/thomas-osgood/ofs/server/internal/interrupts"
+	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	"google.golang.org/grpc"
 )
 
@@ -49,15 +49,15 @@ func RunServer(srv *FServer, cfg *GrpcConfig) (err error) {
 	filehandler.RegisterFileserviceServer(gserver, srv)
 
 	wg.Add(1)
-	go interrupts.HandleKeyboardInterrupt(shutdownChan, gserver, &wg)
+	go ofsinterrupts.HandleKeyboardInterrupt(shutdownChan, gserver, &wg)
 
 	if srv.debug {
-		log.Printf(messages.SERVER_LISTEN_INFO, srvaddr)
+		log.Printf(ofsmessages.SERVER_LISTEN_INFO, srvaddr)
 	}
 
 	err = gserver.Serve(glisten)
 	if err != nil {
-		log.Printf(messages.ERR_SERVE, err.Error())
+		log.Printf(ofsmessages.ERR_SERVE, err.Error())
 		return err
 	}
 

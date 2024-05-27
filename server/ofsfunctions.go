@@ -8,7 +8,7 @@ import (
 
 	"github.com/thomas-osgood/OGOR/output"
 	ofscommon "github.com/thomas-osgood/ofs/common"
-	"github.com/thomas-osgood/ofs/server/internal/messages"
+	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
 )
 
@@ -68,9 +68,9 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 func WithChunksize(size int) FSrvOptFunc {
 	return func(fo *FServerOption) (err error) {
 		if size < MIN_CHUNKSIZE {
-			return fmt.Errorf(messages.ERR_CHUNK_SMALL)
+			return fmt.Errorf(ofsmessages.ERR_CHUNK_SMALL)
 		} else if size > MAX_CHUNKSIZE {
-			return fmt.Errorf(messages.ERR_CHUNK_BIG, MAX_CHUNKSIZE)
+			return fmt.Errorf(ofsmessages.ERR_CHUNK_BIG, MAX_CHUNKSIZE)
 		}
 
 		fo.Chunksize = size
@@ -125,7 +125,7 @@ func WithDownloadsDir(dirname string) FSrvOptFunc {
 	return func(fo *FServerOption) error {
 		dirname = strings.TrimSpace(dirname)
 		if len(dirname) < 1 {
-			return fmt.Errorf(messages.ERR_DIRSTRING_EMPTY)
+			return fmt.Errorf(ofsmessages.ERR_DIRSTRING_EMPTY)
 		}
 		dirname = filepath.Clean(dirname)
 
@@ -140,7 +140,7 @@ func WithUploadsDir(dirname string) FSrvOptFunc {
 	return func(fo *FServerOption) error {
 		dirname = strings.TrimSpace(dirname)
 		if len(dirname) < 1 {
-			return fmt.Errorf(messages.ERR_DIRSTRING_EMPTY)
+			return fmt.Errorf(ofsmessages.ERR_DIRSTRING_EMPTY)
 		}
 		dirname = filepath.Clean(dirname)
 
