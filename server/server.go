@@ -38,12 +38,22 @@ func (fs *FServer) buildDirStructure() (err error) {
 // function designed to clean an uploaded filename and return
 // only the filename portion of it. this will strip the directory
 // information.
-func (fs *FServer) cleanFilename(filename string) (cleaned string) {
+func (fs *FServer) cleanFilename(filename string, ftype string) (cleaned string) {
 	var fnsplit []string
+	var subdir string
+
+	switch strings.ToLower(ftype) {
+	case FTYPE_DOWNLOAD:
+		subdir = fs.downloadsdir
+	case FTYPE_UPLOAD:
+		subdir = fs.uploadsdir
+	default:
+		subdir = ""
+	}
 
 	filename = filepath.Clean(filename)
 	fnsplit = strings.Split(filename, fmt.Sprintf("%c", os.PathSeparator))
-	cleaned = filepath.Join(fs.rootdir, fnsplit[len(fnsplit)-1])
+	cleaned = filepath.Join(fs.rootdir, subdir, fnsplit[len(fnsplit)-1])
 
 	return cleaned
 }
@@ -69,8 +79,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_MD, err.Error()))
 		return err
 	}
-	filename = filepath.Join(fs.downloadsdir, filename)
-	filename = fs.cleanFilename(filename)
+	filename = fs.cleanFilename(filename, FTYPE_DOWNLOAD)
 
 	if fs.debug {
 		fs.printer.SucMsg(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
@@ -149,7 +158,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 func (fs *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fileservice_UploadFileServer) (err error) {
 	var abspath string
 	var fptr *os.File
-	var targetfile string = fs.cleanFilename(req.GetFilename())
+	var targetfile string = fs.cleanFilename(req.GetFilename(), FTYPE_UPLOAD)
 
 	abspath = filepath.Join(fs.rootdir, fs.uploadsdir, targetfile)
 
