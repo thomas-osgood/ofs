@@ -156,14 +156,11 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 
 // function designed to upload a requested file from the server to the client.
 func (fs *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fileservice_UploadFileServer) (err error) {
-	var abspath string
 	var fptr *os.File
 	var targetfile string = fs.cleanFilename(req.GetFilename(), FTYPE_UPLOAD)
 
-	abspath = filepath.Join(fs.rootdir, fs.uploadsdir, targetfile)
-
 	if fs.debug {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILE_REQUEST, abspath))
+		fs.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILE_REQUEST, targetfile))
 	}
 
 	fptr, err = os.Open(targetfile)
