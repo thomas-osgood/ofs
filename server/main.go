@@ -13,6 +13,7 @@ import (
 
 	"github.com/thomas-osgood/OGOR/protobufs/definitions/filehandler"
 	"github.com/thomas-osgood/ofs/server/internal/interrupts"
+	"github.com/thomas-osgood/ofs/server/internal/messages"
 	"google.golang.org/grpc"
 )
 
@@ -51,12 +52,12 @@ func RunServer(srv *FServer, cfg *GrpcConfig) (err error) {
 	go interrupts.HandleKeyboardInterrupt(shutdownChan, gserver, &wg)
 
 	if srv.debug {
-		log.Printf("server listening on \"%s\"\n", srvaddr)
+		log.Printf(messages.SERVER_LISTEN_INFO, srvaddr)
 	}
 
 	err = gserver.Serve(glisten)
 	if err != nil {
-		log.Printf("[SERVE] %s\n", err.Error())
+		log.Printf(messages.ERR_SERVE, err.Error())
 		return err
 	}
 

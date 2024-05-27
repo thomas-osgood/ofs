@@ -14,6 +14,7 @@ const ERR_COPY_FILE string = "[COPY] %s"
 const ERR_MD string = "[MD] %s"
 const ERR_REMOVE_TEMP string = "[REMOVETMP] %s"
 const ERR_RECV string = "[RECV] %s"
+const ERR_SERVE string = "[SERVE] %s\n"
 const ERR_TEMP string = "[TEMP] %s"
 
 const SERVER_LISTEN_INFO string = "server listening on \"%s\"\n"
