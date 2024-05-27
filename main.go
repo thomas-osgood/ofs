@@ -15,7 +15,7 @@ func main() {
 	var err error
 	var srv *server.FServer
 
-	srv, err = server.NewOFS(server.WithDebug(), server.WithDirRoot("uploads"))
+	srv, err = server.NewOFS(server.WithDebug(), server.WithDirRoot("uploads"), server.WithDownloadsDir("in"), server.WithUploadsDir("out"))
 	if err != nil {
 		log.Fatalf("[NEWOFS] %s\n", err.Error())
 	}
