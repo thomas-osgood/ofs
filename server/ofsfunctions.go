@@ -7,6 +7,7 @@ import (
 
 	"github.com/thomas-osgood/OGOR/output"
 	ofscommon "github.com/thomas-osgood/ofs/common"
+	"github.com/thomas-osgood/ofs/server/internal/messages"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
 )
 
@@ -62,9 +63,9 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 func WithChunksize(size int) FSrvOptFunc {
 	return func(fo *FServerOption) (err error) {
 		if size < MIN_CHUNKSIZE {
-			return fmt.Errorf("chunksize must be larger than zero")
+			return fmt.Errorf(messages.ERR_CHUNK_SMALL)
 		} else if size > MAX_CHUNKSIZE {
-			return fmt.Errorf("chunk size must be less than or equal to %d", MAX_CHUNKSIZE)
+			return fmt.Errorf(messages.ERR_CHUNK_BIG, MAX_CHUNKSIZE)
 		}
 
 		fo.Chunksize = size

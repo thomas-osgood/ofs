@@ -8,6 +8,8 @@ const DBG_FILE_REQUEST string = "client requesting \"%s\""
 const DBG_IN_DOWNLOAD string = "server in download file function ..."
 
 const ERR_ACK string = "[ACK] %s"
+const ERR_CHUNK_BIG string = "chunk size must be less than or equal to %d"
+const ERR_CHUNK_SMALL string = "chunksize must be larger than zero"
 const ERR_COPY_FILE string = "[COPY] %s"
 const ERR_MD string = "[MD] %s"
 const ERR_REMOVE_TEMP string = "[REMOVETMP] %s"
