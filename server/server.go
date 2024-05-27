@@ -66,6 +66,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 		fs.debugMessage(fmt.Sprintf("[MD] %s", err.Error()))
 		return err
 	}
+	filename = filepath.Join(DIR_DOWNLOADS, filename)
 	filename = fs.cleanFilename(filename)
 
 	if fs.debug {
@@ -147,7 +148,7 @@ func (fs *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.File
 	var fptr *os.File
 	var targetfile string = fs.cleanFilename(req.GetFilename())
 
-	abspath = filepath.Join(fs.rootdir, targetfile)
+	abspath = filepath.Join(fs.rootdir, DIR_UPLOADS, targetfile)
 
 	if fs.debug {
 		fs.debugMessage(fmt.Sprintf("client requesting \"%s\"", abspath))
