@@ -9,16 +9,25 @@ import (
 type FServer struct {
 	filehandler.UnimplementedFileserviceServer
 
-	chunksize int
-	debug     bool
-	printer   *output.Outputter
-	rootdir   string
+	chunksize    int
+	debug        bool
+	downloadsdir string
+	printer      *output.Outputter
+	rootdir      string
+	uploadsdir   string
 }
 
 type FServerOption struct {
 	Chunksize int
 	Debug     bool
-	Rootdir   string
+	// subdirectory within the rootdir where uploaded
+	// files will be saved.
+	Downloadsdir string
+	// fileserver root directory.
+	Rootdir string
+	// subdirectory within the rootdir where files that
+	// can be downloaded to a client are stored.
+	Uploadsdir string
 }
 
 type GrpcConfig struct {

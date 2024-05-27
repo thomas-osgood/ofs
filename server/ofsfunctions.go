@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/thomas-osgood/OGOR/output"
 	ofscommon "github.com/thomas-osgood/ofs/common"
@@ -23,9 +24,11 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	}
 
 	defaults = FServerOption{
-		Chunksize: ofscommon.DEFAULT_CHUNKSIZE,
-		Debug:     DEFAULT_DEBUG,
-		Rootdir:   rootdir,
+		Chunksize:    ofscommon.DEFAULT_CHUNKSIZE,
+		Debug:        DEFAULT_DEBUG,
+		Downloadsdir: DIR_DOWNLOADS,
+		Rootdir:      rootdir,
+		Uploadsdir:   DIR_UPLOADS,
 	}
 
 	// set the user-defined configuration options.
@@ -46,7 +49,9 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	srv = new(FServer)
 	srv.chunksize = defaults.Chunksize
 	srv.debug = defaults.Debug
+	srv.downloadsdir = defaults.Downloadsdir
 	srv.rootdir = defaults.Rootdir
+	srv.uploadsdir = defaults.Uploadsdir
 
 	srv.printer, err = output.NewOutputter()
 	if err != nil {
@@ -110,6 +115,36 @@ func WithDirRoot(dirpath string) FSrvOptFunc {
 		}
 
 		fo.Rootdir = absdir
+
+		return nil
+	}
+}
+
+// set the downloads directory within the root directory.
+func WithDownloadsDir(dirname string) FSrvOptFunc {
+	return func(fo *FServerOption) error {
+		dirname = strings.TrimSpace(dirname)
+		if len(dirname) < 1 {
+			return fmt.Errorf(messages.ERR_DIRSTRING_EMPTY)
+		}
+		dirname = filepath.Clean(dirname)
+
+		fo.Downloadsdir = dirname
+
+		return nil
+	}
+}
+
+// set the uploads directory within the root directory.
+func WithUploadsDir(dirname string) FSrvOptFunc {
+	return func(fo *FServerOption) error {
+		dirname = strings.TrimSpace(dirname)
+		if len(dirname) < 1 {
+			return fmt.Errorf(messages.ERR_DIRSTRING_EMPTY)
+		}
+		dirname = filepath.Clean(dirname)
+
+		fo.Uploadsdir = dirname
 
 		return nil
 	}
