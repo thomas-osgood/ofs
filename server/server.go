@@ -11,7 +11,7 @@ import (
 	"github.com/thomas-osgood/OGOR/protobufs/definitions/common"
 	"github.com/thomas-osgood/OGOR/protobufs/definitions/filehandler"
 	"github.com/thomas-osgood/OGOR/protobufs/general"
-	ofsc "github.com/thomas-osgood/ofs/common"
+	ofscommon "github.com/thomas-osgood/ofs/common"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
 )
 
@@ -97,7 +97,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 		fs.printer.SysMsgNB("copying data to destination ...")
 	}
 
-	err = ofsc.CopyFile(tmpfile, filename)
+	err = ofscommon.CopyFile(tmpfile, filename)
 	if err != nil {
 		fs.debugMessage(fmt.Sprintf("[COPY] %s", err.Error()))
 		return err

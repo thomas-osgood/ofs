@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/thomas-osgood/OGOR/output"
-	"github.com/thomas-osgood/ofs/common"
+	ofscommon "github.com/thomas-osgood/ofs/common"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
 )
 
@@ -22,7 +22,7 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	}
 
 	defaults = FServerOption{
-		Chunksize: common.DEFAULT_CHUNKSIZE,
+		Chunksize: ofscommon.DEFAULT_CHUNKSIZE,
 		Debug:     DEFAULT_DEBUG,
 		Rootdir:   rootdir,
 	}
