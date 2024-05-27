@@ -45,7 +45,7 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 	}
 	defer conn.Close()
 
-	fptr, err = os.OpenFile(req.GetFilename(), os.O_WRONLY|os.O_CREATE, os.FileMode(0644))
+	fptr, err = os.OpenFile(req.GetFilename(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0644))
 	if err != nil {
 		log.Printf("[OPENFILE] %s\n", err.Error())
 		return err
@@ -63,6 +63,11 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 
 	err = general.ReceiveFileBytes(uploader, fptr)
 	if err != nil {
+		// close the file pointer and remove the empty file,
+		// then return the error that was thrown during the
+		// transfer process.
+		fptr.Close()
+		os.Remove(req.GetFilename())
 		return err
 	}
 
