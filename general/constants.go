@@ -1,4 +1,4 @@
-package common
+package general
 
 const DEFAULT_CHUNKSIZE int = 2048
 

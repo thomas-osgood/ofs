@@ -8,8 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	ofscommon "github.com/thomas-osgood/ofs/common"
-	"github.com/thomas-osgood/ofs/general"
+	ofscommon "github.com/thomas-osgood/ofs/general"
 	"github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
@@ -101,7 +100,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 
 	// stream the file contents from the client and write them
 	// to the temp file.
-	err = general.ReceiveFileBytes(srv, tmpfile)
+	err = ofscommon.ReceiveFileBytes(srv, tmpfile)
 	if err != nil {
 		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_RECV, err.Error()))
 		return err
@@ -167,7 +166,7 @@ func (fs *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.File
 	}
 	defer fptr.Close()
 
-	err = general.TransmitFileBytes(srv, bufio.NewReader(fptr))
+	err = ofscommon.TransmitFileBytes(srv, bufio.NewReader(fptr))
 	if err != nil {
 		return err
 	}

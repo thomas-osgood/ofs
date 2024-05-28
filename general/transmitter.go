@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 
-	ofscommon "github.com/thomas-osgood/ofs/common"
 	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	"google.golang.org/grpc/status"
@@ -16,7 +15,7 @@ import (
 // ByteString objects.
 func TransmitByteStrings(transmitter ByteTransmitter, byteReader *bytes.Reader) (err error) {
 	var bytesread int
-	var currentBlock []byte = make([]byte, ofscommon.DEFAULT_CHUNKSIZE)
+	var currentBlock []byte = make([]byte, DEFAULT_CHUNKSIZE)
 
 	// iterate through the slice of bytes and transmit
 	// each buffer to the receiver. if an error is encountered,
@@ -44,7 +43,7 @@ func TransmitByteStrings(transmitter ByteTransmitter, byteReader *bytes.Reader) 
 // a pointer to a bufio.Reader object which should already be
 // pointing to a target file.
 func TransmitFileBytes(transmitter Transmitter, scanner *bufio.Reader) (err error) {
-	var currentChunk []byte = make([]byte, ofscommon.DEFAULT_CHUNKSIZE)
+	var currentChunk []byte = make([]byte, DEFAULT_CHUNKSIZE)
 	var bytesread int
 
 	// loop through file, reading it chunk by chunk and

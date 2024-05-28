@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/thomas-osgood/ofs/common"
+	ofscommon "github.com/thomas-osgood/ofs/general"
 	"github.com/thomas-osgood/ofs/server/internal/messages"
 	"google.golang.org/grpc/metadata"
 )
@@ -56,7 +56,7 @@ func ReadFilenameMD(ctx context.Context) (string, error) {
 		return "", fmt.Errorf(messages.ERR_HEADER_METADATA)
 	}
 
-	tmp = md.Get(common.HEADER_FILENAME)
+	tmp = md.Get(ofscommon.HEADER_FILENAME)
 	if (tmp == nil) || (len(tmp) < 1) {
 		return "", fmt.Errorf(messages.ERR_HEADER_FILENAME)
 	}
