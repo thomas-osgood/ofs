@@ -4,8 +4,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/thomas-osgood/OGOR/protobufs/definitions/filehandler"
 	"github.com/thomas-osgood/ofs/client"
+	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	"github.com/thomas-osgood/ofs/server"
 	"google.golang.org/grpc/credentials/insecure"
 )
