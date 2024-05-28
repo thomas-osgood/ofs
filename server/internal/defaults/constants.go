@@ -1,4 +1,4 @@
-package server
+package defaults
 
 const DEFAULT_DEBUG bool = false
 const DEFAULT_LISTENADDR string = "0.0.0.0"

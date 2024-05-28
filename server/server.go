@@ -11,6 +11,7 @@ import (
 	ofscommon "github.com/thomas-osgood/ofs/general"
 	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
+	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
 )
@@ -42,9 +43,9 @@ func (fs *FServer) cleanFilename(filename string, ftype string) (cleaned string)
 	var subdir string
 
 	switch strings.ToLower(ftype) {
-	case FTYPE_DOWNLOAD:
+	case ofsdefaults.FTYPE_DOWNLOAD:
 		subdir = fs.downloadsdir
-	case FTYPE_UPLOAD:
+	case ofsdefaults.FTYPE_UPLOAD:
 		subdir = fs.uploadsdir
 	default:
 		subdir = ""
@@ -78,7 +79,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_MD, err.Error()))
 		return err
 	}
-	filename = fs.cleanFilename(filename, FTYPE_DOWNLOAD)
+	filename = fs.cleanFilename(filename, ofsdefaults.FTYPE_DOWNLOAD)
 
 	if fs.debug {
 		fs.printer.SucMsg(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
@@ -156,7 +157,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 // function designed to upload a requested file from the server to the client.
 func (fs *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fileservice_UploadFileServer) (err error) {
 	var fptr *os.File
-	var targetfile string = fs.cleanFilename(req.GetFilename(), FTYPE_UPLOAD)
+	var targetfile string = fs.cleanFilename(req.GetFilename(), ofsdefaults.FTYPE_UPLOAD)
 
 	fs.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILE_REQUEST, targetfile))
 

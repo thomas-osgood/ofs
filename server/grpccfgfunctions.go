@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 
 	"github.com/thomas-osgood/OGOR/networking/validations"
+	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -11,8 +12,8 @@ import (
 // create, initialize and return a new grpc server configuration.
 func NewGrpcConfiguration(opts ...GrpcOptFunc) (config *GrpcConfig, err error) {
 	var defaults GrpcConfigOpt = GrpcConfigOpt{
-		Listenaddr: DEFAULT_LISTENADDR,
-		Listenport: DEFAULT_LISTENPORT,
+		Listenaddr: ofsdefaults.DEFAULT_LISTENADDR,
+		Listenport: ofsdefaults.DEFAULT_LISTENPORT,
 		Options:    make([]grpc.ServerOption, 0),
 		TLSCert:    tls.Certificate{},
 	}
