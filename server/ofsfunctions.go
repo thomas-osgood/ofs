@@ -14,6 +14,16 @@ import (
 )
 
 // create, initialize and return a new instance of a file server object.
+//
+// for Rootdir: if no rootdir is specified, the root directory will be
+// set to the current working directory. this can be set using the
+// WithDirRoot function. the WithDirRoot function will automatically detect
+// if the specified directory is an absolute or relative path. if the path
+// is relative it will be prepended with the current working directory.
+//
+// for Uploadsdir and Downloadsdir: if no value is specified, no subdirectory
+// will be created within the server's root directory. these can be set
+// using the WithDownloadsDir and WithUploadsDir functions.
 func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	var defaults FServerOption
 	var opt FSrvOptFunc
