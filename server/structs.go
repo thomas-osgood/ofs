@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 
 	"github.com/thomas-osgood/OGOR/output"
-	"github.com/thomas-osgood/OGOR/protobufs/definitions/filehandler"
+	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	"google.golang.org/grpc"
 )
 

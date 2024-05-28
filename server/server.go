@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/thomas-osgood/OGOR/protobufs/definitions/common"
-	"github.com/thomas-osgood/OGOR/protobufs/definitions/filehandler"
-	"github.com/thomas-osgood/OGOR/protobufs/general"
 	ofscommon "github.com/thomas-osgood/ofs/common"
+	"github.com/thomas-osgood/ofs/general"
+	"github.com/thomas-osgood/ofs/protobufs/common"
+	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
 )

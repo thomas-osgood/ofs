@@ -11,7 +11,7 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/thomas-osgood/OGOR/protobufs/definitions/filehandler"
+	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	ofsinterrupts "github.com/thomas-osgood/ofs/server/internal/interrupts"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	"google.golang.org/grpc"
