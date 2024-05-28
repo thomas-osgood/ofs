@@ -96,7 +96,7 @@ func (fs *FServer) moveTempfile(tmpname string, filename string) (err error) {
 
 // function designed to read the file data from the incoming
 // file byte stream and save it to a temporary file.
-func (fs *FServer) readIncomingFile(srv ofscommon.Receiver) (tmpname string, err error) {
+func (fs *FServer) readIncomingFile(srv filehandler.Fileservice_DownloadFileServer) (tmpname string, err error) {
 	var tmpfile *os.File
 
 	// create a temporary file to hold the uploaded information.
@@ -119,6 +119,16 @@ func (fs *FServer) readIncomingFile(srv ofscommon.Receiver) (tmpname string, err
 	if err != nil {
 		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_RECV, err.Error()))
 		return "", err
+	}
+
+	// send a successful status message and close the stream.
+	err = srv.SendAndClose(&protocommon.StatusMessage{Message: ofsmessages.UPLOAD_COMPLETE, Code: http.StatusOK})
+	if err != nil {
+		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_ACK, err.Error()))
+	}
+
+	if fs.debug {
+		fs.printer.SucMsg(ofsmessages.UPLOAD_COMPLETE)
 	}
 
 	return tmpname, nil
@@ -146,16 +156,6 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 	tmpname, err = fs.readIncomingFile(srv)
 	if err != nil {
 		return err
-	}
-
-	// send a successful status message and close the stream.
-	err = srv.SendAndClose(&protocommon.StatusMessage{Message: ofsmessages.UPLOAD_COMPLETE, Code: http.StatusOK})
-	if err != nil {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_ACK, err.Error()))
-	}
-
-	if fs.debug {
-		fs.printer.SucMsg(ofsmessages.UPLOAD_COMPLETE)
 	}
 
 	// move over the tmpfile contents to the destination file.
