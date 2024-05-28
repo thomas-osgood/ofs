@@ -1,8 +1,11 @@
 package server
 
 import (
+	"crypto/tls"
+
 	"github.com/thomas-osgood/OGOR/networking/validations"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 // create, initialize and return a new grpc server configuration.
@@ -11,6 +14,7 @@ func NewGrpcConfiguration(opts ...GrpcOptFunc) (config *GrpcConfig, err error) {
 		Listenaddr: DEFAULT_LISTENADDR,
 		Listenport: DEFAULT_LISTENPORT,
 		Options:    make([]grpc.ServerOption, 0),
+		TLSCert:    tls.Certificate{},
 	}
 	var opt GrpcOptFunc
 
@@ -19,6 +23,12 @@ func NewGrpcConfiguration(opts ...GrpcOptFunc) (config *GrpcConfig, err error) {
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	// if the user sepecifies a TLS certificate to use, add it
+	// to the gRPC options slice.
+	if defaults.TLSCert.Certificate != nil {
+		defaults.Options = append(defaults.Options, grpc.Creds(credentials.NewServerTLSFromCert(&defaults.TLSCert)))
 	}
 
 	config = new(GrpcConfig)
@@ -57,6 +67,14 @@ func WithListenport(portno int) GrpcOptFunc {
 func WithGrpcOptions(opts []grpc.ServerOption) GrpcOptFunc {
 	return func(gco *GrpcConfigOpt) error {
 		gco.Options = opts
+		return nil
+	}
+}
+
+// add a TLS cert to the server configuration.
+func WithTLSCert(cert tls.Certificate) GrpcOptFunc {
+	return func(gco *GrpcConfigOpt) error {
+		gco.TLSCert = cert
 		return nil
 	}
 }

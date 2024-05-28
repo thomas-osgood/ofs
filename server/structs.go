@@ -1,6 +1,8 @@
 package server
 
 import (
+	"crypto/tls"
+
 	"github.com/thomas-osgood/OGOR/output"
 	"github.com/thomas-osgood/OGOR/protobufs/definitions/filehandler"
 	"google.golang.org/grpc"
@@ -42,4 +44,5 @@ type GrpcConfigOpt struct {
 	Listenaddr string
 	Listenport int
 	Options    []grpc.ServerOption
+	TLSCert    tls.Certificate
 }
