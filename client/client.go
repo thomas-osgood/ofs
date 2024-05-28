@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/thomas-osgood/OGOR/protobufs/definitions/common"
-	"github.com/thomas-osgood/OGOR/protobufs/definitions/filehandler"
-	"github.com/thomas-osgood/OGOR/protobufs/general"
 	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
+	"github.com/thomas-osgood/ofs/general"
+	"github.com/thomas-osgood/ofs/protobufs/common"
+	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	"google.golang.org/grpc"
 )
 
