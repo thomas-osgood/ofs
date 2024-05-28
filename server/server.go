@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	ofscommon "github.com/thomas-osgood/ofs/general"
-	"github.com/thomas-osgood/ofs/protobufs/common"
+	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
@@ -105,7 +105,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_RECV, err.Error()))
 		return err
 	}
-	err = srv.SendAndClose(&common.StatusMessage{Message: ofsmessages.UPLOAD_COMPLETE, Code: http.StatusOK})
+	err = srv.SendAndClose(&protocommon.StatusMessage{Message: ofsmessages.UPLOAD_COMPLETE, Code: http.StatusOK})
 	if err != nil {
 		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_ACK, err.Error()))
 	}

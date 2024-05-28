@@ -9,8 +9,8 @@ import (
 	"os"
 
 	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
-	"github.com/thomas-osgood/ofs/general"
-	"github.com/thomas-osgood/ofs/protobufs/common"
+	ofscommon "github.com/thomas-osgood/ofs/general"
+	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	"google.golang.org/grpc"
 )
@@ -68,7 +68,7 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 
 	// read content streamed down from the server and save it
 	// in the file specified in the request message.
-	err = general.ReceiveFileBytes(uploader, fptr)
+	err = ofscommon.ReceiveFileBytes(uploader, fptr)
 	if err != nil {
 		// close the file pointer and remove the empty file,
 		// then return the error that was thrown during the
@@ -95,7 +95,7 @@ func (fc *FClient) UploadFile(filename string) (err error) {
 	var ctx context.Context
 	var fptr *os.File
 	var srv filehandler.Fileservice_DownloadFileClient
-	var status *common.StatusMessage
+	var status *protocommon.StatusMessage
 
 	conn, client, err = fc.initConnection()
 	if err != nil {
@@ -125,7 +125,7 @@ func (fc *FClient) UploadFile(filename string) (err error) {
 	}
 
 	// stream the contents of the target file up to the server.
-	err = general.TransmitFileBytes(srv, bufio.NewReader(fptr))
+	err = ofscommon.TransmitFileBytes(srv, bufio.NewReader(fptr))
 	if err != nil {
 		return err
 	}
