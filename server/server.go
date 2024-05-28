@@ -66,59 +66,11 @@ func (fs *FServer) debugMessage(message string) {
 	}
 }
 
-// function designed to download a file from a client to the server.
-func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) (err error) {
-	var filename string
+// function designed to move the contents of a temporary file
+// to a specified destination.
+func (fs *FServer) moveTempfile(tmpname string, filename string) (err error) {
 	var tmpfile *os.File
-	var tmpname string
 
-	fs.debugMessage(ofsmessages.DBG_IN_DOWNLOAD)
-
-	filename, err = ofsutils.ReadFilenameMD(srv.Context())
-	if err != nil {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_MD, err.Error()))
-		return err
-	}
-	filename = fs.cleanFilename(filename, ofsdefaults.FTYPE_DOWNLOAD)
-
-	if fs.debug {
-		fs.printer.SucMsg(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
-	}
-
-	// create a temporary file to hold the uploaded information.
-	tmpfile, err = os.CreateTemp("", "download")
-	if err != nil {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_TEMP, err.Error()))
-		return err
-	}
-	defer tmpfile.Close()
-
-	tmpname = tmpfile.Name()
-
-	if fs.debug {
-		fs.printer.SysMsgNB(fmt.Sprintf(ofsmessages.UPLOAD_IN_PROGRESS, tmpname))
-	}
-
-	// stream the file contents from the client and write them
-	// to the temp file.
-	err = ofscommon.ReceiveFileBytes(srv, tmpfile)
-	if err != nil {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_RECV, err.Error()))
-		return err
-	}
-	err = srv.SendAndClose(&protocommon.StatusMessage{Message: ofsmessages.UPLOAD_COMPLETE, Code: http.StatusOK})
-	if err != nil {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_ACK, err.Error()))
-	}
-
-	if fs.debug {
-		fs.printer.SucMsg(ofsmessages.UPLOAD_COMPLETE)
-	}
-
-	// close and re-open the temp file in read mode. if this
-	// is not done, no bytes will be copied from the temp file
-	// to the destination file.
-	tmpfile.Close()
 	tmpfile, err = os.Open(tmpname)
 	if err != nil {
 		return err
@@ -139,7 +91,78 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 		fs.printer.SucMsg(ofsmessages.COPY_COMPLETE)
 	}
 
-	tmpfile.Close()
+	return nil
+}
+
+// function designed to read the file data from the incoming
+// file byte stream and save it to a temporary file.
+func (fs *FServer) readIncomingFile(srv ofscommon.Receiver) (tmpname string, err error) {
+	var tmpfile *os.File
+
+	// create a temporary file to hold the uploaded information.
+	tmpfile, err = os.CreateTemp("", "download")
+	if err != nil {
+		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_TEMP, err.Error()))
+		return "", err
+	}
+	defer tmpfile.Close()
+
+	tmpname = tmpfile.Name()
+
+	if fs.debug {
+		fs.printer.SysMsgNB(fmt.Sprintf(ofsmessages.UPLOAD_IN_PROGRESS, tmpname))
+	}
+
+	// stream the file contents from the client and write them
+	// to the temp file.
+	err = ofscommon.ReceiveFileBytes(srv, tmpfile)
+	if err != nil {
+		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_RECV, err.Error()))
+		return "", err
+	}
+
+	return tmpname, nil
+}
+
+// function designed to download a file from a client to the server.
+func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) (err error) {
+	var filename string
+	var tmpname string
+
+	fs.debugMessage(ofsmessages.DBG_IN_DOWNLOAD)
+
+	filename, err = ofsutils.ReadFilenameMD(srv.Context())
+	if err != nil {
+		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_MD, err.Error()))
+		return err
+	}
+	filename = fs.cleanFilename(filename, ofsdefaults.FTYPE_DOWNLOAD)
+
+	if fs.debug {
+		fs.printer.SucMsg(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
+	}
+
+	// read the data stream and save it to a temporary file.
+	tmpname, err = fs.readIncomingFile(srv)
+	if err != nil {
+		return err
+	}
+
+	// send a successful status message and close the stream.
+	err = srv.SendAndClose(&protocommon.StatusMessage{Message: ofsmessages.UPLOAD_COMPLETE, Code: http.StatusOK})
+	if err != nil {
+		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_ACK, err.Error()))
+	}
+
+	if fs.debug {
+		fs.printer.SucMsg(ofsmessages.UPLOAD_COMPLETE)
+	}
+
+	// move over the tmpfile contents to the destination file.
+	err = fs.moveTempfile(tmpname, filename)
+	if err != nil {
+		return err
+	}
 
 	// delete the temporary file used during the upload process.
 	err = os.Remove(tmpname)
