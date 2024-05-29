@@ -11,7 +11,6 @@ import (
 type FServer struct {
 	filehandler.UnimplementedFileserviceServer
 
-	chunksize    int
 	debug        bool
 	downloadsdir string
 	printer      *output.Outputter
@@ -20,7 +19,6 @@ type FServer struct {
 }
 
 type FServerOption struct {
-	Chunksize int
 	// if this is set to true, output will be printed to
 	// STDOUT while the server is running.
 	Debug bool

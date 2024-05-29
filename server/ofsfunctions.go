@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/thomas-osgood/OGOR/output"
-	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
@@ -35,7 +34,6 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	}
 
 	defaults = FServerOption{
-		Chunksize:    ofscommon.DEFAULT_CHUNKSIZE,
 		Debug:        ofsdefaults.DEFAULT_DEBUG,
 		Downloadsdir: ofsdefaults.DIR_DOWNLOADS,
 		Rootdir:      rootdir,
@@ -58,7 +56,6 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	// assign the server configuration to the server object
 	// that will be returned.
 	srv = new(FServer)
-	srv.chunksize = defaults.Chunksize
 	srv.debug = defaults.Debug
 	srv.downloadsdir = defaults.Downloadsdir
 	srv.rootdir = defaults.Rootdir
@@ -70,24 +67,6 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	}
 
 	return srv, nil
-}
-
-// set the size of each chunk that will be transmitted/received
-// during a file transfer.
-//
-// max chunk size: 65535
-func WithChunksize(size int) FSrvOptFunc {
-	return func(fo *FServerOption) (err error) {
-		if size < ofsdefaults.MIN_CHUNKSIZE {
-			return fmt.Errorf(ofsmessages.ERR_CHUNK_SMALL)
-		} else if size > ofsdefaults.MAX_CHUNKSIZE {
-			return fmt.Errorf(ofsmessages.ERR_CHUNK_BIG, ofsdefaults.MAX_CHUNKSIZE)
-		}
-
-		fo.Chunksize = size
-
-		return nil
-	}
 }
 
 // turn server debug mode on. this will cause messages to be printed

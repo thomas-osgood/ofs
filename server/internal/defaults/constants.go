@@ -9,6 +9,3 @@ const DIR_DOWNLOADS string = ""
 
 const FTYPE_DOWNLOAD string = "download"
 const FTYPE_UPLOAD string = "upload"
-
-const MAX_CHUNKSIZE int = 65535
-const MIN_CHUNKSIZE int = 1
