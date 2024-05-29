@@ -18,6 +18,8 @@ type FServer struct {
 	uploadsdir   string
 }
 
+// object used to set the confiruation options for
+// a new fileserver.
 type FServerOption struct {
 	// if this is set to true, output will be printed to
 	// STDOUT while the server is running.
