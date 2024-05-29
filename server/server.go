@@ -29,9 +29,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 	}
 	filename = fs.cleanFilename(filename, ofsdefaults.FTYPE_DOWNLOAD)
 
-	if fs.debug {
-		fs.printer.SucMsg(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
-	}
+	fs.debugMessageSuc(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
 
 	// read the data stream and save it to a temporary file.
 	tmpname, err = fs.readIncomingFile(srv)
@@ -51,9 +49,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_REMOVE_TEMP, err.Error()))
 	}
 
-	if fs.debug {
-		fs.printer.SucMsg(ofsmessages.TEMP_REMOVED)
-	}
+	fs.debugMessageSuc(ofsmessages.TEMP_REMOVED)
 
 	return nil
 }

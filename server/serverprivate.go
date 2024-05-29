@@ -65,6 +65,14 @@ func (fs *FServer) debugMessage(message string) {
 	}
 }
 
+// helper function for outputting a success message to STDOUT. this
+// will only print output if the debug flag is set.
+func (fs *FServer) debugMessageSuc(message string) {
+	if fs.debug {
+		fs.printer.SucMsg(message)
+	}
+}
+
 // function designed to move the contents of a temporary file
 // to a specified destination.
 //
@@ -79,9 +87,7 @@ func (fs *FServer) moveTempfile(tmpname string, filename string) (err error) {
 	}
 	defer tmpfile.Close()
 
-	if fs.debug {
-		fs.printer.SysMsgNB(ofsmessages.COPY_IN_PROGRESS)
-	}
+	fs.debugMessageSuc(ofsmessages.COPY_IN_PROGRESS)
 
 	err = ofscommon.CopyFile(tmpfile, filename)
 	if err != nil {
@@ -89,9 +95,7 @@ func (fs *FServer) moveTempfile(tmpname string, filename string) (err error) {
 		return err
 	}
 
-	if fs.debug {
-		fs.printer.SucMsg(ofsmessages.COPY_COMPLETE)
-	}
+	fs.debugMessageSuc(ofsmessages.COPY_COMPLETE)
 
 	return nil
 }
