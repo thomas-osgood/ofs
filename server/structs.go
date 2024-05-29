@@ -8,6 +8,9 @@ import (
 	"google.golang.org/grpc"
 )
 
+// fileserver object. this can be added to an existing
+// grpc server by registering it with the filehandler
+// service via "filehandler.RegisterFileserviceServer".
 type FServer struct {
 	filehandler.UnimplementedFileserviceServer
 
