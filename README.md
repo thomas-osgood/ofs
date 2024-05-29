@@ -6,6 +6,10 @@ The Osgood File Server (OFS) is designed to be a simple file server that utilize
 
 The server can be added to an existing gRPC server (by registering the filehandler via `filehandler.RegisterFileserviceServer`) or can be run as a stand-alone server using the `RunServer` function.
 
+## License
+
+This software is distributed under the [General Public License v3.0](LICENSE). Any and all use of this software should adhere to this license.
+
 ## Example
 
 The following code showcases the `RunServer` functionality. This will spawn a new instance of the fileserver in "stand-alone" mode and have a client upload a specified file, then request a file for download.
