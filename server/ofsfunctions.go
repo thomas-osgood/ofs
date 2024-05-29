@@ -48,6 +48,10 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 		}
 	}
 
+	// make sure the specified root directory is able
+	// to be written to. if the user running the server
+	// does not have write permissions an error will be
+	// returned.
 	err = ofsutils.CheckDirPerms(defaults.Rootdir)
 	if err != nil {
 		return nil, err
