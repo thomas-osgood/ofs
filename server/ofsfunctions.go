@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/thomas-osgood/OGOR/output"
-	ofscommon "github.com/thomas-osgood/ofs/general"
+	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"

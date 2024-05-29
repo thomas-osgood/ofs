@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	ofscommon "github.com/thomas-osgood/ofs/general"
+	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	"github.com/thomas-osgood/ofs/server/internal/messages"
 	"google.golang.org/grpc/metadata"
 )

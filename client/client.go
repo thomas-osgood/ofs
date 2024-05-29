@@ -9,7 +9,7 @@ import (
 	"os"
 
 	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
-	ofscommon "github.com/thomas-osgood/ofs/general"
+	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	"google.golang.org/grpc"

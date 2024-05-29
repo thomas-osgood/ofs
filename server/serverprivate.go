@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	ofscommon "github.com/thomas-osgood/ofs/general"
+	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"

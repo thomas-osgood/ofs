@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 
-	ofscommon "github.com/thomas-osgood/ofs/general"
+	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	"google.golang.org/grpc/metadata"
 )
 
