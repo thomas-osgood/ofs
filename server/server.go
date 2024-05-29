@@ -75,5 +75,7 @@ func (fs *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.File
 		return err
 	}
 
+	fs.debugMessageSuc("file successfully transmitted")
+
 	return nil
 }
