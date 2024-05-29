@@ -13,6 +13,9 @@ import (
 )
 
 // function designed to download a file from a client to the server.
+//
+// this will save the file uploaded by the client to the root directory
+// or downloads directory (if one has been set).
 func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) (err error) {
 	var filename string
 	var tmpname string
@@ -56,6 +59,9 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 }
 
 // function designed to upload a requested file from the server to the client.
+//
+// the specified file must exist in the root directory (or the uploads directory
+// if one is specified) for a successful (nil error) return.
 func (fs *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fileservice_UploadFileServer) (err error) {
 	var fptr *os.File
 	var targetfile string = fs.cleanFilename(req.GetFilename(), ofsdefaults.FTYPE_UPLOAD)
