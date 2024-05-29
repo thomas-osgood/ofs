@@ -35,7 +35,8 @@ func (fs *FServer) buildDirStructure() (err error) {
 
 // function designed to clean an uploaded filename and return
 // only the filename portion of it. this will strip the directory
-// information.
+// information and give it an absolute path within the directory
+// associated with the type of file specified (download, upload, etc).
 func (fs *FServer) cleanFilename(filename string, ftype string) (cleaned string) {
 	var fnsplit []string
 	var subdir string
