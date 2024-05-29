@@ -19,6 +19,8 @@ func NewGrpcConfiguration(opts ...GrpcOptFunc) (config *GrpcConfig, err error) {
 	}
 	var opt GrpcOptFunc
 
+	// loop through all GrpcOptFuncs passed in by the user
+	// and set the configuration options.
 	for _, opt = range opts {
 		err = opt(&defaults)
 		if err != nil {
@@ -32,6 +34,9 @@ func NewGrpcConfiguration(opts ...GrpcOptFunc) (config *GrpcConfig, err error) {
 		defaults.Options = append(defaults.Options, grpc.Creds(credentials.NewServerTLSFromCert(&defaults.TLSCert)))
 	}
 
+	// create the GrpcConfig object and assign the settings
+	// specified by the user. if the user did not specify
+	// any settings, the defaults will be set.
 	config = new(GrpcConfig)
 	config.listenaddr = defaults.Listenaddr
 	config.listenport = defaults.Listenport
