@@ -67,6 +67,9 @@ func (fs *FServer) debugMessage(message string) {
 
 // function designed to move the contents of a temporary file
 // to a specified destination.
+//
+// this will open the temporary file and close it when the
+// function returns.
 func (fs *FServer) moveTempfile(tmpname string, filename string) (err error) {
 	var tmpfile *os.File
 
@@ -95,6 +98,10 @@ func (fs *FServer) moveTempfile(tmpname string, filename string) (err error) {
 
 // function designed to read the file data from the incoming
 // file byte stream and save it to a temporary file.
+//
+// this will create a temporary file containing the data that
+// gets uploaded, close the file upon return and return the
+// temporary file name so the file can be used later on.
 func (fs *FServer) readIncomingFile(srv filehandler.Fileservice_DownloadFileServer) (tmpname string, err error) {
 	var tmpfile *os.File
 
