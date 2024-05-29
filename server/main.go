@@ -37,17 +37,25 @@ func RunServer(srv *FServer, cfg *GrpcConfig) (err error) {
 	// be shutdown.
 	signal.Notify(shutdownChan, os.Interrupt, syscall.SIGTERM)
 
+	// create the grpc server using the configuration options sepcified
+	// by the user via the GrpcConfig object.
 	gserver = grpc.NewServer(cfg.options...)
 	defer gserver.GracefulStop()
 
+	// start the tcp listener that will be used to serve the grpc server.
 	glisten, err = net.Listen("tcp", srvaddr)
 	if err != nil {
 		return err
 	}
 	defer glisten.Close()
 
+	// register the fileserver with the grpc server.
+	// this is how the fileserver would be added to
+	// an existing grpc server in non-standalone mode.
 	filehandler.RegisterFileserviceServer(gserver, srv)
 
+	// spawn go routine used to handle CTRL+C entered
+	// by the user. this will cleanly stop the server.
 	wg.Add(1)
 	go ofsinterrupts.HandleKeyboardInterrupt(shutdownChan, gserver, &wg)
 
@@ -55,6 +63,8 @@ func RunServer(srv *FServer, cfg *GrpcConfig) (err error) {
 		log.Printf(ofsmessages.SERVER_LISTEN_INFO, srvaddr)
 	}
 
+	// start the grpc server and listen for incoming
+	// client connections.
 	err = gserver.Serve(glisten)
 	if err != nil {
 		log.Printf(ofsmessages.ERR_SERVE, err.Error())
