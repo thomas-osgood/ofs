@@ -65,6 +65,14 @@ func (fs *FServer) debugMessage(message string) {
 	}
 }
 
+// helper function for outputting an error message to STDOUT. this
+// will only print output if the debug flag is set.
+func (fs *FServer) debugMessageErr(message string) {
+	if fs.debug {
+		fs.printer.ErrMsg(message)
+	}
+}
+
 // helper function for outputting a success message to STDOUT. this
 // will only print output if the debug flag is set.
 func (fs *FServer) debugMessageSuc(message string) {
@@ -79,19 +87,12 @@ func (fs *FServer) debugMessageSuc(message string) {
 // this will open the temporary file and close it when the
 // function returns.
 func (fs *FServer) moveTempfile(tmpname string, filename string) (err error) {
-	var tmpfile *os.File
-
-	tmpfile, err = os.Open(tmpname)
-	if err != nil {
-		return err
-	}
-	defer tmpfile.Close()
 
 	fs.debugMessageSuc(ofsmessages.COPY_IN_PROGRESS)
 
-	err = ofscommon.CopyFile(tmpfile, filename)
+	err = ofscommon.MoveFile(tmpname, filename)
 	if err != nil {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_COPY_FILE, err.Error()))
+		fs.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_COPY_FILE, err.Error()))
 		return err
 	}
 
@@ -127,19 +128,17 @@ func (fs *FServer) readIncomingFile(srv filehandler.Fileservice_DownloadFileServ
 	// to the temp file.
 	err = ofscommon.ReceiveFileBytes(srv, tmpfile)
 	if err != nil {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_RECV, err.Error()))
+		fs.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_RECV, err.Error()))
 		return "", err
 	}
 
 	// send a successful status message and close the stream.
 	err = srv.SendAndClose(&protocommon.StatusMessage{Message: ofsmessages.UPLOAD_COMPLETE, Code: http.StatusOK})
 	if err != nil {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_ACK, err.Error()))
+		fs.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_ACK, err.Error()))
 	}
 
-	if fs.debug {
-		fs.printer.SucMsg(ofsmessages.UPLOAD_COMPLETE)
-	}
+	fs.debugMessageSuc(ofsmessages.UPLOAD_COMPLETE)
 
 	return tmpname, nil
 }

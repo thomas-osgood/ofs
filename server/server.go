@@ -24,7 +24,7 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 
 	filename, err = ofsutils.ReadFilenameMD(srv.Context())
 	if err != nil {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_MD, err.Error()))
+		fs.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_MD, err.Error()))
 		return err
 	}
 	filename = fs.cleanFilename(filename, ofsdefaults.FTYPE_DOWNLOAD)
@@ -41,12 +41,6 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 	err = fs.moveTempfile(tmpname, filename)
 	if err != nil {
 		return err
-	}
-
-	// delete the temporary file used during the upload process.
-	err = os.Remove(tmpname)
-	if err != nil {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_REMOVE_TEMP, err.Error()))
 	}
 
 	fs.debugMessageSuc(ofsmessages.TEMP_REMOVED)

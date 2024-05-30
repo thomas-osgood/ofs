@@ -53,3 +53,45 @@ func CopyFile(source *os.File, destination string) (err error) {
 
 	return nil
 }
+
+// overload of the CopyFile function that takes in both
+// arguments as filepaths.
+func CopyFileSS(source string, destination string) (err error) {
+	var fptr *os.File
+
+	fptr, err = os.Open(source)
+	if err != nil {
+		return err
+	}
+	defer fptr.Close()
+
+	err = CopyFile(fptr, destination)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// function designed to move a given source file to the
+// designated destination. this will attempt to delete the
+// source file after the data has been copied over
+// to the destination.
+func MoveFile(source string, destination string) (err error) {
+
+	// move data from the source to the destination.
+	err = CopyFileSS(source, destination)
+	if err != nil {
+		return err
+	}
+
+	// remove the source file.
+	//
+	// if this fails an error will be returned.
+	err = os.Remove(source)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
