@@ -79,17 +79,10 @@ func (fs *FServer) debugMessageSuc(message string) {
 // this will open the temporary file and close it when the
 // function returns.
 func (fs *FServer) moveTempfile(tmpname string, filename string) (err error) {
-	var tmpfile *os.File
-
-	tmpfile, err = os.Open(tmpname)
-	if err != nil {
-		return err
-	}
-	defer tmpfile.Close()
 
 	fs.debugMessageSuc(ofsmessages.COPY_IN_PROGRESS)
 
-	err = ofscommon.CopyFile(tmpfile, filename)
+	err = ofscommon.MoveFile(tmpname, filename)
 	if err != nil {
 		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_COPY_FILE, err.Error()))
 		return err

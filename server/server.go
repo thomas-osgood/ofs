@@ -43,12 +43,6 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 		return err
 	}
 
-	// delete the temporary file used during the upload process.
-	err = os.Remove(tmpname)
-	if err != nil {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_REMOVE_TEMP, err.Error()))
-	}
-
 	fs.debugMessageSuc(ofsmessages.TEMP_REMOVED)
 
 	return nil
