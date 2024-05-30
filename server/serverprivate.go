@@ -65,6 +65,14 @@ func (fs *FServer) debugMessage(message string) {
 	}
 }
 
+// helper function for outputting an error message to STDOUT. this
+// will only print output if the debug flag is set.
+func (fs *FServer) debugMessageErr(message string) {
+	if fs.debug {
+		fs.printer.ErrMsg(message)
+	}
+}
+
 // helper function for outputting a success message to STDOUT. this
 // will only print output if the debug flag is set.
 func (fs *FServer) debugMessageSuc(message string) {
