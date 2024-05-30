@@ -11,17 +11,28 @@ import "common.proto";
 service Fileservice {
         // rpc designed to upload a file from the machine the
         // agent is running on to the control server.
-        rpc DownloadFile(stream FileChunk) returns (common.StatusMessage);
+        rpc DownloadFile(stream FileChunk) returns (common.StatusMessage) {};
+
+        // rpc designed to gather and return a list of files
+        // that can be downloaded by the client.
+        rpc ListFiles(common.Empty) returns (stream FileInfo) {};
 
         // rpc designed to download a file to the machine the
         // agent is running on from the control server.
-        rpc UploadFile (FileRequest) returns (stream FileChunk);
+        rpc UploadFile (FileRequest) returns (stream FileChunk) {};
 }
 
 // message designed to transfer chunks of a 
 // file from one machine to another.
 message FileChunk {
         bytes chunk = 1;
+}
+
+// message designed to hold the information
+// about a specific file.
+message FileInfo {
+        string name = 1;
+        int64 sizebytes = 2;
 }
 
 // message designed to request a file.
