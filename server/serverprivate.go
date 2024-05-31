@@ -81,6 +81,39 @@ func (fs *FServer) debugMessageSuc(message string) {
 	}
 }
 
+// function designed to list out and return the files contained
+// within the uploads directory.
+func (fs *FServer) listUploadsDir() (files []*filehandler.FileInfo, err error) {
+	var curfile string
+	var curinfo os.FileInfo
+	var discovered []string
+	var targetdir string = filepath.Join(fs.rootdir, fs.uploadsdir)
+	var targetpat string = fmt.Sprintf("%s%c**%c*", targetdir, os.PathSeparator, os.PathSeparator)
+
+	discovered, err = filepath.Glob(targetpat)
+	if err != nil {
+		return nil, err
+	}
+
+	files = make([]*filehandler.FileInfo, 0)
+
+	for _, curfile = range discovered {
+		curinfo, err = os.Stat(curfile)
+		if (err != nil) || (curinfo.IsDir()) {
+			continue
+		}
+		files = append(
+			files,
+			&filehandler.FileInfo{
+				Name:      curinfo.Name(),
+				Sizebytes: curinfo.Size(),
+			},
+		)
+	}
+
+	return files, nil
+}
+
 // function designed to move the contents of a temporary file
 // to a specified destination.
 //
