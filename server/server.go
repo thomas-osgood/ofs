@@ -17,34 +17,34 @@ import (
 //
 // this will save the file uploaded by the client to the root directory
 // or downloads directory (if one has been set).
-func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) (err error) {
+func (fsrv *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) (err error) {
 	var filename string
 	var tmpname string
 
-	fs.debugMessage(ofsmessages.DBG_IN_DOWNLOAD)
+	fsrv.debugMessage(ofsmessages.DBG_IN_DOWNLOAD)
 
 	filename, err = ofsutils.ReadFilenameMD(srv.Context())
 	if err != nil {
-		fs.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_MD, err.Error()))
+		fsrv.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_MD, err.Error()))
 		return err
 	}
-	filename = fs.cleanFilename(filename, ofsdefaults.FTYPE_DOWNLOAD)
+	filename = fsrv.cleanFilename(filename, ofsdefaults.FTYPE_DOWNLOAD)
 
-	fs.debugMessageSuc(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
+	fsrv.debugMessageSuc(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
 
 	// read the data stream and save it to a temporary file.
-	tmpname, err = fs.readIncomingFile(srv)
+	tmpname, err = fsrv.readIncomingFile(srv)
 	if err != nil {
 		return err
 	}
 
 	// move over the tmpfile contents to the destination file.
-	err = fs.moveTempfile(tmpname, filename)
+	err = fsrv.moveTempfile(tmpname, filename)
 	if err != nil {
 		return err
 	}
 
-	fs.debugMessageSuc(ofsmessages.TEMP_REMOVED)
+	fsrv.debugMessageSuc(ofsmessages.TEMP_REMOVED)
 
 	return nil
 }
@@ -53,12 +53,12 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 // the ability to download files from. if there are separate upload and
 // download directories, only the "uploads" (files that can be uploaded
 // from the server to client) directory will be listed.
-func (fs *FServer) ListFiles(mpty *common.Empty, srv filehandler.Fileservice_ListFilesServer) (err error) {
+func (fsrv *FServer) ListFiles(mpty *common.Empty, srv filehandler.Fileservice_ListFilesServer) (err error) {
 	var curfile *filehandler.FileInfo
 	var files []*filehandler.FileInfo
 
 	// gather all files in the uploads directory.
-	files, err = fs.listUploadsDir()
+	files, err = fsrv.listUploadsDir()
 	if err != nil {
 		return err
 	}
@@ -78,11 +78,11 @@ func (fs *FServer) ListFiles(mpty *common.Empty, srv filehandler.Fileservice_Lis
 //
 // the specified file must exist in the root directory (or the uploads directory
 // if one is specified) for a successful (nil error) return.
-func (fs *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fileservice_UploadFileServer) (err error) {
+func (fsrv *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fileservice_UploadFileServer) (err error) {
 	var fptr *os.File
-	var targetfile string = fs.cleanFilename(req.GetFilename(), ofsdefaults.FTYPE_UPLOAD)
+	var targetfile string = fsrv.cleanFilename(req.GetFilename(), ofsdefaults.FTYPE_UPLOAD)
 
-	fs.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILE_REQUEST, targetfile))
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILE_REQUEST, targetfile))
 
 	fptr, err = os.Open(targetfile)
 	if err != nil {
@@ -95,7 +95,7 @@ func (fs *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.File
 		return err
 	}
 
-	fs.debugMessageSuc("file successfully transmitted")
+	fsrv.debugMessageSuc("file successfully transmitted")
 
 	return nil
 }
