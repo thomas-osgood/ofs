@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -59,26 +60,80 @@ func (fs *FServer) cleanFilename(filename string, ftype string) (cleaned string)
 
 // helper function for outputting a debug message to STDOUT. this
 // will only print output if the debug flag is set.
-func (fs *FServer) debugMessage(message string) {
-	if fs.debug {
-		fs.printer.InfMsg(message)
+func (fsrv *FServer) debugMessage(message string) {
+	if fsrv.debug {
+		fsrv.printer.InfMsg(message)
 	}
 }
 
 // helper function for outputting an error message to STDOUT. this
 // will only print output if the debug flag is set.
-func (fs *FServer) debugMessageErr(message string) {
-	if fs.debug {
-		fs.printer.ErrMsg(message)
+func (fsrv *FServer) debugMessageErr(message string) {
+	if fsrv.debug {
+		fsrv.printer.ErrMsg(message)
 	}
 }
 
 // helper function for outputting a success message to STDOUT. this
 // will only print output if the debug flag is set.
-func (fs *FServer) debugMessageSuc(message string) {
-	if fs.debug {
-		fs.printer.SucMsg(message)
+func (fsrv *FServer) debugMessageSuc(message string) {
+	if fsrv.debug {
+		fsrv.printer.SucMsg(message)
 	}
+}
+
+// function designed to list out and return the files contained
+// within the uploads directory.
+//
+// references:
+//
+// https://stackoverflow.com/questions/14668850/list-directory-in-go
+//
+// https://golang.cafe/blog/how-to-list-files-in-a-directory-in-go.html
+func (fsrv *FServer) listUploadsDir() (files []*filehandler.FileInfo, err error) {
+	var curfile string
+	var targetdir string = filepath.Join(fsrv.rootdir, fsrv.uploadsdir)
+
+	// initialize the return slice to prevent a nil reference error.
+	files = make([]*filehandler.FileInfo, 0)
+
+	// traverse uploads directory and subdirectories, gathering the
+	// filepaths contained within and appending the file data to
+	// the slice that will be returned.
+	err = filepath.Walk(targetdir, func(path string, info fs.FileInfo, err error) error {
+
+		// beacuse the path is an absolute path, remove the uploads
+		// directory that is located at the beginning of the path.
+		// this will leave only the relative path within the uploads dir.
+		curfile = strings.Replace(path, targetdir, "", 1)
+
+		// replace the leading path separator.
+		curfile = strings.TrimSpace(strings.Replace(curfile, fmt.Sprintf("%c", os.PathSeparator), "", 1))
+
+		// if the string is empty (ie: the path was pointing to the
+		// uploads root directory) do nothing.
+		if len(curfile) < 1 {
+			return nil
+		}
+
+		// append file data to the return slice.
+		files = append(
+			files,
+			&filehandler.FileInfo{
+				Name:      curfile,
+				Sizebytes: info.Size(),
+				Isdir:     info.IsDir(),
+			},
+		)
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }
 
 // function designed to move the contents of a temporary file
@@ -86,17 +141,17 @@ func (fs *FServer) debugMessageSuc(message string) {
 //
 // this will open the temporary file and close it when the
 // function returns.
-func (fs *FServer) moveTempfile(tmpname string, filename string) (err error) {
+func (fsrv *FServer) moveTempfile(tmpname string, filename string) (err error) {
 
-	fs.debugMessageSuc(ofsmessages.COPY_IN_PROGRESS)
+	fsrv.debugMessageSuc(ofsmessages.COPY_IN_PROGRESS)
 
 	err = ofscommon.MoveFile(tmpname, filename)
 	if err != nil {
-		fs.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_COPY_FILE, err.Error()))
+		fsrv.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_COPY_FILE, err.Error()))
 		return err
 	}
 
-	fs.debugMessageSuc(ofsmessages.COPY_COMPLETE)
+	fsrv.debugMessageSuc(ofsmessages.COPY_COMPLETE)
 
 	return nil
 }
@@ -107,38 +162,36 @@ func (fs *FServer) moveTempfile(tmpname string, filename string) (err error) {
 // this will create a temporary file containing the data that
 // gets uploaded, close the file upon return and return the
 // temporary file name so the file can be used later on.
-func (fs *FServer) readIncomingFile(srv filehandler.Fileservice_DownloadFileServer) (tmpname string, err error) {
+func (fsrv *FServer) readIncomingFile(srv filehandler.Fileservice_DownloadFileServer) (tmpname string, err error) {
 	var tmpfile *os.File
 
 	// create a temporary file to hold the uploaded information.
 	tmpfile, err = os.CreateTemp("", "download")
 	if err != nil {
-		fs.debugMessage(fmt.Sprintf(ofsmessages.ERR_TEMP, err.Error()))
+		fsrv.debugMessage(fmt.Sprintf(ofsmessages.ERR_TEMP, err.Error()))
 		return "", err
 	}
 	defer tmpfile.Close()
 
 	tmpname = tmpfile.Name()
 
-	if fs.debug {
-		fs.printer.SysMsgNB(fmt.Sprintf(ofsmessages.UPLOAD_IN_PROGRESS, tmpname))
-	}
+	fsrv.debugMessageSuc(fmt.Sprintf(ofsmessages.UPLOAD_IN_PROGRESS, tmpname))
 
 	// stream the file contents from the client and write them
 	// to the temp file.
 	err = ofscommon.ReceiveFileBytes(srv, tmpfile)
 	if err != nil {
-		fs.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_RECV, err.Error()))
+		fsrv.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_RECV, err.Error()))
 		return "", err
 	}
 
 	// send a successful status message and close the stream.
 	err = srv.SendAndClose(&protocommon.StatusMessage{Message: ofsmessages.UPLOAD_COMPLETE, Code: http.StatusOK})
 	if err != nil {
-		fs.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_ACK, err.Error()))
+		fsrv.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_ACK, err.Error()))
 	}
 
-	fs.debugMessageSuc(ofsmessages.UPLOAD_COMPLETE)
+	fsrv.debugMessageSuc(ofsmessages.UPLOAD_COMPLETE)
 
 	return tmpname, nil
 }

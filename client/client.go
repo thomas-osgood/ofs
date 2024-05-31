@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -85,6 +86,60 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 	}
 
 	return nil
+}
+
+// function designed to get the list of files the client
+// is able to download from the server.
+func (fc *FClient) ListFiles() (files []*filehandler.FileInfo, err error) {
+	var cancel context.CancelFunc
+	var client filehandler.FileserviceClient
+	var conn *grpc.ClientConn
+	var ctx context.Context
+	var curfile *filehandler.FileInfo
+	var lister filehandler.Fileservice_ListFilesClient
+
+	conn, client, err = fc.initConnection()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
+	defer cancel()
+
+	lister, err = client.ListFiles(ctx, &protocommon.Empty{})
+	if err != nil {
+		return nil, err
+	}
+
+	files = make([]*filehandler.FileInfo, 0)
+
+	// read all fileinfo objects the server streams to the client.
+	for {
+		curfile, err = lister.Recv()
+		if err != nil {
+			if err != io.EOF {
+				return nil, err
+			}
+			break
+		}
+
+		files = append(
+			files,
+			&filehandler.FileInfo{
+				Name:      curfile.GetName(),
+				Sizebytes: curfile.GetSizebytes(),
+				Isdir:     curfile.GetIsdir(),
+			},
+		)
+	}
+
+	err = lister.CloseSend()
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }
 
 // function designed to upload a file to the file server.
