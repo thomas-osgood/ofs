@@ -102,21 +102,29 @@ func (fsrv *FServer) listUploadsDir() (files []*filehandler.FileInfo, err error)
 	// the slice that will be returned.
 	err = filepath.Walk(targetdir, func(path string, info fs.FileInfo, err error) error {
 
-		// if the current object is a directory, do nothing.
-		if info.IsDir() {
-			return nil
-		}
-
 		// beacuse the path is an absolute path, remove the uploads
 		// directory that is located at the beginning of the path.
 		// this will leave only the relative path within the uploads dir.
 		curfile = strings.Replace(path, targetdir, "", 1)
 
 		// replace the leading path separator.
-		curfile = strings.Replace(curfile, fmt.Sprintf("%c", os.PathSeparator), "", 1)
+		curfile = strings.TrimSpace(strings.Replace(curfile, fmt.Sprintf("%c", os.PathSeparator), "", 1))
+
+		// if the string is empty (ie: the path was pointing to the
+		// uploads root directory) do nothing.
+		if len(curfile) < 1 {
+			return nil
+		}
 
 		// append file data to the return slice.
-		files = append(files, &filehandler.FileInfo{Name: curfile, Sizebytes: info.Size()})
+		files = append(
+			files,
+			&filehandler.FileInfo{
+				Name:      curfile,
+				Sizebytes: info.Size(),
+				Isdir:     info.IsDir(),
+			},
+		)
 
 		return nil
 	})
