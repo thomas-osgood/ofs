@@ -33,6 +33,7 @@ message FileChunk {
 message FileInfo {
         string name = 1;
         int64 sizebytes = 2;
+        bool isdir = 3;
 }
 
 // message designed to request a file.
