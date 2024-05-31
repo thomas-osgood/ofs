@@ -96,6 +96,11 @@ func (fs *FServer) listUploadsDir() (files []*filehandler.FileInfo, err error) {
 	var targetdir string = filepath.Join(fs.rootdir, fs.uploadsdir)
 	var targetpat string = fmt.Sprintf("%s%c**%c*", targetdir, os.PathSeparator, os.PathSeparator)
 
+	////////////////////////////////////////////////////////
+	// TODO: look into filepath.Walk to gather paths along
+	// with discovered filenames...
+	////////////////////////////////////////////////////////
+
 	discovered, err = filepath.Glob(targetpat)
 	if err != nil {
 		return nil, err
