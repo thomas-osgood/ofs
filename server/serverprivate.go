@@ -87,6 +87,8 @@ func (fs *FServer) debugMessageSuc(message string) {
 // references:
 //
 // https://stackoverflow.com/questions/14668850/list-directory-in-go
+//
+// https://golang.cafe/blog/how-to-list-files-in-a-directory-in-go.html
 func (fs *FServer) listUploadsDir() (files []*filehandler.FileInfo, err error) {
 	var curfile string
 	var curinfo os.FileInfo
