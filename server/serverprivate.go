@@ -112,6 +112,9 @@ func (fsrv *FServer) listUploadsDir() (files []*filehandler.FileInfo, err error)
 		// this will leave only the relative path within the uploads dir.
 		curfile = strings.Replace(path, targetdir, "", 1)
 
+		// replace the leading path separator.
+		curfile = strings.Replace(curfile, fmt.Sprintf("%c", os.PathSeparator), "", 1)
+
 		// append file data to the return slice.
 		files = append(files, &filehandler.FileInfo{Name: curfile, Sizebytes: info.Size()})
 
