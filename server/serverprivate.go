@@ -100,7 +100,7 @@ func (fsrv *FServer) listUploadsDir() (files []*filehandler.FileInfo, err error)
 	// traverse uploads directory and subdirectories, gathering the
 	// filepaths contained within and appending the file data to
 	// the slice that will be returned.
-	filepath.Walk(targetdir, func(path string, info fs.FileInfo, err error) error {
+	err = filepath.Walk(targetdir, func(path string, info fs.FileInfo, err error) error {
 
 		// if the current object is a directory, do nothing.
 		if info.IsDir() {
@@ -120,6 +120,10 @@ func (fsrv *FServer) listUploadsDir() (files []*filehandler.FileInfo, err error)
 
 		return nil
 	})
+
+	if err != nil {
+		return nil, err
+	}
 
 	return files, nil
 }
