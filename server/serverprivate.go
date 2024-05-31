@@ -83,6 +83,10 @@ func (fs *FServer) debugMessageSuc(message string) {
 
 // function designed to list out and return the files contained
 // within the uploads directory.
+//
+// references:
+//
+// https://stackoverflow.com/questions/14668850/list-directory-in-go
 func (fs *FServer) listUploadsDir() (files []*filehandler.FileInfo, err error) {
 	var curfile string
 	var curinfo os.FileInfo
@@ -102,6 +106,7 @@ func (fs *FServer) listUploadsDir() (files []*filehandler.FileInfo, err error) {
 		if (err != nil) || (curinfo.IsDir()) {
 			continue
 		}
+
 		files = append(
 			files,
 			&filehandler.FileInfo{
