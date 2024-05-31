@@ -124,7 +124,14 @@ func (fc *FClient) ListFiles() (files []*filehandler.FileInfo, err error) {
 			break
 		}
 
-		files = append(files, &filehandler.FileInfo{Name: curfile.GetName(), Sizebytes: curfile.GetSizebytes()})
+		files = append(
+			files,
+			&filehandler.FileInfo{
+				Name:      curfile.GetName(),
+				Sizebytes: curfile.GetSizebytes(),
+				Isdir:     curfile.GetIsdir(),
+			},
+		)
 	}
 
 	err = lister.CloseSend()
