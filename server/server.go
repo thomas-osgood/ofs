@@ -6,6 +6,7 @@ import (
 	"os"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
+	"github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
@@ -44,6 +45,31 @@ func (fs *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) 
 	}
 
 	fs.debugMessageSuc(ofsmessages.TEMP_REMOVED)
+
+	return nil
+}
+
+// function designed to list out the files in the directory the client has
+// the ability to download files from. if there are separate upload and
+// download directories, only the "uploads" (files that can be uploaded
+// from the server to client) directory will be listed.
+func (fs *FServer) ListFiles(mpty *common.Empty, srv filehandler.Fileservice_ListFilesServer) (err error) {
+	var curfile *filehandler.FileInfo
+	var files []*filehandler.FileInfo
+
+	// gather all files in the uploads directory.
+	files, err = fs.listUploadsDir()
+	if err != nil {
+		return err
+	}
+
+	// transmit the files to the client.
+	for _, curfile = range files {
+		err = srv.Send(curfile)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
