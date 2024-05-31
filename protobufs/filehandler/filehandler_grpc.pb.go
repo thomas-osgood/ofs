@@ -26,6 +26,9 @@ type FileserviceClient interface {
 	// rpc designed to upload a file from the machine the
 	// agent is running on to the control server.
 	DownloadFile(ctx context.Context, opts ...grpc.CallOption) (Fileservice_DownloadFileClient, error)
+	// rpc designed to gather and return a list of files
+	// that can be downloaded by the client.
+	ListFiles(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (Fileservice_ListFilesClient, error)
 	// rpc designed to download a file to the machine the
 	// agent is running on from the control server.
 	UploadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (Fileservice_UploadFileClient, error)
@@ -73,8 +76,40 @@ func (x *fileserviceDownloadFileClient) CloseAndRecv() (*common.StatusMessage, e
 	return m, nil
 }
 
+func (c *fileserviceClient) ListFiles(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (Fileservice_ListFilesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Fileservice_ServiceDesc.Streams[1], "/filehandler.Fileservice/ListFiles", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &fileserviceListFilesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Fileservice_ListFilesClient interface {
+	Recv() (*FileInfo, error)
+	grpc.ClientStream
+}
+
+type fileserviceListFilesClient struct {
+	grpc.ClientStream
+}
+
+func (x *fileserviceListFilesClient) Recv() (*FileInfo, error) {
+	m := new(FileInfo)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *fileserviceClient) UploadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (Fileservice_UploadFileClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Fileservice_ServiceDesc.Streams[1], "/filehandler.Fileservice/UploadFile", opts...)
+	stream, err := c.cc.NewStream(ctx, &Fileservice_ServiceDesc.Streams[2], "/filehandler.Fileservice/UploadFile", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -112,6 +147,9 @@ type FileserviceServer interface {
 	// rpc designed to upload a file from the machine the
 	// agent is running on to the control server.
 	DownloadFile(Fileservice_DownloadFileServer) error
+	// rpc designed to gather and return a list of files
+	// that can be downloaded by the client.
+	ListFiles(*common.Empty, Fileservice_ListFilesServer) error
 	// rpc designed to download a file to the machine the
 	// agent is running on from the control server.
 	UploadFile(*FileRequest, Fileservice_UploadFileServer) error
@@ -124,6 +162,9 @@ type UnimplementedFileserviceServer struct {
 
 func (UnimplementedFileserviceServer) DownloadFile(Fileservice_DownloadFileServer) error {
 	return status.Errorf(codes.Unimplemented, "method DownloadFile not implemented")
+}
+func (UnimplementedFileserviceServer) ListFiles(*common.Empty, Fileservice_ListFilesServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListFiles not implemented")
 }
 func (UnimplementedFileserviceServer) UploadFile(*FileRequest, Fileservice_UploadFileServer) error {
 	return status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
@@ -167,6 +208,27 @@ func (x *fileserviceDownloadFileServer) Recv() (*FileChunk, error) {
 	return m, nil
 }
 
+func _Fileservice_ListFiles_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(common.Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(FileserviceServer).ListFiles(m, &fileserviceListFilesServer{stream})
+}
+
+type Fileservice_ListFilesServer interface {
+	Send(*FileInfo) error
+	grpc.ServerStream
+}
+
+type fileserviceListFilesServer struct {
+	grpc.ServerStream
+}
+
+func (x *fileserviceListFilesServer) Send(m *FileInfo) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 func _Fileservice_UploadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(FileRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -200,6 +262,11 @@ var Fileservice_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "DownloadFile",
 			Handler:       _Fileservice_DownloadFile_Handler,
 			ClientStreams: true,
+		},
+		{
+			StreamName:    "ListFiles",
+			Handler:       _Fileservice_ListFiles_Handler,
+			ServerStreams: true,
 		},
 		{
 			StreamName:    "UploadFile",
