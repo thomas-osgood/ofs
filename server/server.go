@@ -116,6 +116,8 @@ func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFi
 	var absdest string = fsrv.buildUploadFilename(rnreq.GetNewfilename())
 	var abssrc string = fsrv.buildUploadFilename(rnreq.GetOldfilename())
 
+	resp = new(common.StatusMessage)
+
 	// check for the existence of the destination file. if the
 	// destination file already exists, an error will be returned
 	// saying as much.
@@ -130,7 +132,11 @@ func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFi
 	// move the source file to the destination.
 	err = fsrv.moveTempfile(abssrc, absdest)
 	if err != nil {
-		return nil, err
+		resp.Code = http.StatusInternalServerError
+		resp.Message = status.Convert(err).Message()
+	} else {
+		resp.Code = http.StatusOK
+		resp.Message = ofsmessages.COPY_COMPLETE
 	}
 
 	return resp, nil
