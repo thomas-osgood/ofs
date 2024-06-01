@@ -161,7 +161,7 @@ func (fsrv *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fi
 		return err
 	}
 
-	fsrv.debugMessageSuc("file successfully transmitted")
+	fsrv.debugMessageSuc(ofsmessages.FILE_SENT)
 
 	return nil
 }
