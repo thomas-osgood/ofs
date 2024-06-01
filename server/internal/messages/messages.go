@@ -26,6 +26,8 @@ const ERR_RECV string = "[RECV] %s"
 const ERR_SERVE string = "[SERVE] %s\n"
 const ERR_TEMP string = "[TEMP] %s"
 
+const FILE_SENT string = "file successfully transmitted"
+
 const SERVER_LISTEN_INFO string = "server listening on \"%s\"\n"
 
 const TEMP_REMOVED string = "temp file removed"
