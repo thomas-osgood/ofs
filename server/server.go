@@ -81,16 +81,27 @@ func (fsrv *FServer) ListFiles(mpty *common.Empty, srv filehandler.Fileservice_L
 // function designed to create a new sub-directory within the uploads directory.
 // if the sub-directory has sub-directories, this function will attempt to
 // create all directories.
+//
+// successful code: 201 Created
+//
+// failure code: 500 Internal Server Error
 func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.MakeDirectoryRequest) (retstatus *common.StatusMessage, err error) {
 	var subdir string = dirreq.GetDirname()
 
+	// initialize the successful StatusMessage. if everything
+	// works as expected, this will not be modified.
 	retstatus = &common.StatusMessage{
-		Code:    http.StatusOK,
+		Code:    http.StatusCreated,
 		Message: "directory created",
 	}
 
+	// create the absolute path of the directory (or directories)
+	// that will be created.
 	subdir = filepath.Join(fsrv.rootdir, fsrv.uploadsdir, filepath.Clean(subdir))
 
+	// attempt to create sub-directory specified by the client.
+	// if this fails, the StatusMessage returned to the client
+	// will indicate what the error was.
 	err = os.MkdirAll(subdir, os.ModePerm)
 	if err != nil {
 
