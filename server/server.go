@@ -3,6 +3,7 @@ package server
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -111,6 +112,39 @@ func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.Make
 	}
 
 	return retstatus, nil
+}
+
+// function designed to rename a file in the uploads directory. this
+// will move the source file to the destination.
+func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFileRequest) (resp *common.StatusMessage, err error) {
+	var absdest string
+	var abssrc string
+	var uploadsdir = filepath.Join(fsrv.rootdir, fsrv.uploadsdir)
+
+	absdest = filepath.Clean(rnreq.GetNewfilename())
+	absdest = filepath.Join(uploadsdir, absdest)
+
+	abssrc = filepath.Clean(rnreq.GetOldfilename())
+	abssrc = filepath.Join(uploadsdir, abssrc)
+
+	// check for the existence of the destination file. if the
+	// destination file already exists, an error will be returned
+	// saying as much.
+	if err = fsrv.fileExists(absdest); err != nil {
+		if errors.Is(err, os.ErrPermission) {
+			return nil, err
+		}
+	} else {
+		return nil, fmt.Errorf(ofsmessages.ERR_FILE_EXISTS)
+	}
+
+	// move the source file to the destination.
+	err = fsrv.moveTempfile(abssrc, absdest)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }
 
 // function designed to upload a requested file from the server to the client.
