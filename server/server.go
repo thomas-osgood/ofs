@@ -119,6 +119,9 @@ func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.Make
 // success status code: 200 OK
 //
 // failure status code: 500 Internal Server Error
+//
+// note: if the destination file already exists, or if there is an issue
+// related to permissions, an error will be returned.
 func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFileRequest) (resp *common.StatusMessage, err error) {
 	var absdest string = fsrv.buildUploadFilename(rnreq.GetNewfilename())
 	var abssrc string = fsrv.buildUploadFilename(rnreq.GetOldfilename())
