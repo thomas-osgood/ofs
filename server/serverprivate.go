@@ -18,9 +18,9 @@ import (
 
 // function designed to build the directory structure the fileserver
 // will use to save and server files.
-func (fs *FServer) buildDirStructure() (err error) {
-	var downloaddir string = filepath.Join(fs.rootdir, fs.downloadsdir)
-	var uploaddir string = filepath.Join(fs.rootdir, fs.uploadsdir)
+func (fsrv *FServer) buildDirStructure() (err error) {
+	var downloaddir string = filepath.Join(fsrv.rootdir, fsrv.downloadsdir)
+	var uploaddir string = filepath.Join(fsrv.rootdir, fsrv.uploadsdir)
 
 	err = os.MkdirAll(downloaddir, os.ModePerm)
 	if err != nil {
@@ -35,26 +35,32 @@ func (fs *FServer) buildDirStructure() (err error) {
 	return nil
 }
 
+// function designed to build and return the absolute path to a file
+// in the uploads directory.
+func (fsrv *FServer) buildUploadFilename(filename string) string {
+	return filepath.Join(fsrv.rootdir, fsrv.uploadsdir, filepath.Clean(filename))
+}
+
 // function designed to clean an uploaded filename and return
 // only the filename portion of it. this will strip the directory
 // information and give it an absolute path within the directory
 // associated with the type of file specified (download, upload, etc).
-func (fs *FServer) cleanFilename(filename string, ftype string) (cleaned string) {
+func (fsrv *FServer) cleanFilename(filename string, ftype string) (cleaned string) {
 	var fnsplit []string
 	var subdir string
 
 	switch strings.ToLower(ftype) {
 	case ofsdefaults.FTYPE_DOWNLOAD:
-		subdir = fs.downloadsdir
+		subdir = fsrv.downloadsdir
 	case ofsdefaults.FTYPE_UPLOAD:
-		subdir = fs.uploadsdir
+		subdir = fsrv.uploadsdir
 	default:
 		subdir = ""
 	}
 
 	filename = filepath.Clean(filename)
 	fnsplit = strings.Split(filename, fmt.Sprintf("%c", os.PathSeparator))
-	cleaned = filepath.Join(fs.rootdir, subdir, fnsplit[len(fnsplit)-1])
+	cleaned = filepath.Join(fsrv.rootdir, subdir, fnsplit[len(fnsplit)-1])
 
 	return cleaned
 }
