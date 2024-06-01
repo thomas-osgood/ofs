@@ -121,12 +121,10 @@ func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFi
 	// check for the existence of the destination file. if the
 	// destination file already exists, an error will be returned
 	// saying as much.
-	if err = fsrv.fileExists(absdest); err != nil {
-		if errors.Is(err, os.ErrPermission) {
-			return nil, err
-		}
-	} else {
+	if err = fsrv.fileExists(absdest); err == nil {
 		return nil, fmt.Errorf(ofsmessages.ERR_FILE_EXISTS)
+	} else if errors.Is(err, os.ErrPermission) {
+		return nil, err
 	}
 
 	// move the source file to the destination.
