@@ -117,15 +117,8 @@ func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.Make
 // function designed to rename a file in the uploads directory. this
 // will move the source file to the destination.
 func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFileRequest) (resp *common.StatusMessage, err error) {
-	var absdest string
-	var abssrc string
-	var uploadsdir = filepath.Join(fsrv.rootdir, fsrv.uploadsdir)
-
-	absdest = filepath.Clean(rnreq.GetNewfilename())
-	absdest = filepath.Join(uploadsdir, absdest)
-
-	abssrc = filepath.Clean(rnreq.GetOldfilename())
-	abssrc = filepath.Join(uploadsdir, abssrc)
+	var absdest string = fsrv.buildUploadFilename(rnreq.GetNewfilename())
+	var abssrc string = fsrv.buildUploadFilename(rnreq.GetOldfilename())
 
 	// check for the existence of the destination file. if the
 	// destination file already exists, an error will be returned
