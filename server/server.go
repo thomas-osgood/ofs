@@ -93,7 +93,7 @@ func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.Make
 	// works as expected, this will not be modified.
 	retstatus = &common.StatusMessage{
 		Code:    http.StatusCreated,
-		Message: "directory created",
+		Message: ofsmessages.DIR_CREATED,
 	}
 
 	// attempt to create sub-directory specified by the client.
