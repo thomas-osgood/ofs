@@ -21,6 +21,10 @@ service Fileservice {
         // uploads directory on the server.
         rpc MakeDirectory(MakeDirectoryRequest) returns (common.StatusMessage) {};
 
+        // rpc designed to rename a file as requested by
+        // the client.
+        rpc RenameFile(RenameFileRequest) returns (common.StatusMessage) {};
+
         // rpc designed to download a file to the machine the
         // agent is running on from the control server.
         rpc UploadFile (FileRequest) returns (stream FileChunk) {};
@@ -50,4 +54,11 @@ message FileRequest {
 // be passed when a directory request is initiated.
 message MakeDirectoryRequest {
         string dirname = 1;
+}
+
+// message designed to request a file on the server
+// be renamed.
+message RenameFileRequest {
+        string oldfilename = 1;
+        string newfilename = 2;
 }
