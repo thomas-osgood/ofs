@@ -111,6 +111,14 @@ func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.Make
 
 // function designed to rename a file in the uploads directory. this
 // will move the source file to the destination.
+//
+// if the file does not already exist, the success or failure status
+// will be transmitted to the client using a StatusMessage object. the
+// code should be used to determine whether the copy was successful or not.
+//
+// success status code: 200 OK
+//
+// failure status code: 500 Internal Server Error
 func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFileRequest) (resp *common.StatusMessage, err error) {
 	var absdest string = fsrv.buildUploadFilename(rnreq.GetNewfilename())
 	var abssrc string = fsrv.buildUploadFilename(rnreq.GetOldfilename())
