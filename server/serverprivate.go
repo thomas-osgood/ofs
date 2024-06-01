@@ -38,7 +38,7 @@ func (fsrv *FServer) buildDirStructure() (err error) {
 // function designed to build and return the absolute path to a file
 // in the uploads directory.
 func (fsrv *FServer) buildUploadFilename(filename string) string {
-	return filepath.Join(fsrv.rootdir, fsrv.uploadsdir, filepath.Clean(filename))
+	return filepath.Join(fsrv.rootdir, fsrv.uploadsdir, strings.TrimSpace(filepath.Clean(filename)))
 }
 
 // function designed to clean an uploaded filename and return
