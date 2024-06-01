@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"path/filepath"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	"github.com/thomas-osgood/ofs/protobufs/common"
@@ -87,7 +86,7 @@ func (fsrv *FServer) ListFiles(mpty *common.Empty, srv filehandler.Fileservice_L
 //
 // failure code: 500 Internal Server Error
 func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.MakeDirectoryRequest) (retstatus *common.StatusMessage, err error) {
-	var subdir string = fsrv.buildUploadFilename(filepath.Clean(dirreq.GetDirname()))
+	var subdir string = fsrv.buildUploadFilename(dirreq.GetDirname())
 
 	// initialize the successful StatusMessage. if everything
 	// works as expected, this will not be modified.
