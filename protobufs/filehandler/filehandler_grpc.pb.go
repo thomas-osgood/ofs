@@ -29,6 +29,9 @@ type FileserviceClient interface {
 	// rpc designed to gather and return a list of files
 	// that can be downloaded by the client.
 	ListFiles(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (Fileservice_ListFilesClient, error)
+	// rpc designed to create a subdirectory within the
+	// uploads directory on the server.
+	MakeDirectory(ctx context.Context, in *MakeDirectoryRequest, opts ...grpc.CallOption) (*common.StatusMessage, error)
 	// rpc designed to download a file to the machine the
 	// agent is running on from the control server.
 	UploadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (Fileservice_UploadFileClient, error)
@@ -108,6 +111,15 @@ func (x *fileserviceListFilesClient) Recv() (*FileInfo, error) {
 	return m, nil
 }
 
+func (c *fileserviceClient) MakeDirectory(ctx context.Context, in *MakeDirectoryRequest, opts ...grpc.CallOption) (*common.StatusMessage, error) {
+	out := new(common.StatusMessage)
+	err := c.cc.Invoke(ctx, "/filehandler.Fileservice/MakeDirectory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *fileserviceClient) UploadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (Fileservice_UploadFileClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Fileservice_ServiceDesc.Streams[2], "/filehandler.Fileservice/UploadFile", opts...)
 	if err != nil {
@@ -150,6 +162,9 @@ type FileserviceServer interface {
 	// rpc designed to gather and return a list of files
 	// that can be downloaded by the client.
 	ListFiles(*common.Empty, Fileservice_ListFilesServer) error
+	// rpc designed to create a subdirectory within the
+	// uploads directory on the server.
+	MakeDirectory(context.Context, *MakeDirectoryRequest) (*common.StatusMessage, error)
 	// rpc designed to download a file to the machine the
 	// agent is running on from the control server.
 	UploadFile(*FileRequest, Fileservice_UploadFileServer) error
@@ -165,6 +180,9 @@ func (UnimplementedFileserviceServer) DownloadFile(Fileservice_DownloadFileServe
 }
 func (UnimplementedFileserviceServer) ListFiles(*common.Empty, Fileservice_ListFilesServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListFiles not implemented")
+}
+func (UnimplementedFileserviceServer) MakeDirectory(context.Context, *MakeDirectoryRequest) (*common.StatusMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MakeDirectory not implemented")
 }
 func (UnimplementedFileserviceServer) UploadFile(*FileRequest, Fileservice_UploadFileServer) error {
 	return status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
@@ -229,6 +247,24 @@ func (x *fileserviceListFilesServer) Send(m *FileInfo) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Fileservice_MakeDirectory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MakeDirectoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileserviceServer).MakeDirectory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/filehandler.Fileservice/MakeDirectory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileserviceServer).MakeDirectory(ctx, req.(*MakeDirectoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Fileservice_UploadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(FileRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -256,7 +292,12 @@ func (x *fileserviceUploadFileServer) Send(m *FileChunk) error {
 var Fileservice_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "filehandler.Fileservice",
 	HandlerType: (*FileserviceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "MakeDirectory",
+			Handler:    _Fileservice_MakeDirectory_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "DownloadFile",
