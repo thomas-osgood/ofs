@@ -142,6 +142,34 @@ func (fc *FClient) ListFiles() (files []*filehandler.FileInfo, err error) {
 	return files, nil
 }
 
+// function designed to make a specified directory within
+// the server's uploads directory.
+func (fc *FClient) MakeDirectory(dirname string) (err error) {
+	var cancel context.CancelFunc
+	var client filehandler.FileserviceClient
+	var conn *grpc.ClientConn
+	var ctx context.Context
+	var status *protocommon.StatusMessage
+
+	conn, client, err = fc.initConnection()
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
+	defer cancel()
+
+	status, err = client.MakeDirectory(ctx, &filehandler.MakeDirectoryRequest{Dirname: dirname})
+	if err != nil {
+		return err
+	} else if status.GetCode() >= http.StatusBadRequest {
+		return fmt.Errorf(status.GetMessage())
+	}
+
+	return nil
+}
+
 // function designed to upload a file to the file server.
 func (fc *FClient) UploadFile(filename string) (err error) {
 	var cancel context.CancelFunc

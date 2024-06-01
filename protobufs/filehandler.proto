@@ -17,6 +17,10 @@ service Fileservice {
         // that can be downloaded by the client.
         rpc ListFiles(common.Empty) returns (stream FileInfo) {};
 
+        // rpc designed to create a subdirectory within the
+        // uploads directory on the server.
+        rpc MakeDirectory(MakeDirectoryRequest) returns (common.StatusMessage) {};
+
         // rpc designed to download a file to the machine the
         // agent is running on from the control server.
         rpc UploadFile (FileRequest) returns (stream FileChunk) {};
@@ -39,4 +43,11 @@ message FileInfo {
 // message designed to request a file.
 message FileRequest {
         string filename = 1;
+}
+
+
+// message designed to hold the information that will
+// be passed when a directory request is initiated.
+message MakeDirectoryRequest {
+        string dirname = 1;
 }
