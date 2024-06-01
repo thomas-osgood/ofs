@@ -27,16 +27,31 @@ func CopyFile(source *os.File, destination string) (err error) {
 	// attempt to open the destination file for writing.
 	fptr, err = os.OpenFile(destination, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.FileMode(0644))
 	if err != nil {
+		// if an ErrNotExist error is detected, it is assumed
+		// that the directory structure specified for the destination
+		// file does not exist. this block will create the filepath
+		// for the destination file and re-attempt file creation once
+		// the directory structure has been created.
+		//
+		// if the directory structure creation fails, an error will
+		// be returned.
 		if errors.Is(err, os.ErrNotExist) {
+
+			// create the destination file directory structure.
 			err = CreateFileDirs(destination)
 			if err != nil {
 				return err
 			}
 
+			// re-attempt file creation. if this is not
+			// done, an error will occur later on in this
+			// function's logic because the destination
+			// file pointer will be null.
 			fptr, err = os.OpenFile(destination, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.FileMode(0644))
 			if err != nil {
 				return err
 			}
+
 		} else {
 			return err
 		}
