@@ -2,8 +2,11 @@ package server
 
 import (
 	"bufio"
+	"context"
 	"fmt"
+	"net/http"
 	"os"
+	"path/filepath"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	"github.com/thomas-osgood/ofs/protobufs/common"
@@ -11,6 +14,7 @@ import (
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
+	"google.golang.org/grpc/status"
 )
 
 // function designed to download a file from a client to the server.
@@ -72,6 +76,30 @@ func (fsrv *FServer) ListFiles(mpty *common.Empty, srv filehandler.Fileservice_L
 	}
 
 	return nil
+}
+
+// function designed to create a new sub-directory within the uploads directory.
+// if the sub-directory has sub-directories, this function will attempt to
+// create all directories.
+func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.MakeDirectoryRequest) (retstatus *common.StatusMessage, err error) {
+	var subdir string = dirreq.GetDirname()
+
+	retstatus = &common.StatusMessage{
+		Code:    http.StatusOK,
+		Message: "directory created",
+	}
+
+	subdir = filepath.Join(fsrv.rootdir, fsrv.uploadsdir, filepath.Clean(subdir))
+
+	err = os.MkdirAll(subdir, os.ModePerm)
+	if err != nil {
+
+		retstatus.Code = http.StatusInternalServerError
+		retstatus.Message = status.Convert(err).Message()
+
+	}
+
+	return retstatus, nil
 }
 
 // function designed to upload a requested file from the server to the client.
