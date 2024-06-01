@@ -7,6 +7,8 @@ const DBG_FILENAME string = "filename: %s"
 const DBG_FILE_REQUEST string = "client requesting \"%s\""
 const DBG_IN_DOWNLOAD string = "server in download file function ..."
 
+const DIR_CREATED string = "directory successfully created"
+
 const ERR_ACK string = "[ACK] %s"
 const ERR_CHUNK_BIG string = "chunk size must be less than or equal to %d"
 const ERR_CHUNK_SMALL string = "chunksize must be larger than zero"
