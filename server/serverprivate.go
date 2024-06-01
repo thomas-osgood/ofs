@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"net/http"
@@ -80,6 +81,23 @@ func (fsrv *FServer) debugMessageSuc(message string) {
 	if fsrv.debug {
 		fsrv.printer.SucMsg(message)
 	}
+}
+
+// function designed to check whether a file already exists.
+//
+// if a file does exist, a nil error will be returned.
+//
+// if the file does not exist, an error will be returned.
+func (fsrv *FServer) fileExists(filename string) (err error) {
+
+	_, err = os.Stat(filename)
+	if errors.Is(err, os.ErrNotExist) {
+		return err
+	} else if errors.Is(err, os.ErrPermission) {
+		return err
+	}
+
+	return nil
 }
 
 // function designed to list out and return the files contained
