@@ -10,6 +10,15 @@ The server can be added to an existing gRPC server (by registering the filehandl
 
 This software is distributed under the [General Public License v3.0](LICENSE). Any and all use of this software should adhere to this license.
 
+## Features
+
+- **Download File**: This allows the client to download a file from the server. (_note: the RPC for this is named `UploadFile` because from the server's perspective a file is being uploaded to the client._)
+- **Upload File**: This allows the client to upload a file to the server. (_note: the RPC for this is named `DownloadFile` because from the server's perspective a file is being downloaded from the client._)
+- **List Files**: This allows the client to see all files available for download from the server.
+- **Rename File**: This allows the client to rename a file in the uploads directory on the server.
+- **Delete File**: This allows the client to delete a file in the uploads directory on the server.
+- **Make Directory**: This allows the client to create a new directory/directory structure in the uploads directory on the server.
+
 ## Example
 
 The following code showcases the `RunServer` functionality. This will spawn a new instance of the fileserver in "stand-alone" mode and have a client upload a specified file, then request a file for download.
@@ -55,6 +64,31 @@ func main() {
 			log.Fatalf("[CLIENTUP] %s\n", err.Error())
 		}
 
+		files, err := clnt.ListFiles()
+		if err != nil {
+			log.Fatalf("[LISTFILES] %s\n", err.Error())
+		}
+
+		log.Printf("[LIST] %d files discovered ...", len(files))
+		for _, curfile := range files {
+			log.Printf("%s -- %d bytes -- Directory: %t\n", curfile.GetName(), curfile.GetSizebytes(), curfile.GetIsdir())
+		}
+
+		err = clnt.MakeDirectory("testdir/with/subdirs")
+		if err != nil {
+			log.Fatalf("[MKDIR] %s\n", err.Error())
+		}
+
+		err = clnt.RenameFile("test.txt", "copydir/testcopy.txt")
+		if err != nil {
+			log.Fatalf("[COPYFILE] %s\n", err.Error())
+		}
+
+		err = clnt.DeleteFile("copydir/testcopy.txt")
+		if err != nil {
+			log.Fatalf("[DELETEFILE] %s\n", err.Error())
+		}
+
 		err = clnt.DownloadFile(&filehandler.FileRequest{Filename: "test.txt"})
 		if err != nil {
 			log.Fatalf("[CLIENTDOWN] %s\n", err.Error())
@@ -66,4 +100,5 @@ func main() {
 		log.Fatalf("[RUNSRV] %s\n", err.Error())
 	}
 }
+
 ```
