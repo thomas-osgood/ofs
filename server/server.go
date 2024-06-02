@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	"github.com/thomas-osgood/ofs/protobufs/common"
@@ -16,6 +17,33 @@ import (
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
 	"google.golang.org/grpc/status"
 )
+
+// function designed to delete a file in the uploads directory
+// as requested by the client.
+func (fsrv *FServer) DeleteFile(ctx context.Context, req *filehandler.FileRequest) (resp *common.StatusMessage, err error) {
+	var targetpath string = strings.TrimSpace(req.GetFilename())
+
+	resp = &common.StatusMessage{
+		Code:    http.StatusOK,
+		Message: ofsmessages.FILE_DELETED,
+	}
+
+	if len(targetpath) < 1 {
+		resp.Code = http.StatusBadRequest
+		resp.Message = err.Error()
+		return resp, nil
+	}
+
+	targetpath = fsrv.buildUploadFilename(targetpath)
+
+	err = os.Remove(targetpath)
+	if err != nil {
+		resp.Code = http.StatusInternalServerError
+		resp.Message = err.Error()
+	}
+
+	return resp, nil
+}
 
 // function designed to download a file from a client to the server.
 //
