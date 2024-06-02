@@ -5,9 +5,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	"github.com/thomas-osgood/ofs/protobufs/common"
@@ -15,6 +17,7 @@ import (
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -186,10 +189,27 @@ func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFi
 // the specified file must exist in the root directory (or the uploads directory
 // if one is specified) for a successful (nil error) return.
 func (fsrv *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fileservice_UploadFileServer) (err error) {
+	var finfo fs.FileInfo
 	var fptr *os.File
+	var md metadata.MD = make(metadata.MD)
 	var targetfile string = fsrv.cleanFilename(req.GetFilename(), ofsdefaults.FTYPE_UPLOAD)
 
 	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILE_REQUEST, targetfile))
+
+	// get the information for the requested file.
+	finfo, err = os.Stat(targetfile)
+	if err != nil {
+		return err
+	}
+
+	// add the file's size to the metadata.
+	md.Set(ofscommon.HEADER_FILESIZE, fmt.Sprintf("%d", finfo.Size()))
+	// add file's last modified timestamp to metadata.
+	md.Set(ofscommon.HEADER_LASTMODIFIED, finfo.ModTime().Format(time.RFC3339))
+
+	// set the metadata that will be transmitted when the server communicates
+	// with the client.
+	srv.SetHeader(md)
 
 	fptr, err = os.Open(targetfile)
 	if err != nil {
