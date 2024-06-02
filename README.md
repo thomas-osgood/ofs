@@ -55,6 +55,31 @@ func main() {
 			log.Fatalf("[CLIENTUP] %s\n", err.Error())
 		}
 
+		files, err := clnt.ListFiles()
+		if err != nil {
+			log.Fatalf("[LISTFILES] %s\n", err.Error())
+		}
+
+		log.Printf("[LIST] %d files discovered ...", len(files))
+		for _, curfile := range files {
+			log.Printf("%s -- %d bytes -- Directory: %t\n", curfile.GetName(), curfile.GetSizebytes(), curfile.GetIsdir())
+		}
+
+		err = clnt.MakeDirectory("testdir/with/subdirs")
+		if err != nil {
+			log.Fatalf("[MKDIR] %s\n", err.Error())
+		}
+
+		err = clnt.RenameFile("test.txt", "copydir/testcopy.txt")
+		if err != nil {
+			log.Fatalf("[COPYFILE] %s\n", err.Error())
+		}
+
+		err = clnt.DeleteFile("copydir/testcopy.txt")
+		if err != nil {
+			log.Fatalf("[DELETEFILE] %s\n", err.Error())
+		}
+
 		err = clnt.DownloadFile(&filehandler.FileRequest{Filename: "test.txt"})
 		if err != nil {
 			log.Fatalf("[CLIENTDOWN] %s\n", err.Error())
@@ -66,4 +91,5 @@ func main() {
 		log.Fatalf("[RUNSRV] %s\n", err.Error())
 	}
 }
+
 ```
