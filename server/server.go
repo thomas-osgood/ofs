@@ -173,11 +173,9 @@ func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFi
 	if err != nil {
 		resp.Code = http.StatusInternalServerError
 		resp.Message = status.Convert(err).Message()
-		fsrv.debugMessageErr(resp.GetMessage())
 	} else {
 		resp.Code = http.StatusOK
 		resp.Message = ofsmessages.COPY_COMPLETE
-		fsrv.debugMessageSuc(resp.GetMessage())
 	}
 
 	return resp, nil
