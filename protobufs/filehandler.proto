@@ -9,6 +9,10 @@ import "common.proto";
 // gRPC service designed to handle uploading and
 // downloading of files.
 service Fileservice {
+        // rpc designed to delete a file located within the
+        // uploads directory of the server.
+        rpc DeleteFile(FileRequest) returns (common.StatusMessage) {};
+
         // rpc designed to upload a file from the machine the
         // agent is running on to the control server.
         rpc DownloadFile(stream FileChunk) returns (common.StatusMessage) {};

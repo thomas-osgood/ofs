@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	"github.com/thomas-osgood/ofs/protobufs/common"
@@ -16,6 +17,35 @@ import (
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
 	"google.golang.org/grpc/status"
 )
+
+// function designed to delete a file in the uploads directory
+// as requested by the client.
+func (fsrv *FServer) DeleteFile(ctx context.Context, req *filehandler.FileRequest) (resp *common.StatusMessage, err error) {
+	var targetpath string = strings.TrimSpace(req.GetFilename())
+
+	resp = &common.StatusMessage{
+		Code:    http.StatusOK,
+		Message: ofsmessages.FILE_DELETED,
+	}
+
+	if len(targetpath) < 1 {
+		resp.Code = http.StatusBadRequest
+		resp.Message = err.Error()
+		return resp, nil
+	}
+
+	targetpath = fsrv.buildUploadFilename(targetpath)
+
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_DELETING_FILE, targetpath))
+	err = os.Remove(targetpath)
+	if err != nil {
+		resp.Code = http.StatusInternalServerError
+		resp.Message = err.Error()
+	}
+	fsrv.debugMessageSuc(ofsmessages.DBG_DELETE_SUCCESS)
+
+	return resp, nil
+}
 
 // function designed to download a file from a client to the server.
 //
@@ -34,7 +64,7 @@ func (fsrv *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer
 	}
 	filename = fsrv.cleanFilename(filename, ofsdefaults.FTYPE_DOWNLOAD)
 
-	fsrv.debugMessageSuc(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
 
 	// read the data stream and save it to a temporary file.
 	tmpname, err = fsrv.readIncomingFile(srv)
@@ -138,6 +168,7 @@ func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFi
 	}
 
 	// move the source file to the destination.
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_RENAME_START, abssrc, absdest))
 	err = fsrv.moveTempfile(abssrc, absdest)
 	if err != nil {
 		resp.Code = http.StatusInternalServerError

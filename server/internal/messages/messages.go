@@ -3,9 +3,15 @@ package messages
 const COPY_COMPLETE string = "copy complete."
 const COPY_IN_PROGRESS string = "copying data to destination ..."
 
+const DBG_DELETING_FILE string = "deleting \"%s\" ..."
+const DBG_DELETE_SUCCESS string = "file successfully deleted"
 const DBG_FILENAME string = "filename: %s"
+const DBG_FILENAME_VALID_CHECK string = "checking \"%s\" exists"
+const DBG_FILENAME_VALID_SUC string = "file exists"
 const DBG_FILE_REQUEST string = "client requesting \"%s\""
 const DBG_IN_DOWNLOAD string = "server in download file function ..."
+const DBG_RENAME_START string = "renaming \"%s\" to \"%s\""
+const DBG_RENAME_SUCCESS string = "file successfully renamed"
 
 const DIR_CREATED string = "directory successfully created"
 
@@ -26,6 +32,7 @@ const ERR_RECV string = "[RECV] %s"
 const ERR_SERVE string = "[SERVE] %s\n"
 const ERR_TEMP string = "[TEMP] %s"
 
+const FILE_DELETED string = "file successfully deleted"
 const FILE_SENT string = "file successfully transmitted"
 
 const SERVER_LISTEN_INFO string = "server listening on \"%s\"\n"

@@ -31,6 +31,34 @@ func (fc *FClient) initConnection() (conn *grpc.ClientConn, client filehandler.F
 	return conn, client, nil
 }
 
+// function designed to request a file be deleted from the server's
+// uploads directory.
+func (fc *FClient) DeleteFile(targetfile string) (err error) {
+	var cancel context.CancelFunc
+	var client filehandler.FileserviceClient
+	var conn *grpc.ClientConn
+	var ctx context.Context
+	var status *protocommon.StatusMessage
+
+	conn, client, err = fc.initConnection()
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
+	defer cancel()
+
+	status, err = client.DeleteFile(ctx, &filehandler.FileRequest{Filename: targetfile})
+	if err != nil {
+		return err
+	} else if status.GetCode() >= http.StatusBadRequest {
+		return fmt.Errorf(status.GetMessage())
+	}
+
+	return nil
+}
+
 // function designed to download the file contents from the file server.
 //
 // this will save the content to the filename specified in the req object.

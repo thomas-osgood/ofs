@@ -96,12 +96,14 @@ func (fsrv *FServer) debugMessageSuc(message string) {
 // if the file does not exist, an error will be returned.
 func (fsrv *FServer) fileExists(filename string) (err error) {
 
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILENAME_VALID_CHECK, filename))
 	_, err = os.Stat(filename)
 	if errors.Is(err, os.ErrNotExist) {
 		return err
 	} else if errors.Is(err, os.ErrPermission) {
 		return err
 	}
+	fsrv.debugMessageSuc(ofsmessages.DBG_FILENAME_VALID_SUC)
 
 	return nil
 }
@@ -192,14 +194,14 @@ func (fsrv *FServer) readIncomingFile(srv filehandler.Fileservice_DownloadFileSe
 	// create a temporary file to hold the uploaded information.
 	tmpfile, err = os.CreateTemp("", "download")
 	if err != nil {
-		fsrv.debugMessage(fmt.Sprintf(ofsmessages.ERR_TEMP, err.Error()))
+		fsrv.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_TEMP, err.Error()))
 		return "", err
 	}
 	defer tmpfile.Close()
 
 	tmpname = tmpfile.Name()
 
-	fsrv.debugMessageSuc(fmt.Sprintf(ofsmessages.UPLOAD_IN_PROGRESS, tmpname))
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.UPLOAD_IN_PROGRESS, tmpname))
 
 	// stream the file contents from the client and write them
 	// to the temp file.

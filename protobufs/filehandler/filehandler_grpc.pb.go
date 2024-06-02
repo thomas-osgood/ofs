@@ -23,6 +23,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FileserviceClient interface {
+	// rpc designed to delete a file located within the
+	// uploads directory of the server.
+	DeleteFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*common.StatusMessage, error)
 	// rpc designed to upload a file from the machine the
 	// agent is running on to the control server.
 	DownloadFile(ctx context.Context, opts ...grpc.CallOption) (Fileservice_DownloadFileClient, error)
@@ -46,6 +49,15 @@ type fileserviceClient struct {
 
 func NewFileserviceClient(cc grpc.ClientConnInterface) FileserviceClient {
 	return &fileserviceClient{cc}
+}
+
+func (c *fileserviceClient) DeleteFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*common.StatusMessage, error) {
+	out := new(common.StatusMessage)
+	err := c.cc.Invoke(ctx, "/filehandler.Fileservice/DeleteFile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *fileserviceClient) DownloadFile(ctx context.Context, opts ...grpc.CallOption) (Fileservice_DownloadFileClient, error) {
@@ -168,6 +180,9 @@ func (x *fileserviceUploadFileClient) Recv() (*FileChunk, error) {
 // All implementations must embed UnimplementedFileserviceServer
 // for forward compatibility
 type FileserviceServer interface {
+	// rpc designed to delete a file located within the
+	// uploads directory of the server.
+	DeleteFile(context.Context, *FileRequest) (*common.StatusMessage, error)
 	// rpc designed to upload a file from the machine the
 	// agent is running on to the control server.
 	DownloadFile(Fileservice_DownloadFileServer) error
@@ -190,6 +205,9 @@ type FileserviceServer interface {
 type UnimplementedFileserviceServer struct {
 }
 
+func (UnimplementedFileserviceServer) DeleteFile(context.Context, *FileRequest) (*common.StatusMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteFile not implemented")
+}
 func (UnimplementedFileserviceServer) DownloadFile(Fileservice_DownloadFileServer) error {
 	return status.Errorf(codes.Unimplemented, "method DownloadFile not implemented")
 }
@@ -216,6 +234,24 @@ type UnsafeFileserviceServer interface {
 
 func RegisterFileserviceServer(s grpc.ServiceRegistrar, srv FileserviceServer) {
 	s.RegisterService(&Fileservice_ServiceDesc, srv)
+}
+
+func _Fileservice_DeleteFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileserviceServer).DeleteFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/filehandler.Fileservice/DeleteFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileserviceServer).DeleteFile(ctx, req.(*FileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Fileservice_DownloadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -329,6 +365,10 @@ var Fileservice_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "filehandler.Fileservice",
 	HandlerType: (*FileserviceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "DeleteFile",
+			Handler:    _Fileservice_DeleteFile_Handler,
+		},
 		{
 			MethodName: "MakeDirectory",
 			Handler:    _Fileservice_MakeDirectory_Handler,
