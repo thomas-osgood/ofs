@@ -192,14 +192,14 @@ func (fsrv *FServer) readIncomingFile(srv filehandler.Fileservice_DownloadFileSe
 	// create a temporary file to hold the uploaded information.
 	tmpfile, err = os.CreateTemp("", "download")
 	if err != nil {
-		fsrv.debugMessage(fmt.Sprintf(ofsmessages.ERR_TEMP, err.Error()))
+		fsrv.debugMessageErr(fmt.Sprintf(ofsmessages.ERR_TEMP, err.Error()))
 		return "", err
 	}
 	defer tmpfile.Close()
 
 	tmpname = tmpfile.Name()
 
-	fsrv.debugMessageSuc(fmt.Sprintf(ofsmessages.UPLOAD_IN_PROGRESS, tmpname))
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.UPLOAD_IN_PROGRESS, tmpname))
 
 	// stream the file contents from the client and write them
 	// to the temp file.
