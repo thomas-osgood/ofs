@@ -62,7 +62,7 @@ func (fsrv *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer
 	}
 	filename = fsrv.cleanFilename(filename, ofsdefaults.FTYPE_DOWNLOAD)
 
-	fsrv.debugMessageSuc(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
 
 	// read the data stream and save it to a temporary file.
 	tmpname, err = fsrv.readIncomingFile(srv)
