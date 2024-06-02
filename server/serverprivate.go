@@ -96,12 +96,14 @@ func (fsrv *FServer) debugMessageSuc(message string) {
 // if the file does not exist, an error will be returned.
 func (fsrv *FServer) fileExists(filename string) (err error) {
 
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILENAME_VALID_CHECK, filename))
 	_, err = os.Stat(filename)
 	if errors.Is(err, os.ErrNotExist) {
 		return err
 	} else if errors.Is(err, os.ErrPermission) {
 		return err
 	}
+	fsrv.debugMessageSuc(ofsmessages.DBG_FILENAME_VALID_SUC)
 
 	return nil
 }
