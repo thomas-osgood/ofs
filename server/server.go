@@ -191,7 +191,7 @@ func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFi
 func (fsrv *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fileservice_UploadFileServer) (err error) {
 	var finfo fs.FileInfo
 	var fptr *os.File
-	var md metadata.MD
+	var md metadata.MD = make(metadata.MD)
 	var targetfile string = fsrv.cleanFilename(req.GetFilename(), ofsdefaults.FTYPE_UPLOAD)
 
 	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILE_REQUEST, targetfile))
