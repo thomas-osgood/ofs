@@ -3,6 +3,7 @@ package messages
 const COPY_COMPLETE string = "copy complete."
 const COPY_IN_PROGRESS string = "copying data to destination ..."
 
+const DBG_DELETING_FILE string = "deleting \"%s\" ..."
 const DBG_FILENAME string = "filename: %s"
 const DBG_FILE_REQUEST string = "client requesting \"%s\""
 const DBG_IN_DOWNLOAD string = "server in download file function ..."
