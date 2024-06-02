@@ -36,11 +36,13 @@ func (fsrv *FServer) DeleteFile(ctx context.Context, req *filehandler.FileReques
 
 	targetpath = fsrv.buildUploadFilename(targetpath)
 
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_DELETING_FILE, targetpath))
 	err = os.Remove(targetpath)
 	if err != nil {
 		resp.Code = http.StatusInternalServerError
 		resp.Message = err.Error()
 	}
+	fsrv.debugMessageSuc(ofsmessages.DBG_DELETE_SUCCESS)
 
 	return resp, nil
 }
