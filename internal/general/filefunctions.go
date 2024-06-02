@@ -2,8 +2,12 @@ package general
 
 import (
 	"bufio"
+	"errors"
+	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
 // function designed to copy the contents of a source file
@@ -18,10 +22,39 @@ func CopyFile(source *os.File, destination string) (err error) {
 	var readcount int
 	var reader *bufio.Reader
 
+	destination = strings.TrimSpace(filepath.Clean(destination))
+
 	// attempt to open the destination file for writing.
 	fptr, err = os.OpenFile(destination, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.FileMode(0644))
 	if err != nil {
-		return err
+		// if an ErrNotExist error is detected, it is assumed
+		// that the directory structure specified for the destination
+		// file does not exist. this block will create the filepath
+		// for the destination file and re-attempt file creation once
+		// the directory structure has been created.
+		//
+		// if the directory structure creation fails, an error will
+		// be returned.
+		if errors.Is(err, os.ErrNotExist) {
+
+			// create the destination file directory structure.
+			err = CreateFileDirs(destination)
+			if err != nil {
+				return err
+			}
+
+			// re-attempt file creation. if this is not
+			// done, an error will occur later on in this
+			// function's logic because the destination
+			// file pointer will be null.
+			fptr, err = os.OpenFile(destination, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, os.FileMode(0644))
+			if err != nil {
+				return err
+			}
+
+		} else {
+			return err
+		}
 	}
 	defer fptr.Close()
 
@@ -66,6 +99,36 @@ func CopyFileSS(source string, destination string) (err error) {
 	defer fptr.Close()
 
 	err = CopyFile(fptr, destination)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// function designed to create all directories necessary for
+// a file.
+//
+// example: if "test/directory/struct/file.txt" is passed in,
+// "test/directory/struct" will be created so "file.txt" can
+// be created.
+func CreateFileDirs(destination string) (err error) {
+	var basepath string
+	var sepstr string = fmt.Sprintf("%c", os.PathSeparator)
+	var splitpath []string
+
+	destination = strings.TrimSpace(filepath.Clean(destination))
+	splitpath = strings.Split(destination, sepstr)
+
+	// if the split path is only one element, only the filename
+	// has been provided, so there is nothing to do.
+	if len(splitpath) < 2 {
+		return nil
+	}
+
+	basepath = strings.Join(splitpath[:len(splitpath)-1], sepstr)
+
+	err = os.MkdirAll(basepath, os.ModePerm)
 	if err != nil {
 		return err
 	}

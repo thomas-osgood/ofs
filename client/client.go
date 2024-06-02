@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
@@ -161,6 +162,49 @@ func (fc *FClient) MakeDirectory(dirname string) (err error) {
 	defer cancel()
 
 	status, err = client.MakeDirectory(ctx, &filehandler.MakeDirectoryRequest{Dirname: dirname})
+	if err != nil {
+		return err
+	} else if status.GetCode() >= http.StatusBadRequest {
+		return fmt.Errorf(status.GetMessage())
+	}
+
+	return nil
+}
+
+// function designed to request a file in the server's uploads
+// directory be renamed.
+func (fc *FClient) RenameFile(originalname string, newname string) (err error) {
+	var cancel context.CancelFunc
+	var client filehandler.FileserviceClient
+	var conn *grpc.ClientConn
+	var ctx context.Context
+	var status *protocommon.StatusMessage
+
+	conn, client, err = fc.initConnection()
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
+	defer cancel()
+
+	// make sure the filenames passed in are not empty strings.
+	originalname = strings.TrimSpace(originalname)
+	newname = strings.TrimSpace(newname)
+	if (len(originalname) < 1) || (len(newname) < 1) {
+		return fmt.Errorf(ofcmessages.ERR_FILENAME_EMPTY)
+	}
+
+	// request the server rename the file.
+	status, err = client.RenameFile(
+		ctx,
+		&filehandler.RenameFileRequest{
+			Oldfilename: originalname,
+			Newfilename: newname,
+		},
+	)
+
 	if err != nil {
 		return err
 	} else if status.GetCode() >= http.StatusBadRequest {

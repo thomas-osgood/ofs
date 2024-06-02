@@ -32,6 +32,9 @@ type FileserviceClient interface {
 	// rpc designed to create a subdirectory within the
 	// uploads directory on the server.
 	MakeDirectory(ctx context.Context, in *MakeDirectoryRequest, opts ...grpc.CallOption) (*common.StatusMessage, error)
+	// rpc designed to rename a file as requested by
+	// the client.
+	RenameFile(ctx context.Context, in *RenameFileRequest, opts ...grpc.CallOption) (*common.StatusMessage, error)
 	// rpc designed to download a file to the machine the
 	// agent is running on from the control server.
 	UploadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (Fileservice_UploadFileClient, error)
@@ -120,6 +123,15 @@ func (c *fileserviceClient) MakeDirectory(ctx context.Context, in *MakeDirectory
 	return out, nil
 }
 
+func (c *fileserviceClient) RenameFile(ctx context.Context, in *RenameFileRequest, opts ...grpc.CallOption) (*common.StatusMessage, error) {
+	out := new(common.StatusMessage)
+	err := c.cc.Invoke(ctx, "/filehandler.Fileservice/RenameFile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *fileserviceClient) UploadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (Fileservice_UploadFileClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Fileservice_ServiceDesc.Streams[2], "/filehandler.Fileservice/UploadFile", opts...)
 	if err != nil {
@@ -165,6 +177,9 @@ type FileserviceServer interface {
 	// rpc designed to create a subdirectory within the
 	// uploads directory on the server.
 	MakeDirectory(context.Context, *MakeDirectoryRequest) (*common.StatusMessage, error)
+	// rpc designed to rename a file as requested by
+	// the client.
+	RenameFile(context.Context, *RenameFileRequest) (*common.StatusMessage, error)
 	// rpc designed to download a file to the machine the
 	// agent is running on from the control server.
 	UploadFile(*FileRequest, Fileservice_UploadFileServer) error
@@ -183,6 +198,9 @@ func (UnimplementedFileserviceServer) ListFiles(*common.Empty, Fileservice_ListF
 }
 func (UnimplementedFileserviceServer) MakeDirectory(context.Context, *MakeDirectoryRequest) (*common.StatusMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MakeDirectory not implemented")
+}
+func (UnimplementedFileserviceServer) RenameFile(context.Context, *RenameFileRequest) (*common.StatusMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RenameFile not implemented")
 }
 func (UnimplementedFileserviceServer) UploadFile(*FileRequest, Fileservice_UploadFileServer) error {
 	return status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
@@ -265,6 +283,24 @@ func _Fileservice_MakeDirectory_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Fileservice_RenameFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RenameFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileserviceServer).RenameFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/filehandler.Fileservice/RenameFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileserviceServer).RenameFile(ctx, req.(*RenameFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Fileservice_UploadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(FileRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -296,6 +332,10 @@ var Fileservice_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "MakeDirectory",
 			Handler:    _Fileservice_MakeDirectory_Handler,
+		},
+		{
+			MethodName: "RenameFile",
+			Handler:    _Fileservice_RenameFile_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

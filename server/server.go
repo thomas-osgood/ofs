@@ -3,10 +3,10 @@ package server
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
-	"path/filepath"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	"github.com/thomas-osgood/ofs/protobufs/common"
@@ -86,18 +86,14 @@ func (fsrv *FServer) ListFiles(mpty *common.Empty, srv filehandler.Fileservice_L
 //
 // failure code: 500 Internal Server Error
 func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.MakeDirectoryRequest) (retstatus *common.StatusMessage, err error) {
-	var subdir string = dirreq.GetDirname()
+	var subdir string = fsrv.buildUploadFilename(dirreq.GetDirname())
 
 	// initialize the successful StatusMessage. if everything
 	// works as expected, this will not be modified.
 	retstatus = &common.StatusMessage{
 		Code:    http.StatusCreated,
-		Message: "directory created",
+		Message: ofsmessages.DIR_CREATED,
 	}
-
-	// create the absolute path of the directory (or directories)
-	// that will be created.
-	subdir = filepath.Join(fsrv.rootdir, fsrv.uploadsdir, filepath.Clean(subdir))
 
 	// attempt to create sub-directory specified by the client.
 	// if this fails, the StatusMessage returned to the client
@@ -111,6 +107,47 @@ func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.Make
 	}
 
 	return retstatus, nil
+}
+
+// function designed to rename a file in the uploads directory. this
+// will move the source file to the destination.
+//
+// if the file does not already exist, the success or failure status
+// will be transmitted to the client using a StatusMessage object. the
+// code should be used to determine whether the copy was successful or not.
+//
+// success status code: 200 OK
+//
+// failure status code: 500 Internal Server Error
+//
+// note: if the destination file already exists, or if there is an issue
+// related to permissions, an error will be returned.
+func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFileRequest) (resp *common.StatusMessage, err error) {
+	var absdest string = fsrv.buildUploadFilename(rnreq.GetNewfilename())
+	var abssrc string = fsrv.buildUploadFilename(rnreq.GetOldfilename())
+
+	resp = new(common.StatusMessage)
+
+	// check for the existence of the destination file. if the
+	// destination file already exists, an error will be returned
+	// saying as much.
+	if err = fsrv.fileExists(absdest); err == nil {
+		return nil, fmt.Errorf(ofsmessages.ERR_FILE_EXISTS)
+	} else if errors.Is(err, os.ErrPermission) {
+		return nil, err
+	}
+
+	// move the source file to the destination.
+	err = fsrv.moveTempfile(abssrc, absdest)
+	if err != nil {
+		resp.Code = http.StatusInternalServerError
+		resp.Message = status.Convert(err).Message()
+	} else {
+		resp.Code = http.StatusOK
+		resp.Message = ofsmessages.COPY_COMPLETE
+	}
+
+	return resp, nil
 }
 
 // function designed to upload a requested file from the server to the client.
@@ -134,7 +171,7 @@ func (fsrv *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fi
 		return err
 	}
 
-	fsrv.debugMessageSuc("file successfully transmitted")
+	fsrv.debugMessageSuc(ofsmessages.FILE_SENT)
 
 	return nil
 }
