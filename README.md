@@ -10,6 +10,15 @@ The server can be added to an existing gRPC server (by registering the filehandl
 
 This software is distributed under the [General Public License v3.0](LICENSE). Any and all use of this software should adhere to this license.
 
+## Features
+
+- **Download File**: This allows the client to download a file from the server. (_note: the RPC for this is named `UploadFile` because from the server's perspective a file is being uploaded to the client._)
+- **Upload File**: This allows the client to upload a file to the server. (_note: the RPC for this is named `DownloadFile` because from the server's perspective a file is being downloaded from the client._)
+- **List Files**: This allows the client to see all files available for download from the server.
+- **Rename File**: This allows the client to rename a file in the uploads directory on the server.
+- **Delete File**: This allows the client to delete a file in the uploads directory on the server.
+- **Make Directory**: This allows the client to create a new directory/directory structure in the uploads directory on the server.
+
 ## Example
 
 The following code showcases the `RunServer` functionality. This will spawn a new instance of the fileserver in "stand-alone" mode and have a client upload a specified file, then request a file for download.
