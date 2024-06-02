@@ -8,6 +8,8 @@ const DBG_DELETE_SUCCESS string = "file successfully deleted"
 const DBG_FILENAME string = "filename: %s"
 const DBG_FILE_REQUEST string = "client requesting \"%s\""
 const DBG_IN_DOWNLOAD string = "server in download file function ..."
+const DBG_RENAME_START string = "renaming \"%s\" to \"%s\""
+const DBG_RENAME_SUCCESS string = "file successfully renamed"
 
 const DIR_CREATED string = "directory successfully created"
 
