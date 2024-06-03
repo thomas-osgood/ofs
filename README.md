@@ -1,5 +1,10 @@
 # Osgood File Server (OFS)
 
+[![Osgood File Server](https://img.shields.io/badge/Osgood%20File%20Server-8A2BE2)](https://github.com/thomas-osgood/ofs)
+![GitHub Release](https://img.shields.io/github/v/release/thomas-osgood/ofs)
+![GitHub License](https://img.shields.io/github/license/thomas-osgood/ofs)
+[![Go Reference](https://pkg.go.dev/badge/github.com/thomas-osgood/ofs.svg)](https://pkg.go.dev/github.com/thomas-osgood/ofs)
+
 ## Overview
 
 The Osgood File Server (OFS) is designed to be a simple file server that utilizes protocol buffers (protobufs) and gRPC to transfer files. The server is written in Golang.
