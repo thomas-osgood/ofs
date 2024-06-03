@@ -5,6 +5,7 @@ package filehandler;
 option go_package = "github.com/thomas-osgood/ofs/protobufs/filehandler";
 
 import "common.proto";
+import "google/protobuf/timestamp.proto";
 
 // gRPC service designed to handle uploading and
 // downloading of files.
@@ -46,6 +47,7 @@ message FileInfo {
         string name = 1;
         int64 sizebytes = 2;
         bool isdir = 3;
+        google.protobuf.Timestamp lastmodified = 4;
 }
 
 // message designed to request a file.

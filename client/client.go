@@ -156,9 +156,10 @@ func (fc *FClient) ListFiles() (files []*filehandler.FileInfo, err error) {
 		files = append(
 			files,
 			&filehandler.FileInfo{
-				Name:      curfile.GetName(),
-				Sizebytes: curfile.GetSizebytes(),
-				Isdir:     curfile.GetIsdir(),
+				Name:         curfile.GetName(),
+				Sizebytes:    curfile.GetSizebytes(),
+				Isdir:        curfile.GetIsdir(),
+				Lastmodified: curfile.GetLastmodified(),
 			},
 		)
 	}

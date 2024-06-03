@@ -14,6 +14,7 @@ import (
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // function designed to build the directory structure the fileserver
@@ -146,9 +147,10 @@ func (fsrv *FServer) listUploadsDir() (files []*filehandler.FileInfo, err error)
 		files = append(
 			files,
 			&filehandler.FileInfo{
-				Name:      curfile,
-				Sizebytes: info.Size(),
-				Isdir:     info.IsDir(),
+				Name:         curfile,
+				Sizebytes:    info.Size(),
+				Isdir:        info.IsDir(),
+				Lastmodified: timestamppb.New(info.ModTime()),
 			},
 		)
 
