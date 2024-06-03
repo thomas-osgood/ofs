@@ -243,6 +243,13 @@ func (fc *FClient) RenameFile(originalname string, newname string) (err error) {
 	return nil
 }
 
+// function designed to update the address of the server
+// the client attempts to connect to when it makes RPC calls.
+func (fc *FClient) UpdateServerAddress(newaddress string) (err error) {
+	fc.srvaddr = newaddress
+	return nil
+}
+
 // function designed to upload a file to the file server.
 func (fc *FClient) UploadFile(filename string) (err error) {
 	var cancel context.CancelFunc
