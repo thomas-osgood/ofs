@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 PROTOROOT=.
-TARGETPROTOS=("common" "filehandler")
+TARGETPROTOS=("common" "filehandler" "pingpong")
 
 for i in ${TARGETPROTOS[@]};
 do

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pingpong;
+
+option go_package = "github.com/thomas-osgood/ofs/protobufs/pingpong";
+
+import "google/protobuf/timestamp.proto";
+
+// message designed to represent a PING request.
+message Ping {
+    google.protobuf.Timestamp stamp = 1;
+}
+
+// message designed to represent a PONG response.
+message Pong {
+    google.protobuf.Timestamp reqtime = 1;
+    google.protobuf.Timestamp resptime = 2;
+}

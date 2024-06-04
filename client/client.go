@@ -9,12 +9,15 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
+	"github.com/thomas-osgood/ofs/protobufs/pingpong"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // ease-of-use function that creates the gRPC connection and a
@@ -198,6 +201,39 @@ func (fc *FClient) MakeDirectory(dirname string) (err error) {
 	}
 
 	return nil
+}
+
+// function designed to check whether the server is up and able
+// to be contacted.
+func (fc *FClient) Ping() (roundtrip time.Duration, err error) {
+	var cancel context.CancelFunc
+	var client filehandler.FileserviceClient
+	var conn *grpc.ClientConn
+	var ctx context.Context
+	var pong *pingpong.Pong
+	var reqtime time.Time
+	var restime time.Time
+
+	conn, client, err = fc.initConnection()
+	if err != nil {
+		return 0, err
+	}
+	defer conn.Close()
+
+	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
+	defer cancel()
+
+	pong, err = client.Ping(ctx, &pingpong.Ping{Stamp: timestamppb.Now()})
+	if err != nil {
+		return 0, err
+	}
+
+	reqtime = pong.GetReqtime().AsTime()
+	restime = pong.GetResptime().AsTime()
+
+	roundtrip = restime.Sub(reqtime)
+
+	return roundtrip, nil
 }
 
 // function designed to request a file in the server's uploads
