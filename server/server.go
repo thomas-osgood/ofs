@@ -147,6 +147,7 @@ func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.Make
 // function designed to let the client know that the server is up
 // and able to be contacted.
 func (fsrv *FServer) Ping(ctx context.Context, ping *pingpong.Ping) (pong *pingpong.Pong, err error) {
+	fsrv.debugMessage(fmt.Sprintf("ping received: %s", ping.GetStamp().AsTime().Format(time.RFC3339)))
 	return &pingpong.Pong{Reqtime: ping.GetStamp(), Resptime: timestamppb.Now()}, nil
 }
 
