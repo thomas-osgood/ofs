@@ -14,11 +14,13 @@ import (
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	"github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
+	"github.com/thomas-osgood/ofs/protobufs/pingpong"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // function designed to delete a file in the uploads directory
@@ -140,6 +142,12 @@ func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.Make
 	}
 
 	return retstatus, nil
+}
+
+// function designed to let the client know that the server is up
+// and able to be contacted.
+func (fsrv *FServer) Ping(ctx context.Context, ping *pingpong.Ping) (pong *pingpong.Pong, err error) {
+	return &pingpong.Pong{Reqtime: ping.GetStamp(), Resptime: timestamppb.Now()}, nil
 }
 
 // function designed to rename a file in the uploads directory. this
