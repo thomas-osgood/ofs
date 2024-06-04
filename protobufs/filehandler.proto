@@ -5,6 +5,7 @@ package filehandler;
 option go_package = "github.com/thomas-osgood/ofs/protobufs/filehandler";
 
 import "common.proto";
+import "pingpong.proto";
 import "google/protobuf/timestamp.proto";
 
 // gRPC service designed to handle uploading and
@@ -25,6 +26,10 @@ service Fileservice {
         // rpc designed to create a subdirectory within the
         // uploads directory on the server.
         rpc MakeDirectory(MakeDirectoryRequest) returns (common.StatusMessage) {};
+
+        // rpc designed to let the client know the server is up
+        // and able to be contacted.
+        rpc Ping(pingpong.Ping) returns (pingpong.Pong) {};
 
         // rpc designed to rename a file as requested by
         // the client.
