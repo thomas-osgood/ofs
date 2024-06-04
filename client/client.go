@@ -41,7 +41,7 @@ func (fc *FClient) DeleteFile(targetfile string) (err error) {
 	var client filehandler.FileserviceClient
 	var conn *grpc.ClientConn
 	var ctx context.Context
-	var status *protocommon.StatusMessage
+	var resp *protocommon.StatusMessage
 
 	conn, client, err = fc.initConnection()
 	if err != nil {
@@ -52,11 +52,11 @@ func (fc *FClient) DeleteFile(targetfile string) (err error) {
 	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
 	defer cancel()
 
-	status, err = client.DeleteFile(ctx, &filehandler.FileRequest{Filename: targetfile})
+	resp, err = client.DeleteFile(ctx, &filehandler.FileRequest{Filename: targetfile})
 	if err != nil {
 		return err
-	} else if status.GetCode() >= http.StatusBadRequest {
-		return fmt.Errorf(status.GetMessage())
+	} else if resp.GetCode() >= http.StatusBadRequest {
+		return fmt.Errorf(resp.GetMessage())
 	}
 
 	return nil
@@ -182,7 +182,7 @@ func (fc *FClient) MakeDirectory(dirname string) (err error) {
 	var client filehandler.FileserviceClient
 	var conn *grpc.ClientConn
 	var ctx context.Context
-	var status *protocommon.StatusMessage
+	var resp *protocommon.StatusMessage
 
 	conn, client, err = fc.initConnection()
 	if err != nil {
@@ -193,11 +193,11 @@ func (fc *FClient) MakeDirectory(dirname string) (err error) {
 	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
 	defer cancel()
 
-	status, err = client.MakeDirectory(ctx, &filehandler.MakeDirectoryRequest{Dirname: dirname})
+	resp, err = client.MakeDirectory(ctx, &filehandler.MakeDirectoryRequest{Dirname: dirname})
 	if err != nil {
 		return err
-	} else if status.GetCode() >= http.StatusBadRequest {
-		return fmt.Errorf(status.GetMessage())
+	} else if resp.GetCode() >= http.StatusBadRequest {
+		return fmt.Errorf(resp.GetMessage())
 	}
 
 	return nil
@@ -243,7 +243,7 @@ func (fc *FClient) RenameFile(originalname string, newname string) (err error) {
 	var client filehandler.FileserviceClient
 	var conn *grpc.ClientConn
 	var ctx context.Context
-	var status *protocommon.StatusMessage
+	var resp *protocommon.StatusMessage
 
 	conn, client, err = fc.initConnection()
 	if err != nil {
@@ -262,7 +262,7 @@ func (fc *FClient) RenameFile(originalname string, newname string) (err error) {
 	}
 
 	// request the server rename the file.
-	status, err = client.RenameFile(
+	resp, err = client.RenameFile(
 		ctx,
 		&filehandler.RenameFileRequest{
 			Oldfilename: originalname,
@@ -272,8 +272,8 @@ func (fc *FClient) RenameFile(originalname string, newname string) (err error) {
 
 	if err != nil {
 		return err
-	} else if status.GetCode() >= http.StatusBadRequest {
-		return fmt.Errorf(status.GetMessage())
+	} else if resp.GetCode() >= http.StatusBadRequest {
+		return fmt.Errorf(resp.GetMessage())
 	}
 
 	return nil
@@ -287,7 +287,7 @@ func (fc *FClient) UploadFile(filename string) (err error) {
 	var ctx context.Context
 	var fptr *os.File
 	var srv filehandler.Fileservice_DownloadFileClient
-	var status *protocommon.StatusMessage
+	var resp *protocommon.StatusMessage
 
 	conn, client, err = fc.initConnection()
 	if err != nil {
@@ -323,11 +323,11 @@ func (fc *FClient) UploadFile(filename string) (err error) {
 	}
 
 	// close the stream and get the server's status response message.
-	status, err = srv.CloseAndRecv()
+	resp, err = srv.CloseAndRecv()
 	if err != nil {
 		return err
-	} else if status.GetCode() != http.StatusOK {
-		return fmt.Errorf(ofcmessages.ERR_TRANSMIT_FILE, status.GetMessage())
+	} else if resp.GetCode() != http.StatusOK {
+		return fmt.Errorf(ofcmessages.ERR_TRANSMIT_FILE, resp.GetMessage())
 	}
 
 	return nil
