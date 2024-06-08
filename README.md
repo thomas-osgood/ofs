@@ -23,6 +23,7 @@ This software is distributed under the [General Public License v3.0](LICENSE). A
 - **Rename File**: This allows the client to rename a file in the uploads directory on the server.
 - **Delete File**: This allows the client to delete a file in the uploads directory on the server.
 - **Make Directory**: This allows the client to create a new directory/directory structure in the uploads directory on the server.
+- **Multi-File Download**: This allows the client to download multiple files with one function call.
 
 ## Example
 
@@ -82,6 +83,18 @@ func main() {
 		err = clnt.MakeDirectory("testdir/with/subdirs")
 		if err != nil {
 			log.Fatalf("[MKDIR] %s\n", err.Error())
+		}
+
+		err = clnt.UpdateServerAddress("127.0.0.1:89")
+		if err != nil {
+			log.Printf("unable to change address: %s\n", err.Error())
+		}
+
+		multiresult := clnt.MultifileDownload([]string{"multi1.txt", "multi2.txt", "multi3.txt"})
+		if len(multiresult) > 0 {
+			for mres, errmsg := range multiresult {
+				log.Printf("[MULTIFILEERROR] %s: %s\n", mres, errmsg.Error())
+			}
 		}
 
 		err = clnt.RenameFile("test.txt", "copydir/testcopy.txt")
