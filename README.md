@@ -84,6 +84,18 @@ func main() {
 			log.Fatalf("[MKDIR] %s\n", err.Error())
 		}
 
+		err = clnt.UpdateServerAddress("127.0.0.1:89")
+		if err != nil {
+			log.Printf("unable to change address: %s\n", err.Error())
+		}
+
+		multiresult := clnt.MultifileDownload([]string{"multi1.txt", "multi2.txt", "multi3.txt"})
+		if len(multiresult) > 0 {
+			for mres, errmsg := range multiresult {
+				log.Printf("[MULTIFILEERROR] %s: %s\n", mres, errmsg.Error())
+			}
+		}
+
 		err = clnt.RenameFile("test.txt", "copydir/testcopy.txt")
 		if err != nil {
 			log.Fatalf("[COPYFILE] %s\n", err.Error())
