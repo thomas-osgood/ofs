@@ -98,6 +98,13 @@ func main() {
 			}
 		}
 
+		multiresult = clnt.MultifileUpload([]string{"multiu1.txt", "multiu2.txt", "multiu3.txt"})
+		if len(multiresult) > 0 {
+			for mres, errmsg := range multiresult {
+				log.Printf("[MULTIFILEUERROR] %s: %s\n", mres, errmsg.Error())
+			}
+		}
+
 		err = clnt.RenameFile("test.txt", "copydir/testcopy.txt")
 		if err != nil {
 			log.Fatalf("[COPYFILE] %s\n", err.Error())
