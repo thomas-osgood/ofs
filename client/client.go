@@ -239,6 +239,30 @@ func (fc *FClient) MultifileDownload(targets []string) (errs map[string]error) {
 	return errs
 }
 
+// function designed to upload multiple files at one time.
+//
+// this will return a map containing the filenames and an associated
+// error. if no errors occurred, the map will be empty.
+func (fc *FClient) MultifileUpload(targets []string) (errs map[string]error) {
+	var err error
+	var target string
+
+	// initialize the return map to avoid nil reference errors.
+	errs = make(map[string]error)
+
+	// loop through each file and attempt to uploda it to the
+	// server. if an error occurs add a new entry to the return
+	// map connecting the filename and error.
+	for _, target = range targets {
+		err = fc.UploadFile(target)
+		if err != nil {
+			errs[target] = err
+		}
+	}
+
+	return errs
+}
+
 // function designed to check whether the server is up and able
 // to be contacted.
 func (fc *FClient) Ping() (roundtrip time.Duration, err error) {
