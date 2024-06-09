@@ -155,6 +155,8 @@ func (fsrv *FServer) MultifileUpload(srv filehandler.Fileservice_MultifileUpload
 	var targetfile string
 
 	for {
+		// keep receiving FileRequest messages from the client until
+		// the stream is closed.
 		curreq, err = srv.Recv()
 		if err != nil {
 			if err == io.EOF {
