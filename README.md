@@ -24,6 +24,7 @@ This software is distributed under the [General Public License v3.0](LICENSE). A
 - **Delete File**: This allows the client to delete a file in the uploads directory on the server.
 - **Make Directory**: This allows the client to create a new directory/directory structure in the uploads directory on the server.
 - **Multi-File Download**: This allows the client to download multiple files with one function call.
+- **Multi-File Upload**: This allows the client to upload multiple files with one function call.
 
 ## Example
 
