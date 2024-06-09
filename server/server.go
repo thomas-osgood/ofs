@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/http"
 	"os"
@@ -142,6 +143,30 @@ func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.Make
 	}
 
 	return retstatus, nil
+}
+
+// function designed to upload multiple files to a requesting client.
+//
+// the client will stream FileRequest messages to the server and the
+// server will respond by streaming the contents of the requested
+// files down to the client.
+func (fsrv *FServer) MultifileUpload(srv filehandler.Fileservice_MultifileUploadServer) (err error) {
+	var curreq *filehandler.FileRequest
+	var targetfile string
+
+	for {
+		curreq, err = srv.Recv()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+		}
+
+		targetfile = curreq.GetFilename()
+		fsrv.debugMessage(fmt.Sprintf("requested file: %s", targetfile))
+	}
+
+	return nil
 }
 
 // function designed to let the client know that the server is up
