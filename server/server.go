@@ -161,6 +161,9 @@ func (fsrv *FServer) MultifileUpload(srv filehandler.Fileservice_MultifileUpload
 			if err == io.EOF {
 				break
 			}
+
+			fsrv.debugMessageErr(err.Error())
+			return err
 		}
 
 		// attempt to upload the file using the single upload function.
