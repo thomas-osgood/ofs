@@ -166,6 +166,12 @@ func (fsrv *FServer) MultifileUpload(srv filehandler.Fileservice_MultifileUpload
 
 		targetfile = fsrv.buildUploadFilename(curreq.GetFilename())
 		fsrv.debugMessage(fmt.Sprintf("requested file: %s", targetfile))
+
+		// check for existence of target file.
+		err = fsrv.fileExists(targetfile)
+		if err != nil {
+			continue
+		}
 	}
 
 	return nil
