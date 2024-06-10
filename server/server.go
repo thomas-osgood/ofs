@@ -152,7 +152,6 @@ func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.Make
 // files down to the client.
 func (fsrv *FServer) MultifileUpload(srv filehandler.Fileservice_MultifileUploadServer) (err error) {
 	var curreq *filehandler.FileRequest
-	var targetfile string
 
 	for {
 		// keep receiving FileRequest messages from the client until
@@ -164,14 +163,8 @@ func (fsrv *FServer) MultifileUpload(srv filehandler.Fileservice_MultifileUpload
 			}
 		}
 
-		targetfile = fsrv.buildUploadFilename(curreq.GetFilename())
-		fsrv.debugMessage(fmt.Sprintf("requested file: %s", targetfile))
-
-		// check for existence of target file.
-		err = fsrv.fileExists(targetfile)
-		if err != nil {
-			continue
-		}
+		// attempt to upload the file using the single upload function.
+		fsrv.UploadFile(curreq, srv)
 	}
 
 	return nil
