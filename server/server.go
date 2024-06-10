@@ -164,7 +164,7 @@ func (fsrv *FServer) MultifileUpload(srv filehandler.Fileservice_MultifileUpload
 			}
 		}
 
-		targetfile = curreq.GetFilename()
+		targetfile = fsrv.buildUploadFilename(curreq.GetFilename())
 		fsrv.debugMessage(fmt.Sprintf("requested file: %s", targetfile))
 	}
 
