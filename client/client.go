@@ -100,6 +100,12 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 		return err
 	}
 
+	// update the timeout value for the context to the transfer
+	// timeout. by this point, the connection to the server has
+	// already been established.
+	ctx, cancel = context.WithTimeout(context.Background(), fc.transferTimeout)
+	defer cancel()
+
 	// this select statement acts as a timeout mechanism for the
 	// receive file bytes function. if the context times out before
 	// all bytes are received, an error will be returned and the
