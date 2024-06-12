@@ -244,6 +244,7 @@ func (fc *FClient) MultifileDownload(targets []string) (errs map[string]error) {
 		go fc.mfdWorker(target, &errs, &wg)
 	}
 
+	// wait for all go routines to complete before returning.
 	wg.Wait()
 
 	return errs
