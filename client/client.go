@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
@@ -222,8 +223,8 @@ func (fc *FClient) MakeDirectory(dirname string) (err error) {
 // this will return a map containing the filenames and an associated
 // error. if no errors occurred, the map will be empty.
 func (fc *FClient) MultifileDownload(targets []string) (errs map[string]error) {
-	var err error
 	var target string
+	var wg sync.WaitGroup
 
 	// initialize the return map to avoid nil reference errors.
 	errs = make(map[string]error)
@@ -233,23 +234,11 @@ func (fc *FClient) MultifileDownload(targets []string) (errs map[string]error) {
 	// if an error occurs, the error will be attached to the
 	// filename via the errs map.
 	for _, target = range targets {
-
-		// if the current filename is an empty string or only
-		// contains non-printable characters, ignore it and
-		// move to the next filename.
-		target = strings.TrimSpace(target)
-		if len(target) < 1 {
-			continue
-		}
-
-		// attempt to download the file. if an error occurs,
-		// attach it to the filename via the map.
-		err = fc.DownloadFile(&filehandler.FileRequest{Filename: target})
-		if err != nil {
-			errs[target] = err
-		}
-
+		wg.Add(1)
+		go fc.mfdWorker(target, &errs, &wg)
 	}
+
+	wg.Wait()
 
 	return errs
 }
