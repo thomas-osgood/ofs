@@ -36,9 +36,6 @@ type FileserviceClient interface {
 	// rpc designed to create a subdirectory within the
 	// uploads directory on the server.
 	MakeDirectory(ctx context.Context, in *MakeDirectoryRequest, opts ...grpc.CallOption) (*common.StatusMessage, error)
-	// rpc designed to upload multiple files from the server
-	// to the client.
-	MultifileUpload(ctx context.Context, opts ...grpc.CallOption) (Fileservice_MultifileUploadClient, error)
 	// rpc designed to let the client know the server is up
 	// and able to be contacted.
 	Ping(ctx context.Context, in *pingpong.Ping, opts ...grpc.CallOption) (*pingpong.Pong, error)
@@ -142,37 +139,6 @@ func (c *fileserviceClient) MakeDirectory(ctx context.Context, in *MakeDirectory
 	return out, nil
 }
 
-func (c *fileserviceClient) MultifileUpload(ctx context.Context, opts ...grpc.CallOption) (Fileservice_MultifileUploadClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Fileservice_ServiceDesc.Streams[2], "/filehandler.Fileservice/MultifileUpload", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &fileserviceMultifileUploadClient{stream}
-	return x, nil
-}
-
-type Fileservice_MultifileUploadClient interface {
-	Send(*FileRequest) error
-	Recv() (*FileChunk, error)
-	grpc.ClientStream
-}
-
-type fileserviceMultifileUploadClient struct {
-	grpc.ClientStream
-}
-
-func (x *fileserviceMultifileUploadClient) Send(m *FileRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *fileserviceMultifileUploadClient) Recv() (*FileChunk, error) {
-	m := new(FileChunk)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 func (c *fileserviceClient) Ping(ctx context.Context, in *pingpong.Ping, opts ...grpc.CallOption) (*pingpong.Pong, error) {
 	out := new(pingpong.Pong)
 	err := c.cc.Invoke(ctx, "/filehandler.Fileservice/Ping", in, out, opts...)
@@ -192,7 +158,7 @@ func (c *fileserviceClient) RenameFile(ctx context.Context, in *RenameFileReques
 }
 
 func (c *fileserviceClient) UploadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (Fileservice_UploadFileClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Fileservice_ServiceDesc.Streams[3], "/filehandler.Fileservice/UploadFile", opts...)
+	stream, err := c.cc.NewStream(ctx, &Fileservice_ServiceDesc.Streams[2], "/filehandler.Fileservice/UploadFile", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -239,9 +205,6 @@ type FileserviceServer interface {
 	// rpc designed to create a subdirectory within the
 	// uploads directory on the server.
 	MakeDirectory(context.Context, *MakeDirectoryRequest) (*common.StatusMessage, error)
-	// rpc designed to upload multiple files from the server
-	// to the client.
-	MultifileUpload(Fileservice_MultifileUploadServer) error
 	// rpc designed to let the client know the server is up
 	// and able to be contacted.
 	Ping(context.Context, *pingpong.Ping) (*pingpong.Pong, error)
@@ -269,9 +232,6 @@ func (UnimplementedFileserviceServer) ListFiles(*common.Empty, Fileservice_ListF
 }
 func (UnimplementedFileserviceServer) MakeDirectory(context.Context, *MakeDirectoryRequest) (*common.StatusMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MakeDirectory not implemented")
-}
-func (UnimplementedFileserviceServer) MultifileUpload(Fileservice_MultifileUploadServer) error {
-	return status.Errorf(codes.Unimplemented, "method MultifileUpload not implemented")
 }
 func (UnimplementedFileserviceServer) Ping(context.Context, *pingpong.Ping) (*pingpong.Pong, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
@@ -378,32 +338,6 @@ func _Fileservice_MakeDirectory_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Fileservice_MultifileUpload_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(FileserviceServer).MultifileUpload(&fileserviceMultifileUploadServer{stream})
-}
-
-type Fileservice_MultifileUploadServer interface {
-	Send(*FileChunk) error
-	Recv() (*FileRequest, error)
-	grpc.ServerStream
-}
-
-type fileserviceMultifileUploadServer struct {
-	grpc.ServerStream
-}
-
-func (x *fileserviceMultifileUploadServer) Send(m *FileChunk) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *fileserviceMultifileUploadServer) Recv() (*FileRequest, error) {
-	m := new(FileRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 func _Fileservice_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(pingpong.Ping)
 	if err := dec(in); err != nil {
@@ -495,12 +429,6 @@ var Fileservice_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "ListFiles",
 			Handler:       _Fileservice_ListFiles_Handler,
 			ServerStreams: true,
-		},
-		{
-			StreamName:    "MultifileUpload",
-			Handler:       _Fileservice_MultifileUpload_Handler,
-			ServerStreams: true,
-			ClientStreams: true,
 		},
 		{
 			StreamName:    "UploadFile",

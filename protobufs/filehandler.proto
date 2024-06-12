@@ -27,10 +27,6 @@ service Fileservice {
         // uploads directory on the server.
         rpc MakeDirectory(MakeDirectoryRequest) returns (common.StatusMessage) {};
 
-        // rpc designed to upload multiple files from the server
-        // to the client.
-        rpc MultifileUpload(stream FileRequest) returns (stream FileChunk) {};
-
         // rpc designed to let the client know the server is up
         // and able to be contacted.
         rpc Ping(pingpong.Ping) returns (pingpong.Pong) {};
