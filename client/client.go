@@ -105,10 +105,11 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 	// partial download will be deleted.
 	select {
 	case <-ctx.Done():
-
+		// close the file pointer and remove the empty file, then
+		// return an error stating there was a timeout while attempting
+		// to transfer the file to the client.
 		fptr.Close()
 		os.Remove(req.GetFilename())
-
 		return fmt.Errorf(ofcmessages.ERR_TRANSMIT_TIMEOUT)
 	default:
 		// read content streamed down from the server and save it
