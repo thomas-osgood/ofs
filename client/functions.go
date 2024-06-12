@@ -14,10 +14,11 @@ import (
 // create, intialize and return a new FClient object.
 func NewClient(opts ...FClientOptFunc) (client *FClient, err error) {
 	var defaults FClientOption = FClientOption{
-		Creds:   insecure.NewCredentials(),
-		Srvaddr: DEFAULT_SRVADDR,
-		Srvopts: []grpc.DialOption{},
-		Timeout: DEFAULT_TIMEOUT,
+		Creds:           insecure.NewCredentials(),
+		Srvaddr:         DEFAULT_SRVADDR,
+		Srvopts:         []grpc.DialOption{},
+		Timeout:         DEFAULT_TIMEOUT,
+		TransferTimeout: DEFAULT_TRANSFER_TIMEOUT,
 	}
 	var opt FClientOptFunc
 
@@ -34,6 +35,7 @@ func NewClient(opts ...FClientOptFunc) (client *FClient, err error) {
 	client.srvaddr = defaults.Srvaddr
 	client.srvopts = defaults.Srvopts
 	client.timeout = defaults.Timeout
+	client.transferTimeout = defaults.TransferTimeout
 
 	return client, nil
 }
