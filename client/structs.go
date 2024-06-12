@@ -8,9 +8,10 @@ import (
 )
 
 type FClient struct {
-	srvaddr string
-	srvopts []grpc.DialOption
-	timeout time.Duration
+	srvaddr         string
+	srvopts         []grpc.DialOption
+	timeout         time.Duration
+	transferTimeout time.Duration
 }
 
 type FClientOption struct {
@@ -19,5 +20,6 @@ type FClientOption struct {
 	Srvopts []grpc.DialOption
 	// timeout value for making connections to the server. this will
 	// be applied to both upload and download functions.
-	Timeout time.Duration
+	Timeout         time.Duration
+	TransferTimeout time.Duration
 }
