@@ -208,6 +208,8 @@ func (fc *FClient) MakeDirectory(dirname string) (err error) {
 // this will return a map containing the filenames and an associated
 // error. if no errors occurred, the map will be empty.
 func (fc *FClient) MultifileDownload(targets []string) (errs map[string]error) {
+	var cancel context.CancelFunc
+	var ctx context.Context
 	var err error
 	var target string
 
@@ -228,11 +230,22 @@ func (fc *FClient) MultifileDownload(targets []string) (errs map[string]error) {
 			continue
 		}
 
-		// attempt to download the file. if an error occurs,
-		// attach it to the filename via the map.
-		err = fc.DownloadFile(&filehandler.FileRequest{Filename: target})
-		if err != nil {
-			errs[target] = err
+		ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
+		defer cancel()
+
+		select {
+		case <-ctx.Done():
+			errs[target] = fmt.Errorf(ofcmessages.ERR_TRANSMIT_TIMEOUT)
+		default:
+			// attempt to download the file. if an error occurs,
+			// attach it to the filename via the map.
+			err = fc.DownloadFile(&filehandler.FileRequest{Filename: target})
+			if err != nil {
+				errs[target] = err
+			}
+
+			// cancel the context and release resources.
+			cancel()
 		}
 	}
 
