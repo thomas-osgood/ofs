@@ -73,3 +73,17 @@ func WithTimeout(timeout time.Duration) FClientOptFunc {
 		return nil
 	}
 }
+
+// set the transfer timeout value. this will be the timeout
+// value for a file upload and download.
+func WithTransferTimeout(timeout time.Duration) FClientOptFunc {
+	return func(fo *FClientOption) error {
+		if timeout < (1 * time.Second) {
+			return fmt.Errorf(ofcmessages.ERR_NEGATIVE_TIMEOUT)
+		}
+
+		fo.TransferTimeout = timeout
+
+		return nil
+	}
+}
