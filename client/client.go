@@ -99,9 +99,17 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 		return err
 	}
 
+	// this select statement acts as a timeout mechanism for the
+	// receive file bytes function. if the context times out before
+	// all bytes are received, an error will be returned and the
+	// partial download will be deleted.
 	select {
 	case <-ctx.Done():
-		err = fmt.Errorf(ofcmessages.ERR_TRANSMIT_TIMEOUT)
+
+		fptr.Close()
+		os.Remove(req.GetFilename())
+
+		return fmt.Errorf(ofcmessages.ERR_TRANSMIT_TIMEOUT)
 	default:
 		// read content streamed down from the server and save it
 		// in the file specified in the request message.
