@@ -9,6 +9,18 @@ import (
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 )
 
+// function designed to deccrement the number of "activedownloads"
+// for the client.
+func (fc *FClient) decreaseActiveDownloads() {
+	fc.transferCfg.ActiveDownloads--
+}
+
+// function designed to increment the number of "activedownloads"
+// for the client.
+func (fc *FClient) increaseActiveDownloads() {
+	fc.transferCfg.ActiveDownloads++
+}
+
 // worker function designed to be used by MultifileDownload
 // to spawn multiple go routines to download files in a
 // concurrent manner.
