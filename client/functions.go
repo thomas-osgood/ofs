@@ -57,6 +57,32 @@ func WithCreds(creds credentials.TransportCredentials) FClientOptFunc {
 	}
 }
 
+// set the maximum number of concurrent downloads allowed
+func WithMaxDownloads(maxdownloads int) FClientOptFunc {
+	return func(fo *FClientOption) error {
+		if maxdownloads < 1 {
+			return fmt.Errorf(ofcmessages.ERR_MAXTRANSFER_LOW)
+		}
+
+		fo.TransferCfg.MaxDownloads = maxdownloads
+
+		return nil
+	}
+}
+
+// set the maximum number of concurrent downloads allowed
+func WithMaxUploads(maxuploads int) FClientOptFunc {
+	return func(fo *FClientOption) error {
+		if maxuploads < 1 {
+			return fmt.Errorf(ofcmessages.ERR_MAXTRANSFER_LOW)
+		}
+
+		fo.TransferCfg.MaxUploads = maxuploads
+
+		return nil
+	}
+}
+
 // set the server address (<ip/domain>:<port>)
 func WithSrvAddr(addr string) FClientOptFunc {
 	return func(fo *FClientOption) error {
