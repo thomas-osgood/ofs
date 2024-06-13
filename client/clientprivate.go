@@ -18,6 +18,15 @@ func (fc *FClient) decreaseActiveDownloads() {
 	fc.transferCfg.ActiveDownloads--
 }
 
+// function designed to deccrement the number of "activedownloads"
+// for the client.
+func (fc *FClient) decreaseActiveUploads() {
+	// acquire the mutex lock and enter the critical section.
+	fc.transferCfg.UpMut.Lock()
+	defer fc.transferCfg.UpMut.Unlock()
+	fc.transferCfg.ActiveUploads--
+}
+
 // function designed to increment the number of "activedownloads"
 // for the client.
 func (fc *FClient) increaseActiveDownloads() {
@@ -37,6 +46,27 @@ func (fc *FClient) increaseActiveDownloads() {
 	}
 
 	fc.transferCfg.ActiveDownloads++
+}
+
+// function designed to increment the number of "activedownloads"
+// for the client.
+func (fc *FClient) increaseActiveUploads() {
+
+	// wait until the active downloads are below the max
+	// download count allowed.
+	//
+	// once the download count is at an acceptable number,
+	// acquire the mutex lock and continue.
+	for {
+		if fc.transferCfg.ActiveUploads < fc.transferCfg.MaxUploads {
+			// acquire the mutex lock and enter the critical section.
+			fc.transferCfg.UpMut.Lock()
+			defer fc.transferCfg.UpMut.Unlock()
+			break
+		}
+	}
+
+	fc.transferCfg.ActiveUploads++
 }
 
 // worker function designed to be used by MultifileDownload
