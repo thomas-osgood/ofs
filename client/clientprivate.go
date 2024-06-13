@@ -18,6 +18,21 @@ func (fc *FClient) decreaseActiveDownloads() {
 // function designed to increment the number of "activedownloads"
 // for the client.
 func (fc *FClient) increaseActiveDownloads() {
+
+	// wait until the active downloads are below the max
+	// download count allowed.
+	//
+	// once the download count is at an acceptable number,
+	// acquire the mutex lock and continue.
+	for {
+		if fc.transferCfg.ActiveDownloads < fc.transferCfg.MaxDownloads {
+			// acquire the mutex lock and enter the critical section.
+			fc.transferCfg.DownMut.Lock()
+			defer fc.transferCfg.DownMut.Unlock()
+			break
+		}
+	}
+
 	fc.transferCfg.ActiveDownloads++
 }
 
