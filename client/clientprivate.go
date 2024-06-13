@@ -12,6 +12,9 @@ import (
 // function designed to deccrement the number of "activedownloads"
 // for the client.
 func (fc *FClient) decreaseActiveDownloads() {
+	// acquire the mutex lock and enter the critical section.
+	fc.transferCfg.DownMut.Lock()
+	defer fc.transferCfg.DownMut.Unlock()
 	fc.transferCfg.ActiveDownloads--
 }
 
