@@ -364,7 +364,7 @@ func (fc *FClient) UploadFile(filename string) (err error) {
 	var srv filehandler.Fileservice_DownloadFileClient
 	var resp *protocommon.StatusMessage
 
-	// keep track of the number of active downloads.
+	// keep track of the number of active uploads.
 	fc.increaseActiveUploads()
 	defer fc.decreaseActiveUploads()
 
