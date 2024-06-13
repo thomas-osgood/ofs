@@ -1,6 +1,9 @@
 package ofctypes
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type TransferConfig struct {
 	downloadConfig
@@ -12,9 +15,11 @@ type TransferConfig struct {
 type downloadConfig struct {
 	ActiveDownloads int
 	MaxDownloads    int
+	DownMut         *sync.Mutex
 }
 
 type uploadConfig struct {
 	ActiveUploads int
 	MaxUploads    int
+	UpMut         *sync.Mutex
 }
