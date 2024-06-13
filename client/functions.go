@@ -39,9 +39,11 @@ func NewClient(opts ...FClientOptFunc) (client *FClient, err error) {
 
 	// build channels to create semaphore objects.
 	//
-	// reference:
+	// references:
 	//
 	// https://medium.com/@deckarep/gos-extended-concurrency-semaphores-part-1-5eeabfa351ce
+	//
+	// https://www.codingexplorations.com/blog/understanding-and-implementing-the-semaphore-pattern-in-go
 	defaults.TransferCfg.DownSem = make(chan struct{}, defaults.TransferCfg.MaxDownloads)
 	defaults.TransferCfg.UpSem = make(chan struct{}, defaults.TransferCfg.MaxUploads)
 
