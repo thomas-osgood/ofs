@@ -74,6 +74,10 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 	var fptr *os.File
 	var uploader filehandler.Fileservice_UploadFileClient
 
+	// keep track of the number of active downloads.
+	fc.increaseActiveDownloads()
+	defer fc.decreaseActiveDownloads()
+
 	conn, client, err = fc.initConnection()
 	if err != nil {
 		return err
