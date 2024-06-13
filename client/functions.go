@@ -3,7 +3,6 @@ package client
 import (
 	"fmt"
 	"strings"
-	"sync"
 	"time"
 
 	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
@@ -30,8 +29,6 @@ func NewClient(opts ...FClientOptFunc) (client *FClient, err error) {
 	defaults.TransferCfg.MaxDownloads = DEFAULT_MAX_DOWNLOADS
 	defaults.TransferCfg.MaxUploads = DEFAULT_MAX_UPLOADS
 	defaults.TransferCfg.Timeout = DEFAULT_TRANSFER_TIMEOUT
-	defaults.TransferCfg.DownMut = new(sync.Mutex)
-	defaults.TransferCfg.UpMut = new(sync.Mutex)
 
 	for _, opt = range opts {
 		err = opt(&defaults)
@@ -39,6 +36,9 @@ func NewClient(opts ...FClientOptFunc) (client *FClient, err error) {
 			return nil, err
 		}
 	}
+
+	defaults.TransferCfg.DownSem = make(chan struct{}, defaults.TransferCfg.MaxDownloads)
+	defaults.TransferCfg.UpSem = make(chan struct{}, defaults.TransferCfg.MaxUploads)
 
 	defaults.Srvopts = append(defaults.Srvopts, grpc.WithTransportCredentials(defaults.Creds))
 

@@ -12,60 +12,34 @@ import (
 // function designed to deccrement the number of "activedownloads"
 // for the client.
 func (fc *FClient) decreaseActiveDownloads() {
-	// acquire the mutex lock and enter the critical section.
-	fc.transferCfg.DownMut.Lock()
-	defer fc.transferCfg.DownMut.Unlock()
+	// decrease active downloads and semaphore.
 	fc.transferCfg.ActiveDownloads--
+	<-fc.transferCfg.DownSem
 }
 
 // function designed to deccrement the number of "activeuploads"
 // for the client.
 func (fc *FClient) decreaseActiveUploads() {
-	// acquire the mutex lock and enter the critical section.
-	fc.transferCfg.UpMut.Lock()
-	defer fc.transferCfg.UpMut.Unlock()
+	// decrease active uploads and semaphore.
 	fc.transferCfg.ActiveUploads--
+	<-fc.transferCfg.UpSem
 }
 
 // function designed to increment the number of "activedownloads"
 // for the client.
 func (fc *FClient) increaseActiveDownloads() {
-
-	// wait until the active downloads are below the max
-	// download count allowed.
-	//
-	// once the download count is at an acceptable number,
-	// acquire the mutex lock and continue.
-	for {
-		if fc.transferCfg.ActiveDownloads < fc.transferCfg.MaxDownloads {
-			// acquire the mutex lock and enter the critical section.
-			fc.transferCfg.DownMut.Lock()
-			defer fc.transferCfg.DownMut.Unlock()
-			break
-		}
-	}
-
+	// wait for room in semaphore, then increase
+	// the semaphore and active uploads.
+	fc.transferCfg.DownSem <- struct{}{}
 	fc.transferCfg.ActiveDownloads++
 }
 
 // function designed to increment the number of "activeuploads"
 // for the client.
 func (fc *FClient) increaseActiveUploads() {
-
-	// wait until the active downloads are below the max
-	// upload count allowed.
-	//
-	// once the upload count is at an acceptable number,
-	// acquire the mutex lock and continue.
-	for {
-		if fc.transferCfg.ActiveUploads < fc.transferCfg.MaxUploads {
-			// acquire the mutex lock and enter the critical section.
-			fc.transferCfg.UpMut.Lock()
-			defer fc.transferCfg.UpMut.Unlock()
-			break
-		}
-	}
-
+	// wait for room in semaphore, then increase
+	// the semaphore and active uploads.
+	fc.transferCfg.UpSem <- struct{}{}
 	fc.transferCfg.ActiveUploads++
 }
 
