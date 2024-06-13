@@ -20,6 +20,7 @@ type FClientOption struct {
 	Srvopts []grpc.DialOption
 	// timeout value for making connections to the server. this will
 	// be applied to both upload and download functions.
-	Timeout         time.Duration
+	Timeout time.Duration
+	// timeout value for downloading and uploading files.
 	TransferTimeout time.Duration
 }
