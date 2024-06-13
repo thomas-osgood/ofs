@@ -6,6 +6,7 @@ import (
 	"time"
 
 	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
+	"github.com/thomas-osgood/ofs/client/internal/ofctypes"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -14,13 +15,20 @@ import (
 // create, intialize and return a new FClient object.
 func NewClient(opts ...FClientOptFunc) (client *FClient, err error) {
 	var defaults FClientOption = FClientOption{
-		Creds:           insecure.NewCredentials(),
-		Srvaddr:         DEFAULT_SRVADDR,
-		Srvopts:         []grpc.DialOption{},
-		Timeout:         DEFAULT_TIMEOUT,
-		TransferTimeout: DEFAULT_TRANSFER_TIMEOUT,
+		Creds:       insecure.NewCredentials(),
+		Srvaddr:     DEFAULT_SRVADDR,
+		Srvopts:     []grpc.DialOption{},
+		Timeout:     DEFAULT_TIMEOUT,
+		TransferCfg: ofctypes.TransferConfig{},
 	}
 	var opt FClientOptFunc
+
+	// initialize transfer config defaults
+	defaults.TransferCfg.ActiveDownloads = 0
+	defaults.TransferCfg.ActiveUploads = 0
+	defaults.TransferCfg.MaxDownloads = DEFAULT_MAX_DOWNLOADS
+	defaults.TransferCfg.MaxUploads = DEFAULT_MAX_UPLOADS
+	defaults.TransferCfg.Timeout = DEFAULT_TRANSFER_TIMEOUT
 
 	for _, opt = range opts {
 		err = opt(&defaults)
@@ -35,7 +43,7 @@ func NewClient(opts ...FClientOptFunc) (client *FClient, err error) {
 	client.srvaddr = defaults.Srvaddr
 	client.srvopts = defaults.Srvopts
 	client.timeout = defaults.Timeout
-	client.transferTimeout = defaults.TransferTimeout
+	client.transferCfg = defaults.TransferCfg
 
 	return client, nil
 }
@@ -84,7 +92,7 @@ func WithTransferTimeout(timeout time.Duration) FClientOptFunc {
 			return fmt.Errorf(ofcmessages.ERR_NEGATIVE_TIMEOUT)
 		}
 
-		fo.TransferTimeout = timeout
+		fo.TransferCfg.Timeout = timeout
 
 		return nil
 	}
