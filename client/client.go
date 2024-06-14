@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
@@ -73,6 +74,10 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 	var fptr *os.File
 	var uploader filehandler.Fileservice_UploadFileClient
 
+	// keep track of the number of active downloads.
+	fc.increaseActiveDownloads()
+	defer fc.decreaseActiveDownloads()
+
 	conn, client, err = fc.initConnection()
 	if err != nil {
 		return err
@@ -99,16 +104,36 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 		return err
 	}
 
-	// read content streamed down from the server and save it
-	// in the file specified in the request message.
-	err = ofscommon.ReceiveFileBytes(uploader, fptr)
-	if err != nil {
-		// close the file pointer and remove the empty file,
-		// then return the error that was thrown during the
-		// transfer process.
+	// update the timeout value for the context to the transfer
+	// timeout. by this point, the connection to the server has
+	// already been established.
+	ctx, cancel = context.WithTimeout(context.Background(), fc.transferCfg.Timeout)
+	defer cancel()
+
+	// this select statement acts as a timeout mechanism for the
+	// receive file bytes function. if the context times out before
+	// all bytes are received, an error will be returned and the
+	// partial download will be deleted.
+	select {
+	case <-ctx.Done():
+		// close the file pointer and remove the empty file, then
+		// return an error stating there was a timeout while attempting
+		// to transfer the file to the client.
 		fptr.Close()
 		os.Remove(req.GetFilename())
-		return err
+		return fmt.Errorf(ofcmessages.ERR_TRANSMIT_TIMEOUT)
+	default:
+		// read content streamed down from the server and save it
+		// in the file specified in the request message.
+		err = ofscommon.ReceiveFileBytes(uploader, fptr)
+		if err != nil {
+			// close the file pointer and remove the empty file,
+			// then return the error that was thrown during the
+			// transfer process.
+			fptr.Close()
+			os.Remove(req.GetFilename())
+			return err
+		}
 	}
 
 	// close the stream.
@@ -208,8 +233,8 @@ func (fc *FClient) MakeDirectory(dirname string) (err error) {
 // this will return a map containing the filenames and an associated
 // error. if no errors occurred, the map will be empty.
 func (fc *FClient) MultifileDownload(targets []string) (errs map[string]error) {
-	var err error
 	var target string
+	var wg sync.WaitGroup
 
 	// initialize the return map to avoid nil reference errors.
 	errs = make(map[string]error)
@@ -219,22 +244,12 @@ func (fc *FClient) MultifileDownload(targets []string) (errs map[string]error) {
 	// if an error occurs, the error will be attached to the
 	// filename via the errs map.
 	for _, target = range targets {
-
-		// if the current filename is an empty string or only
-		// contains non-printable characters, ignore it and
-		// move to the next filename.
-		target = strings.TrimSpace(target)
-		if len(target) < 1 {
-			continue
-		}
-
-		// attempt to download the file. if an error occurs,
-		// attach it to the filename via the map.
-		err = fc.DownloadFile(&filehandler.FileRequest{Filename: target})
-		if err != nil {
-			errs[target] = err
-		}
+		wg.Add(1)
+		go fc.mfdWorker(target, &errs, &wg)
 	}
+
+	// wait for all go routines to complete before returning.
+	wg.Wait()
 
 	return errs
 }
@@ -348,6 +363,10 @@ func (fc *FClient) UploadFile(filename string) (err error) {
 	var fptr *os.File
 	var srv filehandler.Fileservice_DownloadFileClient
 	var resp *protocommon.StatusMessage
+
+	// keep track of the number of active uploads.
+	fc.increaseActiveUploads()
+	defer fc.decreaseActiveUploads()
 
 	conn, client, err = fc.initConnection()
 	if err != nil {
