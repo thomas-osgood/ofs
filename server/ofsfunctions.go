@@ -65,6 +65,8 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	srv.debug = defaults.Debug
 	srv.downloadsdir = defaults.Downloadsdir
 	srv.rootdir = defaults.Rootdir
+	srv.transferCfg.ActiveDownloads = 0
+	srv.transferCfg.ActiveUploads = 0
 	srv.transferCfg.DownSem = make(chan struct{}, defaults.MaxDownloads)
 	srv.transferCfg.UpSem = make(chan struct{}, defaults.MaxUploads)
 	srv.uploadsdir = defaults.Uploadsdir
