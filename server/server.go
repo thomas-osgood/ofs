@@ -214,6 +214,8 @@ func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFi
 // the specified file must exist in the root directory (or the uploads directory
 // if one is specified) for a successful (nil error) return.
 func (fsrv *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fileservice_UploadFileServer) (err error) {
+	var cancel context.CancelFunc
+	var ctx context.Context
 	var finfo fs.FileInfo
 	var fptr *os.File
 	var md metadata.MD = make(metadata.MD)
@@ -245,9 +247,19 @@ func (fsrv *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fi
 	}
 	defer fptr.Close()
 
-	err = ofscommon.TransmitFileBytes(srv, bufio.NewReader(fptr))
-	if err != nil {
-		return err
+	ctx, cancel = context.WithTimeout(context.Background(), fsrv.transferCfg.TransferTimeout)
+	defer cancel()
+
+	// attempt to upload the file to the client. if the transfer takes too long,
+	// the function will return an error.
+	select {
+	case <-ctx.Done():
+		return fmt.Errorf(ofsmessages.ERR_TRANSFER_TIMEOUT)
+	default:
+		err = ofscommon.TransmitFileBytes(srv, bufio.NewReader(fptr))
+		if err != nil {
+			return err
+		}
 	}
 
 	fsrv.debugMessageSuc(ofsmessages.FILE_SENT)
