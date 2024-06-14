@@ -96,6 +96,7 @@ func (fsrv *FServer) decreaseActiveDownloads() {
 	// decrease active downloads and semaphore.
 	fsrv.transferCfg.ActiveDownloads--
 	<-fsrv.transferCfg.DownSem
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_ACTIVE_DOWNLOADS, fsrv.transferCfg.ActiveDownloads))
 }
 
 // function designed to deccrement the number of "activeuploads"
@@ -104,6 +105,7 @@ func (fsrv *FServer) decreaseActiveUploads() {
 	// decrease active uploads and semaphore.
 	fsrv.transferCfg.ActiveUploads--
 	<-fsrv.transferCfg.UpSem
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_ACTIVE_UPLOADS, fsrv.transferCfg.ActiveUploads))
 }
 
 // function designed to check whether a file already exists.
@@ -132,6 +134,7 @@ func (fsrv *FServer) increaseActiveDownloads() {
 	// the semaphore and active uploads.
 	fsrv.transferCfg.DownSem <- struct{}{}
 	fsrv.transferCfg.ActiveDownloads++
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_ACTIVE_DOWNLOADS, fsrv.transferCfg.ActiveDownloads))
 }
 
 // function designed to increment the number of "activeuploads"
@@ -141,6 +144,7 @@ func (fsrv *FServer) increaseActiveUploads() {
 	// the semaphore and active uploads.
 	fsrv.transferCfg.UpSem <- struct{}{}
 	fsrv.transferCfg.ActiveUploads++
+	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_ACTIVE_UPLOADS, fsrv.transferCfg.ActiveUploads))
 }
 
 // function designed to list out and return the files contained
