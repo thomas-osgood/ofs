@@ -2,6 +2,7 @@ package server
 
 import (
 	"crypto/tls"
+	"time"
 
 	"github.com/thomas-osgood/OGOR/output"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
@@ -40,6 +41,8 @@ type FServerOption struct {
 	MaxUploads int
 	// fileserver root directory.
 	Rootdir string
+	// maximum allowed time a file upload or download can take.
+	TransferTimeout time.Duration
 	// subdirectory within the rootdir where files that
 	// can be downloaded to a client are stored.
 	Uploadsdir string
