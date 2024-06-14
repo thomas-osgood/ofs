@@ -5,6 +5,7 @@ import (
 
 	"github.com/thomas-osgood/OGOR/output"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
+	"github.com/thomas-osgood/ofs/server/internal/ofstypes"
 	"google.golang.org/grpc"
 )
 
@@ -18,6 +19,7 @@ type FServer struct {
 	downloadsdir string
 	printer      *output.Outputter
 	rootdir      string
+	transferCfg  ofstypes.TransferConfig
 	uploadsdir   string
 }
 
