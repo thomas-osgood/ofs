@@ -60,6 +60,9 @@ func (fsrv *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer
 	var filename string
 	var tmpname string
 
+	fsrv.increaseActiveDownloads()
+	defer fsrv.decreaseActiveDownloads()
+
 	fsrv.debugMessage(ofsmessages.DBG_IN_DOWNLOAD)
 
 	filename, err = ofsutils.ReadFilenameMD(srv.Context())
@@ -202,6 +205,9 @@ func (fsrv *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fi
 	var fptr *os.File
 	var md metadata.MD = make(metadata.MD)
 	var targetfile string = fsrv.cleanFilename(req.GetFilename(), ofsdefaults.FTYPE_UPLOAD)
+
+	fsrv.increaseActiveUploads()
+	defer fsrv.decreaseActiveUploads()
 
 	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILE_REQUEST, targetfile))
 
