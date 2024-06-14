@@ -36,6 +36,8 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	defaults = FServerOption{
 		Debug:        ofsdefaults.DEFAULT_DEBUG,
 		Downloadsdir: ofsdefaults.DIR_DOWNLOADS,
+		MaxDownloads: ofsdefaults.DEFAULT_MAX_DOWNLOADS,
+		MaxUploads:   ofsdefaults.DEFAULT_MAX_UPLOADS,
 		Rootdir:      rootdir,
 		Uploadsdir:   ofsdefaults.DIR_UPLOADS,
 	}
@@ -63,6 +65,8 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	srv.debug = defaults.Debug
 	srv.downloadsdir = defaults.Downloadsdir
 	srv.rootdir = defaults.Rootdir
+	srv.transferCfg.DownSem = make(chan struct{}, defaults.MaxDownloads)
+	srv.transferCfg.UpSem = make(chan struct{}, defaults.MaxUploads)
 	srv.uploadsdir = defaults.Uploadsdir
 
 	srv.printer, err = output.NewOutputter()
