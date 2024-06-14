@@ -31,6 +31,7 @@ const ERR_REMOVE_TEMP string = "[REMOVETMP] %s"
 const ERR_RECV string = "[RECV] %s"
 const ERR_SERVE string = "[SERVE] %s\n"
 const ERR_TEMP string = "[TEMP] %s"
+const ERR_TIMEOUT_VALUE string = "timeout value must be at least one second"
 const ERR_TRANSFER_MIN string = "value must be one or greater"
 const ERR_TRANSFER_TIMEOUT string = "file transfer exceeded maximum allowed time"
 
