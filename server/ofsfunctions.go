@@ -133,6 +133,34 @@ func WithDownloadsDir(dirname string) FSrvOptFunc {
 	}
 }
 
+// set the maximum number of concurrent downloads allowed
+// at one time.
+func WithMaxDownloads(max int) FSrvOptFunc {
+	return func(fo *FServerOption) error {
+		if max < 1 {
+			return fmt.Errorf(ofsmessages.ERR_TRANSFER_MIN)
+		}
+
+		fo.MaxDownloads = max
+
+		return nil
+	}
+}
+
+// set the maximum number of concurrent uploads allowed
+// at one time.
+func WithMaxUploads(max int) FSrvOptFunc {
+	return func(fo *FServerOption) error {
+		if max < 1 {
+			return fmt.Errorf(ofsmessages.ERR_TRANSFER_MIN)
+		}
+
+		fo.MaxUploads = max
+
+		return nil
+	}
+}
+
 // set the uploads directory within the root directory.
 func WithUploadsDir(dirname string) FSrvOptFunc {
 	return func(fo *FServerOption) error {
