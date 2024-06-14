@@ -90,6 +90,22 @@ func (fsrv *FServer) debugMessageSuc(message string) {
 	}
 }
 
+// function designed to deccrement the number of "activedownloads"
+// for the client.
+func (fsrv *FServer) decreaseActiveDownloads() {
+	// decrease active downloads and semaphore.
+	fsrv.transferCfg.ActiveDownloads--
+	<-fsrv.transferCfg.DownSem
+}
+
+// function designed to deccrement the number of "activeuploads"
+// for the client.
+func (fsrv *FServer) decreaseActiveUploads() {
+	// decrease active uploads and semaphore.
+	fsrv.transferCfg.ActiveUploads--
+	<-fsrv.transferCfg.UpSem
+}
+
 // function designed to check whether a file already exists.
 //
 // if a file does exist, a nil error will be returned.
@@ -107,6 +123,24 @@ func (fsrv *FServer) fileExists(filename string) (err error) {
 	fsrv.debugMessageSuc(ofsmessages.DBG_FILENAME_VALID_SUC)
 
 	return nil
+}
+
+// function designed to increment the number of "activedownloads"
+// for the client.
+func (fsrv *FServer) increaseActiveDownloads() {
+	// wait for room in semaphore, then increase
+	// the semaphore and active uploads.
+	fsrv.transferCfg.DownSem <- struct{}{}
+	fsrv.transferCfg.ActiveDownloads++
+}
+
+// function designed to increment the number of "activeuploads"
+// for the client.
+func (fsrv *FServer) increaseActiveUploads() {
+	// wait for room in semaphore, then increase
+	// the semaphore and active uploads.
+	fsrv.transferCfg.UpSem <- struct{}{}
+	fsrv.transferCfg.ActiveUploads++
 }
 
 // function designed to list out and return the files contained
