@@ -3,7 +3,8 @@ package messages
 const COPY_COMPLETE string = "copy complete."
 const COPY_IN_PROGRESS string = "copying data to destination ..."
 
-const DBG_ACTIVE_DOWNLOADS string = "active downloads %d"
+const DBG_ACTIVE_DOWNLOADS string = "active downloads: %d"
+const DBG_ACTIVE_UPLOADS string = "active uploads: %d"
 const DBG_DELETING_FILE string = "deleting \"%s\" ..."
 const DBG_DELETE_SUCCESS string = "file successfully deleted"
 const DBG_FILENAME string = "filename: %s"
