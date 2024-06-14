@@ -31,6 +31,7 @@ const ERR_REMOVE_TEMP string = "[REMOVETMP] %s"
 const ERR_RECV string = "[RECV] %s"
 const ERR_SERVE string = "[SERVE] %s\n"
 const ERR_TEMP string = "[TEMP] %s"
+const ERR_TRANSFER_MIN string = "value must be one or greater"
 
 const FILE_DELETED string = "file successfully deleted"
 const FILE_SENT string = "file successfully transmitted"
