@@ -12,9 +12,11 @@ type TransferConfig struct {
 }
 
 type downloadConfig struct {
-	DownSem chan struct{}
+	ActiveDownloads int
+	DownSem         chan struct{}
 }
 
 type uploadConfig struct {
-	UpSem chan struct{}
+	ActiveUploads int
+	UpSem         chan struct{}
 }
