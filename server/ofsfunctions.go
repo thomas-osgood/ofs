@@ -35,12 +35,13 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	}
 
 	defaults = FServerOption{
-		Debug:        ofsdefaults.DEFAULT_DEBUG,
-		Downloadsdir: ofsdefaults.DIR_DOWNLOADS,
-		MaxDownloads: ofsdefaults.DEFAULT_MAX_DOWNLOADS,
-		MaxUploads:   ofsdefaults.DEFAULT_MAX_UPLOADS,
-		Rootdir:      rootdir,
-		Uploadsdir:   ofsdefaults.DIR_UPLOADS,
+		Debug:           ofsdefaults.DEFAULT_DEBUG,
+		Downloadsdir:    ofsdefaults.DIR_DOWNLOADS,
+		MaxDownloads:    ofsdefaults.DEFAULT_MAX_DOWNLOADS,
+		MaxUploads:      ofsdefaults.DEFAULT_MAX_UPLOADS,
+		Rootdir:         rootdir,
+		TransferTimeout: ofsdefaults.DEFAULT_TRANSFER_TIMEOUT,
+		Uploadsdir:      ofsdefaults.DIR_UPLOADS,
 	}
 
 	// set the user-defined configuration options.
@@ -69,6 +70,7 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	srv.transferCfg.ActiveDownloads = 0
 	srv.transferCfg.ActiveUploads = 0
 	srv.transferCfg.DownSem = make(chan struct{}, defaults.MaxDownloads)
+	srv.transferCfg.TransferTimeout = defaults.TransferTimeout
 	srv.transferCfg.UpSem = make(chan struct{}, defaults.MaxUploads)
 	srv.uploadsdir = defaults.Uploadsdir
 
