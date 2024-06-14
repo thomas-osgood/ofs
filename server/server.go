@@ -57,6 +57,8 @@ func (fsrv *FServer) DeleteFile(ctx context.Context, req *filehandler.FileReques
 // this will save the file uploaded by the client to the root directory
 // or downloads directory (if one has been set).
 func (fsrv *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer) (err error) {
+	var cancel context.CancelFunc
+	var ctx context.Context
 	var filename string
 	var tmpname string
 
@@ -74,10 +76,21 @@ func (fsrv *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer
 
 	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_FILENAME, filename))
 
-	// read the data stream and save it to a temporary file.
-	tmpname, err = fsrv.readIncomingFile(srv)
-	if err != nil {
-		return err
+	ctx, cancel = context.WithTimeout(context.Background(), fsrv.transferCfg.TransferTimeout)
+	defer cancel()
+
+	// attempt to download the file being uploaded by the client.
+	// if the timeout takes too long, the function will return an
+	// error.
+	select {
+	case <-ctx.Done():
+		return fmt.Errorf(ofsmessages.ERR_TRANSFER_TIMEOUT)
+	default:
+		// read the data stream and save it to a temporary file.
+		tmpname, err = fsrv.readIncomingFile(srv)
+		if err != nil {
+			return err
+		}
 	}
 
 	// move over the tmpfile contents to the destination file.
