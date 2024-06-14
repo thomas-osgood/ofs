@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/thomas-osgood/OGOR/output"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
@@ -158,6 +159,19 @@ func WithMaxUploads(max int) FSrvOptFunc {
 		}
 
 		fo.MaxUploads = max
+
+		return nil
+	}
+}
+
+// set the transfer timeout value for the server.
+func WithTransferTimeout(timeout time.Duration) FSrvOptFunc {
+	return func(fo *FServerOption) error {
+		if timeout < (1 * time.Second) {
+			return fmt.Errorf(ofsmessages.ERR_TIMEOUT_VALUE)
+		}
+
+		fo.TransferTimeout = timeout
 
 		return nil
 	}
