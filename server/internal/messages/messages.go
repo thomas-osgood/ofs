@@ -3,6 +3,8 @@ package messages
 const COPY_COMPLETE string = "copy complete."
 const COPY_IN_PROGRESS string = "copying data to destination ..."
 
+const DBG_ACTIVE_DOWNLOADS string = "active downloads: %d"
+const DBG_ACTIVE_UPLOADS string = "active uploads: %d"
 const DBG_DELETING_FILE string = "deleting \"%s\" ..."
 const DBG_DELETE_SUCCESS string = "file successfully deleted"
 const DBG_FILENAME string = "filename: %s"
@@ -31,6 +33,9 @@ const ERR_REMOVE_TEMP string = "[REMOVETMP] %s"
 const ERR_RECV string = "[RECV] %s"
 const ERR_SERVE string = "[SERVE] %s\n"
 const ERR_TEMP string = "[TEMP] %s"
+const ERR_TIMEOUT_VALUE string = "timeout value must be at least one second"
+const ERR_TRANSFER_MIN string = "value must be one or greater"
+const ERR_TRANSFER_TIMEOUT string = "file transfer exceeded maximum allowed time"
 
 const FILE_DELETED string = "file successfully deleted"
 const FILE_SENT string = "file successfully transmitted"

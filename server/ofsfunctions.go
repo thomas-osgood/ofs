@@ -5,6 +5,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/thomas-osgood/OGOR/output"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
@@ -34,10 +36,13 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	}
 
 	defaults = FServerOption{
-		Debug:        ofsdefaults.DEFAULT_DEBUG,
-		Downloadsdir: ofsdefaults.DIR_DOWNLOADS,
-		Rootdir:      rootdir,
-		Uploadsdir:   ofsdefaults.DIR_UPLOADS,
+		Debug:           ofsdefaults.DEFAULT_DEBUG,
+		Downloadsdir:    ofsdefaults.DIR_DOWNLOADS,
+		MaxDownloads:    ofsdefaults.DEFAULT_MAX_DOWNLOADS,
+		MaxUploads:      ofsdefaults.DEFAULT_MAX_UPLOADS,
+		Rootdir:         rootdir,
+		TransferTimeout: ofsdefaults.DEFAULT_TRANSFER_TIMEOUT,
+		Uploadsdir:      ofsdefaults.DIR_UPLOADS,
 	}
 
 	// set the user-defined configuration options.
@@ -63,6 +68,13 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	srv.debug = defaults.Debug
 	srv.downloadsdir = defaults.Downloadsdir
 	srv.rootdir = defaults.Rootdir
+	srv.transferCfg.ActiveDownloads = 0
+	srv.transferCfg.ActiveUploads = 0
+	srv.transferCfg.DownMut = new(sync.Mutex)
+	srv.transferCfg.DownSem = make(chan struct{}, defaults.MaxDownloads)
+	srv.transferCfg.TransferTimeout = defaults.TransferTimeout
+	srv.transferCfg.UpMut = new(sync.Mutex)
+	srv.transferCfg.UpSem = make(chan struct{}, defaults.MaxUploads)
 	srv.uploadsdir = defaults.Uploadsdir
 
 	srv.printer, err = output.NewOutputter()
@@ -124,6 +136,47 @@ func WithDownloadsDir(dirname string) FSrvOptFunc {
 		dirname = filepath.Clean(dirname)
 
 		fo.Downloadsdir = dirname
+
+		return nil
+	}
+}
+
+// set the maximum number of concurrent downloads allowed
+// at one time.
+func WithMaxDownloads(max int) FSrvOptFunc {
+	return func(fo *FServerOption) error {
+		if max < 1 {
+			return fmt.Errorf(ofsmessages.ERR_TRANSFER_MIN)
+		}
+
+		fo.MaxDownloads = max
+
+		return nil
+	}
+}
+
+// set the maximum number of concurrent uploads allowed
+// at one time.
+func WithMaxUploads(max int) FSrvOptFunc {
+	return func(fo *FServerOption) error {
+		if max < 1 {
+			return fmt.Errorf(ofsmessages.ERR_TRANSFER_MIN)
+		}
+
+		fo.MaxUploads = max
+
+		return nil
+	}
+}
+
+// set the transfer timeout value for the server.
+func WithTransferTimeout(timeout time.Duration) FSrvOptFunc {
+	return func(fo *FServerOption) error {
+		if timeout < (1 * time.Second) {
+			return fmt.Errorf(ofsmessages.ERR_TIMEOUT_VALUE)
+		}
+
+		fo.TransferTimeout = timeout
 
 		return nil
 	}

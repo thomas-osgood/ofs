@@ -2,9 +2,11 @@ package server
 
 import (
 	"crypto/tls"
+	"time"
 
 	"github.com/thomas-osgood/OGOR/output"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
+	"github.com/thomas-osgood/ofs/server/internal/ofstypes"
 	"google.golang.org/grpc"
 )
 
@@ -18,6 +20,7 @@ type FServer struct {
 	downloadsdir string
 	printer      *output.Outputter
 	rootdir      string
+	transferCfg  ofstypes.TransferConfig
 	uploadsdir   string
 }
 
@@ -30,8 +33,16 @@ type FServerOption struct {
 	// subdirectory within the rootdir where uploaded
 	// files will be saved.
 	Downloadsdir string
+	// number of maximum concurrent downloads the server is
+	// allowed to have active at one time.
+	MaxDownloads int
+	// number of maximum concurrent uploads the server is
+	// allowed to have active at one time.
+	MaxUploads int
 	// fileserver root directory.
 	Rootdir string
+	// maximum allowed time a file upload or download can take.
+	TransferTimeout time.Duration
 	// subdirectory within the rootdir where files that
 	// can be downloaded to a client are stored.
 	Uploadsdir string
