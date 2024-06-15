@@ -12,6 +12,10 @@ import (
 // function designed to deccrement the number of "activedownloads"
 // for the client.
 func (fc *FClient) decreaseActiveDownloads() {
+	// enter critical section.
+	fc.transferCfg.DownMut.Lock()
+	defer fc.transferCfg.DownMut.Unlock()
+
 	// decrease active downloads and semaphore.
 	fc.transferCfg.ActiveDownloads--
 	<-fc.transferCfg.DownSem
@@ -20,6 +24,10 @@ func (fc *FClient) decreaseActiveDownloads() {
 // function designed to deccrement the number of "activeuploads"
 // for the client.
 func (fc *FClient) decreaseActiveUploads() {
+	// enter critical section.
+	fc.transferCfg.UpMut.Lock()
+	defer fc.transferCfg.UpMut.Unlock()
+
 	// decrease active uploads and semaphore.
 	fc.transferCfg.ActiveUploads--
 	<-fc.transferCfg.UpSem
@@ -31,6 +39,11 @@ func (fc *FClient) increaseActiveDownloads() {
 	// wait for room in semaphore, then increase
 	// the semaphore and active uploads.
 	fc.transferCfg.DownSem <- struct{}{}
+
+	// enter critical section.
+	fc.transferCfg.DownMut.Lock()
+	defer fc.transferCfg.DownMut.Unlock()
+
 	fc.transferCfg.ActiveDownloads++
 }
 
@@ -40,6 +53,11 @@ func (fc *FClient) increaseActiveUploads() {
 	// wait for room in semaphore, then increase
 	// the semaphore and active uploads.
 	fc.transferCfg.UpSem <- struct{}{}
+
+	// enter critical section.
+	fc.transferCfg.UpMut.Lock()
+	defer fc.transferCfg.UpMut.Unlock()
+
 	fc.transferCfg.ActiveUploads++
 }
 

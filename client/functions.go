@@ -3,6 +3,7 @@ package client
 import (
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
@@ -54,6 +55,8 @@ func NewClient(opts ...FClientOptFunc) (client *FClient, err error) {
 	client.srvopts = defaults.Srvopts
 	client.timeout = defaults.Timeout
 	client.transferCfg = defaults.TransferCfg
+	client.transferCfg.DownMut = new(sync.Mutex)
+	client.transferCfg.UpMut = new(sync.Mutex)
 
 	return client, nil
 }
