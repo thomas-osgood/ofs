@@ -209,6 +209,26 @@ func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFi
 	return resp, nil
 }
 
+// function designed to calculate and return the amount of storage (in bytes)
+// consumed by the uploads and downloads directories.
+func (fsrv *FServer) StorageBreakdown(ctx context.Context, mpty *common.Empty) (consumption *filehandler.StorageInfo, err error) {
+	consumption = new(filehandler.StorageInfo)
+
+	consumption.Downloads, err = fsrv.calculateDirectoryConsumption(fsrv.downloadsdir)
+	if err != nil {
+		return nil, err
+	}
+
+	consumption.Uploads, err = fsrv.calculateDirectoryConsumption(fsrv.uploadsdir)
+	if err != nil {
+		return nil, err
+	}
+
+	consumption.Total = consumption.Downloads + consumption.Uploads
+
+	return consumption, nil
+}
+
 // function designed to upload a requested file from the server to the client.
 //
 // the specified file must exist in the root directory (or the uploads directory
