@@ -73,3 +73,13 @@ message RenameFileRequest {
         string oldfilename = 1;
         string newfilename = 2;
 }
+
+// message designe to hold storage information breakdown.
+message StorageInfo {
+        // total space consumed.
+        uint64 total = 1;
+        // space consumed by the downloads directory.
+        uint64 downloads = 2;
+        // space consumed by the uploads directory.
+        uint64 uploads = 3;
+}
