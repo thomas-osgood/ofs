@@ -106,6 +106,15 @@ func main() {
 			}
 		}
 
+		breakdown, err := clnt.StorageBreakdown()
+		if err != nil {
+			log.Printf("[BREAKDOWN] %s\n", err.Error())
+		} else {
+			log.Printf("Total: %d bytes\n", breakdown.GetTotal())
+			log.Printf("Downloads: %d bytes\n", breakdown.GetDownloads())
+			log.Printf("Uploads: %d bytes\n", breakdown.GetUploads())
+		}
+
 		err = clnt.RenameFile("test.txt", "copydir/testcopy.txt")
 		if err != nil {
 			log.Fatalf("[COPYFILE] %s\n", err.Error())
