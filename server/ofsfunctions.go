@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/thomas-osgood/OGOR/output"
@@ -69,8 +70,10 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	srv.rootdir = defaults.Rootdir
 	srv.transferCfg.ActiveDownloads = 0
 	srv.transferCfg.ActiveUploads = 0
+	srv.transferCfg.DownMut = new(sync.Mutex)
 	srv.transferCfg.DownSem = make(chan struct{}, defaults.MaxDownloads)
 	srv.transferCfg.TransferTimeout = defaults.TransferTimeout
+	srv.transferCfg.UpMut = new(sync.Mutex)
 	srv.transferCfg.UpSem = make(chan struct{}, defaults.MaxUploads)
 	srv.uploadsdir = defaults.Uploadsdir
 

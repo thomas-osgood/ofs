@@ -93,18 +93,28 @@ func (fsrv *FServer) debugMessageSuc(message string) {
 // function designed to deccrement the number of "activedownloads"
 // for the client.
 func (fsrv *FServer) decreaseActiveDownloads() {
+	// enter critical section.
+	fsrv.transferCfg.DownMut.Lock()
+	defer fsrv.transferCfg.DownMut.Unlock()
+
 	// decrease active downloads and semaphore.
 	fsrv.transferCfg.ActiveDownloads--
 	<-fsrv.transferCfg.DownSem
+
 	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_ACTIVE_DOWNLOADS, fsrv.transferCfg.ActiveDownloads))
 }
 
 // function designed to deccrement the number of "activeuploads"
 // for the client.
 func (fsrv *FServer) decreaseActiveUploads() {
+	// enter critical section.
+	fsrv.transferCfg.UpMut.Lock()
+	defer fsrv.transferCfg.UpMut.Unlock()
+
 	// decrease active uploads and semaphore.
 	fsrv.transferCfg.ActiveUploads--
 	<-fsrv.transferCfg.UpSem
+
 	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_ACTIVE_UPLOADS, fsrv.transferCfg.ActiveUploads))
 }
 
@@ -133,6 +143,11 @@ func (fsrv *FServer) increaseActiveDownloads() {
 	// wait for room in semaphore, then increase
 	// the semaphore and active uploads.
 	fsrv.transferCfg.DownSem <- struct{}{}
+
+	// enter critical section.
+	fsrv.transferCfg.DownMut.Lock()
+	defer fsrv.transferCfg.DownMut.Unlock()
+
 	fsrv.transferCfg.ActiveDownloads++
 	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_ACTIVE_DOWNLOADS, fsrv.transferCfg.ActiveDownloads))
 }
@@ -143,6 +158,11 @@ func (fsrv *FServer) increaseActiveUploads() {
 	// wait for room in semaphore, then increase
 	// the semaphore and active uploads.
 	fsrv.transferCfg.UpSem <- struct{}{}
+
+	// enter critical section.
+	fsrv.transferCfg.UpMut.Lock()
+	defer fsrv.transferCfg.UpMut.Unlock()
+
 	fsrv.transferCfg.ActiveUploads++
 	fsrv.debugMessage(fmt.Sprintf(ofsmessages.DBG_ACTIVE_UPLOADS, fsrv.transferCfg.ActiveUploads))
 }

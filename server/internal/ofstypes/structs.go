@@ -2,7 +2,10 @@
 // the Osgood File Server.
 package ofstypes
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type TransferConfig struct {
 	downloadConfig
@@ -13,10 +16,12 @@ type TransferConfig struct {
 
 type downloadConfig struct {
 	ActiveDownloads int
+	DownMut         *sync.Mutex
 	DownSem         chan struct{}
 }
 
 type uploadConfig struct {
 	ActiveUploads int
+	UpMut         *sync.Mutex
 	UpSem         chan struct{}
 }
