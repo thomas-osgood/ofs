@@ -225,7 +225,18 @@ func (fsrv *FServer) StorageBreakdown(ctx context.Context, mpty *protocommon.Emp
 		return nil, err
 	}
 
-	consumption.Total = consumption.Downloads + consumption.Uploads
+	// only take the sum of the directory sizes if the uploads directory
+	// is not the same as the downloads directory.
+	//
+	// if both directories are the same, set total to the downloads directory
+	// size information.
+	//
+	// this is to avoid double-counting file sizes.
+	if strings.Compare(fsrv.downloadsdir, fsrv.uploadsdir) != 0 {
+		consumption.Total = consumption.Downloads + consumption.Uploads
+	} else {
+		consumption.Total = consumption.Downloads
+	}
 
 	return consumption, nil
 }
