@@ -25,6 +25,7 @@ This software is distributed under the [General Public License v3.0](LICENSE). A
 - **Make Directory**: This allows the client to create a new directory/directory structure in the uploads directory on the server.
 - **Multi-File Download**: This allows the client to download multiple files with one function call.
 - **Multi-File Upload**: This allows the client to upload multiple files with one function call.
+- **Storage Breakdown**: This allows the client to see the amount of space consumed in the server's upload and download directories.
 
 ## Example
 
@@ -103,6 +104,15 @@ func main() {
 			for mres, errmsg := range multiresult {
 				log.Printf("[MULTIFILEUERROR] %s: %s\n", mres, errmsg.Error())
 			}
+		}
+
+		breakdown, err := clnt.StorageBreakdown()
+		if err != nil {
+			log.Printf("[BREAKDOWN] %s\n", err.Error())
+		} else {
+			log.Printf("Total: %d bytes\n", breakdown.GetTotal())
+			log.Printf("Downloads: %d bytes\n", breakdown.GetDownloads())
+			log.Printf("Uploads: %d bytes\n", breakdown.GetUploads())
 		}
 
 		err = clnt.RenameFile("test.txt", "copydir/testcopy.txt")
