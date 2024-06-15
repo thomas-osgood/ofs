@@ -35,6 +35,10 @@ service Fileservice {
         // the client.
         rpc RenameFile(RenameFileRequest) returns (common.StatusMessage) {};
 
+        // rpc designed to get the storage informatio breakdown
+        // from the server.
+        rpc StorageBreakdown(common.Empty) returns (StorageInfo) {};
+
         // rpc designed to download a file to the machine the
         // agent is running on from the control server.
         rpc UploadFile (FileRequest) returns (stream FileChunk) {};
