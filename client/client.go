@@ -18,6 +18,7 @@ import (
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	"github.com/thomas-osgood/ofs/protobufs/pingpong"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -352,6 +353,31 @@ func (fc *FClient) RenameFile(originalname string, newname string) (err error) {
 	}
 
 	return nil
+}
+
+// function designed to call the StorageBreakdown rpc and get
+// the storage consumption information from the server.
+func (fc *FClient) StorageBreakdown() (consumption *filehandler.StorageInfo, err error) {
+	var cancel context.CancelFunc
+	var client filehandler.FileserviceClient
+	var conn *grpc.ClientConn
+	var ctx context.Context
+
+	conn, client, err = fc.initConnection()
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
+	defer cancel()
+
+	consumption, err = client.StorageBreakdown(ctx, &protocommon.Empty{})
+	if err != nil {
+		return nil, status.Convert(err).Err()
+	}
+
+	return consumption, nil
 }
 
 // function designed to upload a file to the file server.

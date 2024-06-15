@@ -42,6 +42,27 @@ func (fsrv *FServer) buildUploadFilename(filename string) string {
 	return filepath.Join(fsrv.rootdir, fsrv.uploadsdir, strings.TrimSpace(filepath.Clean(filename)))
 }
 
+// function designed to go through the target directory and return the
+// amount of space (in bytes) consumed.
+//
+// note: this does not add the "Size" info from directory object. instead
+// it sums up all the Size information for each file present in the directory
+// and sub-directories.
+func (fsrv *FServer) calculateDirectoryConsumption(targetdir string) (consumption uint64, err error) {
+
+	err = filepath.Walk(targetdir, func(path string, info fs.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+
+		consumption += uint64(info.Size())
+
+		return nil
+	})
+
+	return consumption, err
+}
+
 // function designed to clean an uploaded filename and return
 // only the filename portion of it. this will strip the directory
 // information and give it an absolute path within the directory

@@ -35,6 +35,10 @@ service Fileservice {
         // the client.
         rpc RenameFile(RenameFileRequest) returns (common.StatusMessage) {};
 
+        // rpc designed to get the storage informatio breakdown
+        // from the server.
+        rpc StorageBreakdown(common.Empty) returns (StorageInfo) {};
+
         // rpc designed to download a file to the machine the
         // agent is running on from the control server.
         rpc UploadFile (FileRequest) returns (stream FileChunk) {};
@@ -72,4 +76,14 @@ message MakeDirectoryRequest {
 message RenameFileRequest {
         string oldfilename = 1;
         string newfilename = 2;
+}
+
+// message designe to hold storage information breakdown.
+message StorageInfo {
+        // total space consumed.
+        uint64 total = 1;
+        // space consumed by the downloads directory.
+        uint64 downloads = 2;
+        // space consumed by the uploads directory.
+        uint64 uploads = 3;
 }

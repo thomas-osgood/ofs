@@ -8,11 +8,12 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
-	"github.com/thomas-osgood/ofs/protobufs/common"
+	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	"github.com/thomas-osgood/ofs/protobufs/pingpong"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
@@ -25,10 +26,10 @@ import (
 
 // function designed to delete a file in the uploads directory
 // as requested by the client.
-func (fsrv *FServer) DeleteFile(ctx context.Context, req *filehandler.FileRequest) (resp *common.StatusMessage, err error) {
+func (fsrv *FServer) DeleteFile(ctx context.Context, req *filehandler.FileRequest) (resp *protocommon.StatusMessage, err error) {
 	var targetpath string = strings.TrimSpace(req.GetFilename())
 
-	resp = &common.StatusMessage{
+	resp = &protocommon.StatusMessage{
 		Code:    http.StatusOK,
 		Message: ofsmessages.FILE_DELETED,
 	}
@@ -108,7 +109,7 @@ func (fsrv *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer
 // the ability to download files from. if there are separate upload and
 // download directories, only the "uploads" (files that can be uploaded
 // from the server to client) directory will be listed.
-func (fsrv *FServer) ListFiles(mpty *common.Empty, srv filehandler.Fileservice_ListFilesServer) (err error) {
+func (fsrv *FServer) ListFiles(mpty *protocommon.Empty, srv filehandler.Fileservice_ListFilesServer) (err error) {
 	var curfile *filehandler.FileInfo
 	var files []*filehandler.FileInfo
 
@@ -136,12 +137,12 @@ func (fsrv *FServer) ListFiles(mpty *common.Empty, srv filehandler.Fileservice_L
 // successful code: 201 Created
 //
 // failure code: 500 Internal Server Error
-func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.MakeDirectoryRequest) (retstatus *common.StatusMessage, err error) {
+func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.MakeDirectoryRequest) (retstatus *protocommon.StatusMessage, err error) {
 	var subdir string = fsrv.buildUploadFilename(dirreq.GetDirname())
 
 	// initialize the successful StatusMessage. if everything
 	// works as expected, this will not be modified.
-	retstatus = &common.StatusMessage{
+	retstatus = &protocommon.StatusMessage{
 		Code:    http.StatusCreated,
 		Message: ofsmessages.DIR_CREATED,
 	}
@@ -180,11 +181,11 @@ func (fsrv *FServer) Ping(ctx context.Context, ping *pingpong.Ping) (pong *pingp
 //
 // note: if the destination file already exists, or if there is an issue
 // related to permissions, an error will be returned.
-func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFileRequest) (resp *common.StatusMessage, err error) {
+func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFileRequest) (resp *protocommon.StatusMessage, err error) {
 	var absdest string = fsrv.buildUploadFilename(rnreq.GetNewfilename())
 	var abssrc string = fsrv.buildUploadFilename(rnreq.GetOldfilename())
 
-	resp = new(common.StatusMessage)
+	resp = new(protocommon.StatusMessage)
 
 	// check for the existence of the destination file. if the
 	// destination file already exists, an error will be returned
@@ -207,6 +208,42 @@ func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFi
 	}
 
 	return resp, nil
+}
+
+// function designed to calculate and return the amount of storage (in bytes)
+// consumed by the uploads and downloads directories.
+func (fsrv *FServer) StorageBreakdown(ctx context.Context, mpty *protocommon.Empty) (consumption *filehandler.StorageInfo, err error) {
+
+	// initialize return object. this is required so a nil reference error
+	// is not thrown.
+	consumption = new(filehandler.StorageInfo)
+
+	// get total consumption of downloads directory.
+	consumption.Downloads, err = fsrv.calculateDirectoryConsumption(filepath.Join(fsrv.rootdir, fsrv.downloadsdir))
+	if err != nil {
+		return nil, err
+	}
+
+	// get total consumption of uploads directory.
+	consumption.Uploads, err = fsrv.calculateDirectoryConsumption(filepath.Join(fsrv.rootdir, fsrv.uploadsdir))
+	if err != nil {
+		return nil, err
+	}
+
+	// only take the sum of the directory sizes if the uploads directory
+	// is not the same as the downloads directory.
+	//
+	// if both directories are the same, set total to the downloads directory
+	// size information.
+	//
+	// this is to avoid double-counting file sizes.
+	if strings.Compare(fsrv.downloadsdir, fsrv.uploadsdir) != 0 {
+		consumption.Total = consumption.Downloads + consumption.Uploads
+	} else {
+		consumption.Total = consumption.Downloads
+	}
+
+	return consumption, nil
 }
 
 // function designed to upload a requested file from the server to the client.
