@@ -25,6 +25,7 @@ This software is distributed under the [General Public License v3.0](LICENSE). A
 - **Make Directory**: This allows the client to create a new directory/directory structure in the uploads directory on the server.
 - **Multi-File Download**: This allows the client to download multiple files with one function call.
 - **Multi-File Upload**: This allows the client to upload multiple files with one function call.
+- **Storage Breakdown**: This allows the client to see the amount of space consumed in the server's upload and download directories.
 
 ## Example
 
