@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -214,12 +215,12 @@ func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFi
 func (fsrv *FServer) StorageBreakdown(ctx context.Context, mpty *protocommon.Empty) (consumption *filehandler.StorageInfo, err error) {
 	consumption = new(filehandler.StorageInfo)
 
-	consumption.Downloads, err = fsrv.calculateDirectoryConsumption(fsrv.downloadsdir)
+	consumption.Downloads, err = fsrv.calculateDirectoryConsumption(filepath.Join(fsrv.rootdir, fsrv.downloadsdir))
 	if err != nil {
 		return nil, err
 	}
 
-	consumption.Uploads, err = fsrv.calculateDirectoryConsumption(fsrv.uploadsdir)
+	consumption.Uploads, err = fsrv.calculateDirectoryConsumption(filepath.Join(fsrv.rootdir, fsrv.uploadsdir))
 	if err != nil {
 		return nil, err
 	}
