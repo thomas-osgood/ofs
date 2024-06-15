@@ -42,6 +42,9 @@ type FileserviceClient interface {
 	// rpc designed to rename a file as requested by
 	// the client.
 	RenameFile(ctx context.Context, in *RenameFileRequest, opts ...grpc.CallOption) (*common.StatusMessage, error)
+	// rpc designed to get the storage informatio breakdown
+	// from the server.
+	StorageBreakdown(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*StorageInfo, error)
 	// rpc designed to download a file to the machine the
 	// agent is running on from the control server.
 	UploadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (Fileservice_UploadFileClient, error)
@@ -157,6 +160,15 @@ func (c *fileserviceClient) RenameFile(ctx context.Context, in *RenameFileReques
 	return out, nil
 }
 
+func (c *fileserviceClient) StorageBreakdown(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (*StorageInfo, error) {
+	out := new(StorageInfo)
+	err := c.cc.Invoke(ctx, "/filehandler.Fileservice/StorageBreakdown", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *fileserviceClient) UploadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (Fileservice_UploadFileClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Fileservice_ServiceDesc.Streams[2], "/filehandler.Fileservice/UploadFile", opts...)
 	if err != nil {
@@ -211,6 +223,9 @@ type FileserviceServer interface {
 	// rpc designed to rename a file as requested by
 	// the client.
 	RenameFile(context.Context, *RenameFileRequest) (*common.StatusMessage, error)
+	// rpc designed to get the storage informatio breakdown
+	// from the server.
+	StorageBreakdown(context.Context, *common.Empty) (*StorageInfo, error)
 	// rpc designed to download a file to the machine the
 	// agent is running on from the control server.
 	UploadFile(*FileRequest, Fileservice_UploadFileServer) error
@@ -238,6 +253,9 @@ func (UnimplementedFileserviceServer) Ping(context.Context, *pingpong.Ping) (*pi
 }
 func (UnimplementedFileserviceServer) RenameFile(context.Context, *RenameFileRequest) (*common.StatusMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RenameFile not implemented")
+}
+func (UnimplementedFileserviceServer) StorageBreakdown(context.Context, *common.Empty) (*StorageInfo, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StorageBreakdown not implemented")
 }
 func (UnimplementedFileserviceServer) UploadFile(*FileRequest, Fileservice_UploadFileServer) error {
 	return status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
@@ -374,6 +392,24 @@ func _Fileservice_RenameFile_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Fileservice_StorageBreakdown_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(common.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileserviceServer).StorageBreakdown(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/filehandler.Fileservice/StorageBreakdown",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileserviceServer).StorageBreakdown(ctx, req.(*common.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Fileservice_UploadFile_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(FileRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -417,6 +453,10 @@ var Fileservice_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RenameFile",
 			Handler:    _Fileservice_RenameFile_Handler,
+		},
+		{
+			MethodName: "StorageBreakdown",
+			Handler:    _Fileservice_StorageBreakdown_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
