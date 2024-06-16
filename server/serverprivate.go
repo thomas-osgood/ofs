@@ -36,6 +36,18 @@ func (fsrv *FServer) buildDirStructure() (err error) {
 	return nil
 }
 
+// function designed to build and return the absolute path to the
+// downloads directory.
+func (fsrv *FServer) buildDownloadDirPath() string {
+	return filepath.Join(fsrv.rootdir, fsrv.downloadsdir)
+}
+
+// function designed to build and return the absolute path to the
+// uploads directory.
+func (fsrv *FServer) buildUploadDirPath() string {
+	return filepath.Join(fsrv.rootdir, fsrv.uploadsdir)
+}
+
 // function designed to build and return the absolute path to a file
 // in the uploads directory.
 func (fsrv *FServer) buildUploadFilename(filename string) string {
