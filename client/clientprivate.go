@@ -1,11 +1,8 @@
 package client
 
 import (
-	"fmt"
-	"strings"
 	"sync"
 
-	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 )
 
@@ -72,15 +69,38 @@ func (fc *FClient) mfdWorker(target string, errs *map[string]error, wg *sync.Wai
 	// if the current filename is an empty string or only
 	// contains non-printable characters, ignore it and
 	// move to the next filename.
-	target = strings.TrimSpace(target)
-	if len(target) < 1 {
-		(*errs)[target] = fmt.Errorf(ofcmessages.ERR_FILENAME_EMPTY)
+	target, err = validateFilename(target)
+	if err != nil {
+		(*errs)[target] = err
 		return
 	}
 
 	// attempt to download the file. if an error occurs,
 	// attach it to the filename via the map.
 	err = fc.DownloadFile(&filehandler.FileRequest{Filename: target})
+	if err != nil {
+		(*errs)[target] = err
+	}
+}
+
+// worker function designed to be used by MultifileUpload
+// to spawn multiple go routines to upload files in a
+// concurrent manner.
+func (fc *FClient) mfuWorker(target string, errs *map[string]error, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	var err error
+
+	// make sure the target is not an empty string. if
+	// this validation fails, add the error to the errors
+	// map and return.
+	target, err = validateFilename(target)
+	if err != nil {
+		(*errs)[target] = err
+		return
+	}
+
+	err = fc.UploadFile(target)
 	if err != nil {
 		(*errs)[target] = err
 	}
