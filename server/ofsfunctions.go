@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"time"
 
@@ -129,11 +128,10 @@ func WithDirRoot(dirpath string) FSrvOptFunc {
 // set the downloads directory within the root directory.
 func WithDownloadsDir(dirname string) FSrvOptFunc {
 	return func(fo *FServerOption) error {
-		dirname = strings.TrimSpace(dirname)
+		dirname = ofsutils.CleanDirname(dirname)
 		if len(dirname) < 1 {
 			return fmt.Errorf(ofsmessages.ERR_DIRSTRING_EMPTY)
 		}
-		dirname = filepath.Clean(dirname)
 
 		fo.Downloadsdir = dirname
 
@@ -185,11 +183,10 @@ func WithTransferTimeout(timeout time.Duration) FSrvOptFunc {
 // set the uploads directory within the root directory.
 func WithUploadsDir(dirname string) FSrvOptFunc {
 	return func(fo *FServerOption) error {
-		dirname = strings.TrimSpace(dirname)
+		dirname = ofsutils.CleanDirname(dirname)
 		if len(dirname) < 1 {
 			return fmt.Errorf(ofsmessages.ERR_DIRSTRING_EMPTY)
 		}
-		dirname = filepath.Clean(dirname)
 
 		fo.Uploadsdir = dirname
 
