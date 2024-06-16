@@ -260,8 +260,8 @@ func (fc *FClient) MultifileDownload(targets []string) (errs map[string]error) {
 // this will return a map containing the filenames and an associated
 // error. if no errors occurred, the map will be empty.
 func (fc *FClient) MultifileUpload(targets []string) (errs map[string]error) {
-	var err error
 	var target string
+	var wg sync.WaitGroup
 
 	// initialize the return map to avoid nil reference errors.
 	errs = make(map[string]error)
@@ -270,11 +270,12 @@ func (fc *FClient) MultifileUpload(targets []string) (errs map[string]error) {
 	// server. if an error occurs add a new entry to the return
 	// map connecting the filename and error.
 	for _, target = range targets {
-		err = fc.UploadFile(target)
-		if err != nil {
-			errs[target] = err
-		}
+		wg.Add(1)
+		go fc.mfuWorker(target, &errs, &wg)
 	}
+
+	// wait for all go routines to complete before returning.
+	wg.Wait()
 
 	return errs
 }
