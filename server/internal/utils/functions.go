@@ -6,6 +6,8 @@ import (
 	"io/fs"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	"github.com/thomas-osgood/ofs/server/internal/messages"
@@ -41,6 +43,13 @@ func CheckDirPerms(dirpath string) (err error) {
 	}
 
 	return nil
+}
+
+// function designed to clean and return a passed in directory name.
+// this will strip any non-printable chars using TrimSpace, pass the
+// dirname through the filepath.Clean func, etc.
+func CleanDirname(dirname string) string {
+	return filepath.Clean(strings.TrimSpace(dirname))
 }
 
 // function designed to read the filename header value from
