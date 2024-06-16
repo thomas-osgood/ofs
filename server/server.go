@@ -8,7 +8,6 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -219,13 +218,13 @@ func (fsrv *FServer) StorageBreakdown(ctx context.Context, mpty *protocommon.Emp
 	consumption = new(filehandler.StorageInfo)
 
 	// get total consumption of downloads directory.
-	consumption.Downloads, err = fsrv.calculateDirectoryConsumption(filepath.Join(fsrv.rootdir, fsrv.downloadsdir))
+	consumption.Downloads, err = fsrv.calculateDirectoryConsumption(fsrv.buildDownloadDirPath())
 	if err != nil {
 		return nil, err
 	}
 
 	// get total consumption of uploads directory.
-	consumption.Uploads, err = fsrv.calculateDirectoryConsumption(filepath.Join(fsrv.rootdir, fsrv.uploadsdir))
+	consumption.Uploads, err = fsrv.calculateDirectoryConsumption(fsrv.buildUploadDirPath())
 	if err != nil {
 		return nil, err
 	}
