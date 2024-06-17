@@ -177,3 +177,22 @@ func ReadFileBytes(filename string) (content []byte, err error) {
 
 	return content, nil
 }
+
+// function designed to create (or overwrite) a given file
+// and write the provided content to it.
+func WriteFileBytes(filename string, content []byte) (err error) {
+	var fptr *os.File
+
+	fptr, err = os.OpenFile(filename, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	defer fptr.Close()
+
+	_, err = fptr.Write(content)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
