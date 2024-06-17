@@ -2,9 +2,20 @@ package ofsaesencryptor
 
 // function designed to create, initialize and return a new
 // aes encryptor object.
-func NewAesEncryptor() (encryptor *AESEncryptor, err error) {
+func NewAesEncryptor(opts ...AESEncryptorOptFunc) (encryptor *AESEncryptor, err error) {
+	var defaults AESEncryptorOpt = AESEncryptorOpt{}
+	var curopt AESEncryptorOptFunc
+
+	for _, curopt = range opts {
+		err = curopt(&defaults)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	encryptor = new(AESEncryptor)
+
+	encryptor.key = defaults.Key
 
 	return encryptor, nil
 }
