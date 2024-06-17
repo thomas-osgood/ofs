@@ -3,7 +3,7 @@ package ofsaesencryptor
 // function designed to create, initialize and return a new
 // aes encryptor object.
 func NewAesEncryptor(opts ...AESEncryptorOptFunc) (encryptor *AESEncryptor, err error) {
-	var defaults AESEncryptorOpt = AESEncryptorOpt{}
+	var defaults AESEncryptorOpt = AESEncryptorOpt{Key: make([]byte, 0)}
 	var curopt AESEncryptorOptFunc
 
 	for _, curopt = range opts {
