@@ -11,7 +11,20 @@ import (
 
 // function designed to decrypt a file using AES encryption.
 func (ae *AESEncryptor) DecryptFile(filename string) (err error) {
-	return nil
+	var ciphertext []byte
+	var plaintext []byte
+
+	ciphertext, err = ofscommon.ReadFileBytes(filename)
+	if err != nil {
+		return err
+	}
+
+	plaintext, err = ae.decryptBytesAES(ciphertext)
+	if err != nil {
+		return err
+	}
+
+	return ofscommon.WriteFileBytes(filename, plaintext)
 }
 
 // function designed to encrypt a file using AES encryption.
