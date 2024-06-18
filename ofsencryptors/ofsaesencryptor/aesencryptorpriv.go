@@ -5,7 +5,7 @@ import (
 	"crypto/cipher"
 	"fmt"
 
-	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
+	encryptormessages "github.com/thomas-osgood/ofs/ofsencryptors/internal/messages"
 )
 
 // function designed to decrypt bytes using a given AES key.
@@ -25,7 +25,7 @@ func (ae *AESEncryptor) decryptBytesAES(ciphertext []byte) (plaintext []byte, er
 
 	nonceSize = gcm.NonceSize()
 	if len(ciphertext) < nonceSize {
-		return nil, fmt.Errorf(ofsmessages.ERR_CIPHERTEXT_NONCE_SIZE)
+		return nil, fmt.Errorf(encryptormessages.ERR_AES_CIPHERTEXT_NONCE_SIZE)
 	}
 
 	nonce, ciphertext = ciphertext[:nonceSize], ciphertext[nonceSize:]
