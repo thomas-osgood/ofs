@@ -1,5 +1,9 @@
 package ofsaesencryptor
 
+import (
+	encryptorvalidations "github.com/thomas-osgood/ofs/ofsencryptors/ofsaesencryptor/internal/validations"
+)
+
 // function designed to create, initialize and return a new
 // aes encryptor object.
 func NewAesEncryptor(opts ...AESEncryptorOptFunc) (encryptor *AESEncryptor, err error) {
@@ -24,7 +28,7 @@ func NewAesEncryptor(opts ...AESEncryptorOptFunc) (encryptor *AESEncryptor, err 
 func WithKey(key []byte) AESEncryptorOptFunc {
 	return func(ao *AESEncryptorOpt) (err error) {
 
-		err = validateKey(key)
+		err = encryptorvalidations.ValidateKey(key)
 		if err != nil {
 			return err
 		}
