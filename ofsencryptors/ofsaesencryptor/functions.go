@@ -6,6 +6,10 @@ import (
 
 // function designed to create, initialize and return a new
 // aes encryptor object.
+//
+// if WithKey() is not specified, an encryption key will be
+// randomly generated upon initialization and AES-256 will
+// be implemented.
 func NewAesEncryptor(opts ...AESEncryptorOptFunc) (encryptor *AESEncryptor, err error) {
 	var defaults AESEncryptorOpt = AESEncryptorOpt{Key: make([]byte, 0)}
 	var curopt AESEncryptorOptFunc
