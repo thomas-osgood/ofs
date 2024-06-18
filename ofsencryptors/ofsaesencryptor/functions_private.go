@@ -7,7 +7,7 @@ import (
 )
 
 // function designed to auto-generate a key based on the key
-// length passed in.
+// type passed in.
 //
 // the key type is determined via the keytype enum.
 func autogenKey(keytype int) (key []byte, err error) {
