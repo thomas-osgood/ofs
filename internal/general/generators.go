@@ -9,6 +9,9 @@ import (
 	encmsg "github.com/thomas-osgood/ofs/internal/messages"
 )
 
+// function designed to generate and return a slice of a length
+// between [minlen,maxlen) full of randomly selected bytes from
+// a charset of a-zA-Z0-9.
 func GenerateRandomBytes(minlen int, maxlen int) (randbytes []byte, err error) {
 	var baseval *big.Int
 	var biglen *big.Int
