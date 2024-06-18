@@ -21,6 +21,15 @@ func NewAesEncryptor(opts ...AESEncryptorOptFunc) (encryptor *AESEncryptor, err 
 		}
 	}
 
+	// if no key is specified and WithAutokey has not been called,
+	// auto-generate an AES-256 key.
+	if (defaults.Key == nil) || (len(defaults.Key) < 1) {
+		defaults.Key, err = autogenKey(AES_256)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	encryptor = new(AESEncryptor)
 
 	encryptor.key = defaults.Key
