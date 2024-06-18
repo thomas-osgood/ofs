@@ -28,6 +28,22 @@ func NewAesEncryptor(opts ...AESEncryptorOptFunc) (encryptor *AESEncryptor, err 
 	return encryptor, nil
 }
 
+// auto-generate a key for the given AES type.
+func WithAutokey(keytype int) AESEncryptorOptFunc {
+	return func(ao *AESEncryptorOpt) (err error) {
+		var key []byte
+
+		key, err = autogenKey(keytype)
+		if err != nil {
+			return err
+		}
+
+		ao.Key = key
+
+		return nil
+	}
+}
+
 // specify a key to use for the AES ecnryptor.
 func WithKey(key []byte) AESEncryptorOptFunc {
 	return func(ao *AESEncryptorOpt) (err error) {
