@@ -8,8 +8,8 @@ import (
 	"io"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
-	encmsg "github.com/thomas-osgood/ofs/ofsencryptors/internal/messages"
 	consts "github.com/thomas-osgood/ofs/ofsencryptors/ofsaesencryptor/internal/constants"
+	encmsg "github.com/thomas-osgood/ofs/ofsencryptors/ofsaesencryptor/internal/messages"
 )
 
 // function designed to decrypt bytes and return the "plainbytes".
@@ -29,7 +29,7 @@ func (ae *AESEncryptor) decryptBytesAES(ciphertext []byte) (plaintext []byte, er
 
 	nonceSize = gcm.NonceSize()
 	if len(ciphertext) < nonceSize {
-		return nil, fmt.Errorf(encmsg.ERR_AES_CIPHERTEXT_NONCE_SIZE)
+		return nil, fmt.Errorf(encmsg.ERR_CIPHERTEXT_NONCE_SIZE)
 	}
 
 	nonce, ciphertext = ciphertext[:nonceSize], ciphertext[nonceSize:]
