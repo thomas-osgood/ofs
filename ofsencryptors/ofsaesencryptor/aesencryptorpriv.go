@@ -85,7 +85,7 @@ func (ae *AESEncryptor) manipulateFileData(filename string, action int) (err err
 	case consts.ACT_ENCRYPT:
 		output, err = ae.encryptBytesAES(original)
 	default:
-		err = fmt.Errorf(consts.ERR_ACTION_UNKNOWN)
+		err = fmt.Errorf(encmsg.ERR_ACTION_UNKNOWN)
 	}
 
 	if err != nil {
