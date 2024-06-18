@@ -9,6 +9,4 @@ type OFSEncryptor interface {
 	DecryptFile(string) error
 	// encrypt a given file.
 	EncryptFile(string) error
-	// autogenerate and return an encryption key.
-	GenerateKey() ([]byte, error)
 }
