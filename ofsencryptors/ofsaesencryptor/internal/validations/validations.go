@@ -1,4 +1,4 @@
-package ofsaesencryptor
+package validations
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 )
 
 // function designed to validate an AES encryptor's key.
-func validateKey(key []byte) (err error) {
+func ValidateKey(key []byte) (err error) {
 	var keylen int = len(key)
 
 	if (keylen != 32) && (keylen != 24) && (keylen != 16) {
