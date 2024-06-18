@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+
+	encmsg "github.com/thomas-osgood/ofs/internal/messages"
 )
 
 func GenerateRandomBytes(minlen int, maxlen int) (randbytes []byte, err error) {
@@ -37,7 +39,7 @@ func GenerateRandomBytes(minlen int, maxlen int) (randbytes []byte, err error) {
 	// for the string.
 	biglen, err = rand.Int(rand.Reader, big.NewInt(baseval.Int64()))
 	if err != nil {
-		return nil, fmt.Errorf("error generating the length: %s", err)
+		return nil, fmt.Errorf(encmsg.ERR_RANDLEN_GEN, err)
 	}
 
 	// adjust the generated number to fit within the range.
