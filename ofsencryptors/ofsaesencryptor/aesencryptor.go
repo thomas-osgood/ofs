@@ -1,3 +1,6 @@
+// module defining an AES Encryptor object. this encryptor
+// is able to be used with OFS (or as a stand-alone object)
+// to encrypt and decrypt files.
 package ofsaesencryptor
 
 import (
