@@ -57,8 +57,3 @@ func (ae *AESEncryptor) EncryptFile(filename string) (err error) {
 
 	return ofscommon.WriteFileBytes(filename, ciphertext)
 }
-
-// function designed to encrypt a file using AES encryption.
-func (ae *AESEncryptor) GenerateKey() (key []byte, err error) {
-	return key, nil
-}
