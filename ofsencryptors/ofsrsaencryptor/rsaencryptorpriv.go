@@ -52,6 +52,8 @@ func (rsae *RSAEncryptor) manipulateFileData(filename string, action int) (err e
 // references:
 //
 // https://serverfault.com/questions/325467/i-have-a-keypair-how-do-i-determine-the-key-length
+//
+// https://stackoverflow.com/questions/42707353/how-to-verify-rsa-key-length-in-go
 func (rsae *RSAEncryptor) maxEncryptionSize() (maxsize int) {
 	return maxsize
 }
