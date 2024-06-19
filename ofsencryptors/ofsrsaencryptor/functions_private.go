@@ -13,12 +13,21 @@ import (
 // for an RSA encryptor.
 func genKeyPair() (privkey []byte, pubkey []byte, err error) {
 	var priv *rsa.PrivateKey
-	var pub *rsa.PublicKey = new(rsa.PublicKey)
 
 	priv, err = rsa.GenerateKey(rand.Reader, consts.KEYSIZE)
 	if err != nil {
 		return nil, nil, err
 	}
+
+	privkey, pubkey = genPubPrivBytes(priv)
+
+	return privkey, pubkey, nil
+}
+
+// function designed to generate the public and private key bytes
+// for a key pair based on a given RSA private key.
+func genPubPrivBytes(priv *rsa.PrivateKey) (privkey []byte, pubkey []byte) {
+	var pub *rsa.PublicKey = new(rsa.PublicKey)
 
 	privkey = pem.EncodeToMemory(&pem.Block{
 		Type:  consts.RSA_TYPE_PRIVKEY,
@@ -30,5 +39,5 @@ func genKeyPair() (privkey []byte, pubkey []byte, err error) {
 		Bytes: x509.MarshalPKCS1PublicKey(pub),
 	})
 
-	return privkey, pubkey, nil
+	return privkey, pubkey
 }
