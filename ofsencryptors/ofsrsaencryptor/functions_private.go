@@ -25,7 +25,9 @@ func genKeyPair() (privkey []byte, pubkey []byte, err error) {
 }
 
 // function designed to generate the public and private key bytes
-// for a key pair based on a given RSA private key.
+// for a key pair based on a given RSA private key. this utilizes
+// the MarshalPKCS1 functions to generate the private and public
+// key pair bytes.
 func genPubPrivBytes(priv *rsa.PrivateKey) (privkey []byte, pubkey []byte) {
 	var pub *rsa.PublicKey = new(rsa.PublicKey)
 
