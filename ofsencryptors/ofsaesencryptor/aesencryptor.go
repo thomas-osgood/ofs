@@ -4,7 +4,7 @@
 package ofsaesencryptor
 
 import (
-	consts "github.com/thomas-osgood/ofs/ofsencryptors/ofsaesencryptor/internal/constants"
+	consts "github.com/thomas-osgood/ofs/ofsencryptors/internal/constants"
 )
 
 // function designed to decrypt a file using AES encryption.

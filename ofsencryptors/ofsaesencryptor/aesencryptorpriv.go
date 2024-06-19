@@ -8,7 +8,7 @@ import (
 	"io"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
-	consts "github.com/thomas-osgood/ofs/ofsencryptors/ofsaesencryptor/internal/constants"
+	consts "github.com/thomas-osgood/ofs/ofsencryptors/internal/constants"
 	encmsg "github.com/thomas-osgood/ofs/ofsencryptors/ofsaesencryptor/internal/messages"
 )
 
