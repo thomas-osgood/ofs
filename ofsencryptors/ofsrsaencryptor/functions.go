@@ -13,6 +13,14 @@ func NewRsaEncryptor(opts ...RSAEncryptorOptFunc) (encryptor *RSAEncryptor, err 
 		}
 	}
 
+	// if no key option was provided, auto-generate a key.
+	if (defaults.PrivkeyPem == nil) || (defaults.PubkeyPem == nil) {
+		defaults.PrivkeyPem, defaults.PubkeyPem, err = genKeyPair()
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	encryptor = new(RSAEncryptor)
 
 	encryptor.privkeypem = defaults.PrivkeyPem
