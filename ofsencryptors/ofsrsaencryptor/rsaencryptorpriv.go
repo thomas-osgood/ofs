@@ -5,7 +5,8 @@ import (
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	consts "github.com/thomas-osgood/ofs/ofsencryptors/internal/constants"
-	ofsmessages "github.com/thomas-osgood/ofs/ofsencryptors/internal/messages"
+	encmessages "github.com/thomas-osgood/ofs/ofsencryptors/internal/messages"
+	rsamessages "github.com/thomas-osgood/ofs/ofsencryptors/ofsrsaencryptor/internal/messages"
 )
 
 // function designed to decrypt a file's contents.
@@ -29,12 +30,24 @@ func (rsae *RSAEncryptor) manipulateFileData(filename string, action int) (err e
 		return err
 	}
 
+	// if the file content length exceeds the maximum length
+	// the current RSA object can encrypt, return an error.
+	if len(content) > rsae.maxEncryptionSize() {
+		return fmt.Errorf(rsamessages.ERR_CONTENT_TOO_LONG)
+	}
+
 	switch action {
 	case consts.ACT_DECRYPT:
 		return rsae.decryptBytesRSA(content)
 	case consts.ACT_ENCRYPT:
 		return rsae.encryptBytesRSA(content)
 	default:
-		return fmt.Errorf(ofsmessages.ERR_ACTION_UNKNOWN)
+		return fmt.Errorf(encmessages.ERR_ACTION_UNKNOWN)
 	}
+}
+
+// function designed to calculate and return the maximum size (in bytes)
+// that the RSA object can encrypt.
+func (rsae *RSAEncryptor) maxEncryptionSize() (maxsize int) {
+	return maxsize
 }
