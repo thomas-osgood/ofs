@@ -1,5 +1,7 @@
 package ofsrsaencryptor
 
+import "crypto/rsa"
+
 // function designed to create, initialize and return a new
 // rsa encryptor object.
 func NewRsaEncryptor(opts ...RSAEncryptorOptFunc) (encryptor *RSAEncryptor, err error) {
@@ -27,4 +29,13 @@ func NewRsaEncryptor(opts ...RSAEncryptorOptFunc) (encryptor *RSAEncryptor, err 
 	encryptor.pubkeypem = defaults.PubkeyPem
 
 	return encryptor, nil
+}
+
+// set the public-private key pair used by the encryptor by
+// passing in an RSA Private Key object.
+func WithRSAKeyPair(privkey *rsa.PrivateKey) RSAEncryptorOptFunc {
+	return func(ro *RSAEncryptorOpt) error {
+		ro.PrivkeyPem, ro.PubkeyPem = genPubPrivBytes(privkey)
+		return nil
+	}
 }
