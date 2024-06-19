@@ -9,7 +9,8 @@ import (
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	consts "github.com/thomas-osgood/ofs/ofsencryptors/internal/constants"
-	encmsg "github.com/thomas-osgood/ofs/ofsencryptors/ofsaesencryptor/internal/messages"
+	encmessages "github.com/thomas-osgood/ofs/ofsencryptors/internal/messages"
+	aesmessages "github.com/thomas-osgood/ofs/ofsencryptors/ofsaesencryptor/internal/messages"
 )
 
 // function designed to decrypt bytes and return the "plainbytes".
@@ -29,7 +30,7 @@ func (ae *AESEncryptor) decryptBytesAES(ciphertext []byte) (plaintext []byte, er
 
 	nonceSize = gcm.NonceSize()
 	if len(ciphertext) < nonceSize {
-		return nil, fmt.Errorf(encmsg.ERR_CIPHERTEXT_NONCE_SIZE)
+		return nil, fmt.Errorf(aesmessages.ERR_CIPHERTEXT_NONCE_SIZE)
 	}
 
 	nonce, ciphertext = ciphertext[:nonceSize], ciphertext[nonceSize:]
@@ -85,7 +86,7 @@ func (ae *AESEncryptor) manipulateFileData(filename string, action int) (err err
 	case consts.ACT_ENCRYPT:
 		output, err = ae.encryptBytesAES(original)
 	default:
-		err = fmt.Errorf(encmsg.ERR_ACTION_UNKNOWN)
+		err = fmt.Errorf(encmessages.ERR_ACTION_UNKNOWN)
 	}
 
 	if err != nil {
