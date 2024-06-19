@@ -31,6 +31,15 @@ func NewRsaEncryptor(opts ...RSAEncryptorOptFunc) (encryptor *RSAEncryptor, err 
 	return encryptor, nil
 }
 
+// auto-generate a public-private key pair to be used by
+// the encryptor.
+func WithRSAKeyAuto() RSAEncryptorOptFunc {
+	return func(ro *RSAEncryptorOpt) (err error) {
+		ro.PrivkeyPem, ro.PubkeyPem, err = genKeyPair()
+		return err
+	}
+}
+
 // set the public-private key pair used by the encryptor by
 // passing in an RSA Private Key object.
 func WithRSAKeyPair(privkey *rsa.PrivateKey) RSAEncryptorOptFunc {
