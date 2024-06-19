@@ -48,6 +48,10 @@ func (rsae *RSAEncryptor) manipulateFileData(filename string, action int) (err e
 
 // function designed to calculate and return the maximum size (in bytes)
 // that the RSA object can encrypt.
+//
+// references:
+//
+// https://serverfault.com/questions/325467/i-have-a-keypair-how-do-i-determine-the-key-length
 func (rsae *RSAEncryptor) maxEncryptionSize() (maxsize int) {
 	return maxsize
 }
