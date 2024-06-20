@@ -1,6 +1,9 @@
 package ofsrsaencryptor
 
 import (
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
@@ -62,4 +65,26 @@ func (rsae *RSAEncryptor) manipulateFileData(filename string, action int) (err e
 // https://stackoverflow.com/questions/42707353/how-to-verify-rsa-key-length-in-go
 func (rsae *RSAEncryptor) maxEncryptionSize() (maxsize int, err error) {
 	return maxsize, nil
+}
+
+// function designed to build and return an RSA private key object
+// using the private key bytes saved by the RSAEncryptor.
+func (rsae *RSAEncryptor) constructPrivKey() (key *rsa.PrivateKey, err error) {
+	var der *pem.Block
+
+	if (rsae.privkeybytes == nil) || (len(rsae.privkeybytes) < 1) {
+		return nil, fmt.Errorf(rsamessages.ERR_PRIVKEY_GEN)
+	}
+
+	der, _ = pem.Decode(rsae.privkeybytes)
+	if der == nil {
+		return nil, fmt.Errorf(rsamessages.ERR_PRIVKEY_DEC)
+	}
+
+	key, err = x509.ParsePKCS1PrivateKey(der.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return key, nil
 }
