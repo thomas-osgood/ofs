@@ -15,6 +15,50 @@ import (
 	rsamessages "github.com/thomas-osgood/ofs/ofsencryptors/ofsrsaencryptor/internal/messages"
 )
 
+// function designed to build and return an RSA private key object
+// using the private key bytes saved by the RSAEncryptor.
+func (rsae *RSAEncryptor) constructPrivKey() (key *rsa.PrivateKey, err error) {
+	var der *pem.Block
+
+	if (rsae.privkeybytes == nil) || (len(rsae.privkeybytes) < 1) {
+		return nil, fmt.Errorf(rsamessages.ERR_PRIVKEY_GEN)
+	}
+
+	der, _ = pem.Decode(rsae.privkeybytes)
+	if der == nil {
+		return nil, fmt.Errorf(rsamessages.ERR_PRIVKEY_DEC)
+	}
+
+	key, err = x509.ParsePKCS1PrivateKey(der.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return key, nil
+}
+
+// function designed to build and return an RSA public key object using
+// the public key bytes saved by the RSAEncryptor.
+func (rsae *RSAEncryptor) constructPublicKey() (key *rsa.PublicKey, err error) {
+	var der *pem.Block
+
+	if (rsae.privkeybytes == nil) || (len(rsae.privkeybytes) < 1) {
+		return nil, fmt.Errorf(rsamessages.ERR_PUBKEY_GEN)
+	}
+
+	der, _ = pem.Decode(rsae.pubkeybytes)
+	if der == nil {
+		return nil, fmt.Errorf(rsamessages.ERR_PUBKEY_DEC)
+	}
+
+	key, err = x509.ParsePKCS1PublicKey(der.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return key, nil
+}
+
 // function designed to decrypt a file's contents.
 func (rsae *RSAEncryptor) decryptBytesRSA(ciphertext []byte) (plaintext []byte, err error) {
 	var privkey *rsa.PrivateKey
@@ -106,48 +150,4 @@ func (rsae *RSAEncryptor) maxEncryptionSize() (maxsize int, err error) {
 	maxsize = (key.N.BitLen() / 8) - rsaconsts.PKCS_HEADER_LEN
 
 	return maxsize, nil
-}
-
-// function designed to build and return an RSA private key object
-// using the private key bytes saved by the RSAEncryptor.
-func (rsae *RSAEncryptor) constructPrivKey() (key *rsa.PrivateKey, err error) {
-	var der *pem.Block
-
-	if (rsae.privkeybytes == nil) || (len(rsae.privkeybytes) < 1) {
-		return nil, fmt.Errorf(rsamessages.ERR_PRIVKEY_GEN)
-	}
-
-	der, _ = pem.Decode(rsae.privkeybytes)
-	if der == nil {
-		return nil, fmt.Errorf(rsamessages.ERR_PRIVKEY_DEC)
-	}
-
-	key, err = x509.ParsePKCS1PrivateKey(der.Bytes)
-	if err != nil {
-		return nil, err
-	}
-
-	return key, nil
-}
-
-// function designed to build and return an RSA public key object using
-// the public key bytes saved by the RSAEncryptor.
-func (rsae *RSAEncryptor) constructPublicKey() (key *rsa.PublicKey, err error) {
-	var der *pem.Block
-
-	if (rsae.privkeybytes == nil) || (len(rsae.privkeybytes) < 1) {
-		return nil, fmt.Errorf(rsamessages.ERR_PUBKEY_GEN)
-	}
-
-	der, _ = pem.Decode(rsae.pubkeybytes)
-	if der == nil {
-		return nil, fmt.Errorf(rsamessages.ERR_PUBKEY_DEC)
-	}
-
-	key, err = x509.ParsePKCS1PublicKey(der.Bytes)
-	if err != nil {
-		return nil, err
-	}
-
-	return key, nil
 }
