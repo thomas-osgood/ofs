@@ -115,6 +115,7 @@ func (rsae *RSAEncryptor) manipulateFileData(filename string, action int) (err e
 		return fmt.Errorf(rsamessages.ERR_CONTENT_TOO_LONG)
 	}
 
+	// determine what to do based on the action passed in.
 	switch action {
 	case consts.ACT_DECRYPT:
 		result, err = rsae.decryptBytesRSA(content)
