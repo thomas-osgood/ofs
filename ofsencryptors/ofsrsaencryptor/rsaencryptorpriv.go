@@ -1,7 +1,9 @@
 package ofsrsaencryptor
 
 import (
+	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
@@ -14,13 +16,24 @@ import (
 )
 
 // function designed to decrypt a file's contents.
-func (rsae *RSAEncryptor) decryptBytesRSA(ciphertext []byte) (err error) {
-	return nil
+func (rsae *RSAEncryptor) decryptBytesRSA(ciphertext []byte) (plaintext []byte, err error) {
+	var privkey *rsa.PrivateKey
+
+	if privkey, err = rsae.constructPrivKey(); err != nil {
+		return nil, err
+	}
+
+	plaintext, err = rsa.DecryptOAEP(sha256.New(), rand.Reader, privkey, ciphertext, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return plaintext, nil
 }
 
 // function designed to encrypt a file's contents.
-func (rsae *RSAEncryptor) encryptBytesRSA(plaintext []byte) (err error) {
-	return nil
+func (rsae *RSAEncryptor) encryptBytesRSA(plaintext []byte) (ciphertext []byte, err error) {
+	return ciphertext, nil
 }
 
 // func designed to manipulate the data contained within
