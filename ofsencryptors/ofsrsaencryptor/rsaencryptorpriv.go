@@ -24,6 +24,12 @@ func (rsae *RSAEncryptor) encryptBytesRSA(plaintext []byte) (err error) {
 // data and write it back to the file.
 func (rsae *RSAEncryptor) manipulateFileData(filename string, action int) (err error) {
 	var content []byte
+	var maxsize int
+
+	maxsize, err = rsae.maxEncryptionSize()
+	if err != nil {
+		return err
+	}
 
 	content, err = ofscommon.ReadFileBytes(filename)
 	if err != nil {
@@ -32,7 +38,7 @@ func (rsae *RSAEncryptor) manipulateFileData(filename string, action int) (err e
 
 	// if the file content length exceeds the maximum length
 	// the current RSA object can encrypt, return an error.
-	if len(content) > rsae.maxEncryptionSize() {
+	if len(content) > maxsize {
 		return fmt.Errorf(rsamessages.ERR_CONTENT_TOO_LONG)
 	}
 
