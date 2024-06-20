@@ -16,8 +16,8 @@ func NewRsaEncryptor(opts ...RSAEncryptorOptFunc) (encryptor *RSAEncryptor, err 
 	}
 
 	// if no key option was provided, auto-generate a key.
-	if (defaults.PrivkeyPem == nil) || (defaults.PubkeyPem == nil) {
-		defaults.PrivkeyPem, defaults.PubkeyPem, err = genKeyPair()
+	if (defaults.PrivkeyBytes == nil) || (defaults.PubkeyBytes == nil) {
+		defaults.PrivkeyBytes, defaults.PubkeyBytes, err = genKeyPair()
 		if err != nil {
 			return nil, err
 		}
@@ -25,8 +25,8 @@ func NewRsaEncryptor(opts ...RSAEncryptorOptFunc) (encryptor *RSAEncryptor, err 
 
 	encryptor = new(RSAEncryptor)
 
-	encryptor.privkeypem = defaults.PrivkeyPem
-	encryptor.pubkeypem = defaults.PubkeyPem
+	encryptor.privkeybytes = defaults.PrivkeyBytes
+	encryptor.pubkeybytes = defaults.PubkeyBytes
 
 	return encryptor, nil
 }
@@ -35,7 +35,7 @@ func NewRsaEncryptor(opts ...RSAEncryptorOptFunc) (encryptor *RSAEncryptor, err 
 // the encryptor.
 func WithRSAKeyAuto() RSAEncryptorOptFunc {
 	return func(ro *RSAEncryptorOpt) (err error) {
-		ro.PrivkeyPem, ro.PubkeyPem, err = genKeyPair()
+		ro.PrivkeyBytes, ro.PubkeyBytes, err = genKeyPair()
 		return err
 	}
 }
@@ -44,7 +44,7 @@ func WithRSAKeyAuto() RSAEncryptorOptFunc {
 // passing in an RSA Private Key object.
 func WithRSAKeyPair(privkey *rsa.PrivateKey) RSAEncryptorOptFunc {
 	return func(ro *RSAEncryptorOpt) error {
-		ro.PrivkeyPem, ro.PubkeyPem = genPubPrivBytes(privkey)
+		ro.PrivkeyBytes, ro.PubkeyBytes = genPubPrivBytes(privkey)
 		return nil
 	}
 }

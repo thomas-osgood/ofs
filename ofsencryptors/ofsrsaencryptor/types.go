@@ -1,13 +1,13 @@
 package ofsrsaencryptor
 
 type RSAEncryptor struct {
-	privkeypem []byte
-	pubkeypem  []byte
+	privkeybytes []byte
+	pubkeybytes  []byte
 }
 
 type RSAEncryptorOpt struct {
-	PrivkeyPem []byte
-	PubkeyPem  []byte
+	PrivkeyBytes []byte
+	PubkeyBytes  []byte
 }
 
 type RSAEncryptorOptFunc func(*RSAEncryptorOpt) error
