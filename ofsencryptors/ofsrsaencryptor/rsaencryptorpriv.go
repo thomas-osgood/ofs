@@ -1,9 +1,7 @@
 package ofsrsaencryptor
 
 import (
-	"crypto/rand"
 	"crypto/rsa"
-	"crypto/sha256"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
@@ -59,38 +57,6 @@ func (rsae *RSAEncryptor) constructPublicKey() (key *rsa.PublicKey, err error) {
 	return key, nil
 }
 
-// function designed to decrypt provided ciphertext bytes.
-func (rsae *RSAEncryptor) decryptBytesRSA(ciphertext []byte) (plaintext []byte, err error) {
-	var privkey *rsa.PrivateKey
-
-	if privkey, err = rsae.constructPrivKey(); err != nil {
-		return nil, err
-	}
-
-	plaintext, err = rsa.DecryptOAEP(sha256.New(), rand.Reader, privkey, ciphertext, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return plaintext, nil
-}
-
-// function designed to encrypt provided plaintext bytes.
-func (rsae *RSAEncryptor) encryptBytesRSA(plaintext []byte) (ciphertext []byte, err error) {
-	var pubkey *rsa.PublicKey
-
-	if pubkey, err = rsae.constructPublicKey(); err != nil {
-		return nil, err
-	}
-
-	ciphertext, err = rsa.EncryptOAEP(sha256.New(), rand.Reader, pubkey, plaintext, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return ciphertext, nil
-}
-
 // func designed to manipulate the data contained within
 // a given file. this will either encrypt or decrypt the
 // data and write it back to the file.
@@ -118,9 +84,9 @@ func (rsae *RSAEncryptor) manipulateFileData(filename string, action int) (err e
 	// determine what to do based on the action passed in.
 	switch action {
 	case consts.ACT_DECRYPT:
-		result, err = rsae.decryptBytesRSA(content)
+		result, err = rsae.DecryptBytes(content)
 	case consts.ACT_ENCRYPT:
-		result, err = rsae.encryptBytesRSA(content)
+		result, err = rsae.EncryptBytes(content)
 	default:
 		err = fmt.Errorf(encmessages.ERR_ACTION_UNKNOWN)
 	}
