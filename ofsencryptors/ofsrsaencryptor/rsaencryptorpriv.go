@@ -42,6 +42,7 @@ func (rsae *RSAEncryptor) encryptBytesRSA(plaintext []byte) (ciphertext []byte, 
 func (rsae *RSAEncryptor) manipulateFileData(filename string, action int) (err error) {
 	var content []byte
 	var maxsize int
+	var result []byte
 
 	maxsize, err = rsae.maxEncryptionSize()
 	if err != nil {
@@ -61,12 +62,18 @@ func (rsae *RSAEncryptor) manipulateFileData(filename string, action int) (err e
 
 	switch action {
 	case consts.ACT_DECRYPT:
-		return rsae.decryptBytesRSA(content)
+		result, err = rsae.decryptBytesRSA(content)
 	case consts.ACT_ENCRYPT:
-		return rsae.encryptBytesRSA(content)
+		result, err = rsae.encryptBytesRSA(content)
 	default:
-		return fmt.Errorf(encmessages.ERR_ACTION_UNKNOWN)
+		err = fmt.Errorf(encmessages.ERR_ACTION_UNKNOWN)
 	}
+
+	if err != nil {
+		return err
+	}
+
+	return ofscommon.WriteFileBytes(filename, result)
 }
 
 // function designed to calculate and return the maximum size (in bytes)
