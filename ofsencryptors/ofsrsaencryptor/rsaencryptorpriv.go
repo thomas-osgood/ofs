@@ -33,6 +33,17 @@ func (rsae *RSAEncryptor) decryptBytesRSA(ciphertext []byte) (plaintext []byte, 
 
 // function designed to encrypt a file's contents.
 func (rsae *RSAEncryptor) encryptBytesRSA(plaintext []byte) (ciphertext []byte, err error) {
+	var pubkey *rsa.PublicKey
+
+	if pubkey, err = rsae.constructPublicKey(); err != nil {
+		return nil, err
+	}
+
+	ciphertext, err = rsa.EncryptOAEP(sha256.New(), rand.Reader, pubkey, plaintext, nil)
+	if err != nil {
+		return nil, err
+	}
+
 	return ciphertext, nil
 }
 
@@ -112,6 +123,28 @@ func (rsae *RSAEncryptor) constructPrivKey() (key *rsa.PrivateKey, err error) {
 	}
 
 	key, err = x509.ParsePKCS1PrivateKey(der.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return key, nil
+}
+
+// function designed to build and return an RSA public key object using
+// the public key bytes saved by the RSAEncryptor.
+func (rsae *RSAEncryptor) constructPublicKey() (key *rsa.PublicKey, err error) {
+	var der *pem.Block
+
+	if (rsae.privkeybytes == nil) || (len(rsae.privkeybytes) < 1) {
+		return nil, fmt.Errorf(rsamessages.ERR_PUBKEY_GEN)
+	}
+
+	der, _ = pem.Decode(rsae.pubkeybytes)
+	if der == nil {
+		return nil, fmt.Errorf(rsamessages.ERR_PUBKEY_DEC)
+	}
+
+	key, err = x509.ParsePKCS1PublicKey(der.Bytes)
 	if err != nil {
 		return nil, err
 	}
