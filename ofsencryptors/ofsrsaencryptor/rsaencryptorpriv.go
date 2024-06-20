@@ -9,6 +9,7 @@ import (
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	consts "github.com/thomas-osgood/ofs/ofsencryptors/internal/constants"
 	encmessages "github.com/thomas-osgood/ofs/ofsencryptors/internal/messages"
+	rsaconsts "github.com/thomas-osgood/ofs/ofsencryptors/ofsrsaencryptor/internal/constants"
 	rsamessages "github.com/thomas-osgood/ofs/ofsencryptors/ofsrsaencryptor/internal/messages"
 )
 
@@ -64,6 +65,15 @@ func (rsae *RSAEncryptor) manipulateFileData(filename string, action int) (err e
 //
 // https://stackoverflow.com/questions/42707353/how-to-verify-rsa-key-length-in-go
 func (rsae *RSAEncryptor) maxEncryptionSize() (maxsize int, err error) {
+	var key *rsa.PrivateKey
+
+	key, err = rsae.constructPrivKey()
+	if err != nil {
+		return -1, err
+	}
+
+	maxsize = (key.N.BitLen() / 8) - rsaconsts.PKCS_HEADER_LEN
+
 	return maxsize, nil
 }
 
