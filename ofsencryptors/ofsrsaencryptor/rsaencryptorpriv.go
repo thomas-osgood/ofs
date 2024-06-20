@@ -59,7 +59,7 @@ func (rsae *RSAEncryptor) constructPublicKey() (key *rsa.PublicKey, err error) {
 	return key, nil
 }
 
-// function designed to decrypt a file's contents.
+// function designed to decrypt provided ciphertext bytes.
 func (rsae *RSAEncryptor) decryptBytesRSA(ciphertext []byte) (plaintext []byte, err error) {
 	var privkey *rsa.PrivateKey
 
@@ -75,7 +75,7 @@ func (rsae *RSAEncryptor) decryptBytesRSA(ciphertext []byte) (plaintext []byte, 
 	return plaintext, nil
 }
 
-// function designed to encrypt a file's contents.
+// function designed to encrypt provided plaintext bytes.
 func (rsae *RSAEncryptor) encryptBytesRSA(plaintext []byte) (ciphertext []byte, err error) {
 	var pubkey *rsa.PublicKey
 
