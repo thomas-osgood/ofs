@@ -28,12 +28,10 @@ func (rsae *RSAEncryptor) constructPrivKey() (key *rsa.PrivateKey, err error) {
 	}
 
 	switch der.Type {
-	case rsaconsts.KEY_TYPE_CERT:
-		err = fmt.Errorf(rsamessages.ERR_KEY_TYPE_UNSUPPORTED, der.Type)
 	case rsaconsts.RSA_TYPE_PRIVKEY:
 		key, err = x509.ParsePKCS1PrivateKey(der.Bytes)
 	default:
-		err = fmt.Errorf(rsamessages.ERR_KEY_TYPE, der.Type)
+		err = fmt.Errorf(rsamessages.ERR_KEY_TYPE_UNSUPPORTED, der.Type)
 	}
 
 	if err != nil {
@@ -62,12 +60,10 @@ func (rsae *RSAEncryptor) constructPublicKey() (key *rsa.PublicKey, err error) {
 	}
 
 	switch der.Type {
-	case rsaconsts.KEY_TYPE_CERT:
-		err = fmt.Errorf(rsamessages.ERR_KEY_TYPE_UNSUPPORTED, der.Type)
 	case rsaconsts.KEY_TYPE_PUBKEY:
 		key, err = x509.ParsePKCS1PublicKey(der.Bytes)
 	default:
-		err = fmt.Errorf(rsamessages.ERR_KEY_TYPE, der.Type)
+		err = fmt.Errorf(rsamessages.ERR_KEY_TYPE_UNSUPPORTED, der.Type)
 	}
 
 	if err != nil {
