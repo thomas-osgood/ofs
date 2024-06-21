@@ -36,11 +36,7 @@ func (ae *AESEncryptor) DecryptBytes(ciphertext []byte) (plaintext []byte, err e
 
 	nonce, ciphertext = ciphertext[:nonceSize], ciphertext[nonceSize:]
 
-	if plaintext, err = gcm.Open(nil, nonce, ciphertext, nil); err != nil {
-		return nil, err
-	}
-
-	return plaintext, nil
+	return gcm.Open(nil, nonce, ciphertext, nil)
 }
 
 // function designed to decrypt a file using AES encryption.
