@@ -79,6 +79,8 @@ func (fc *FClient) mfdWorker(target string, errs *map[string]error, wg *sync.Wai
 	// attach it to the filename via the map.
 	err = fc.DownloadFile(&filehandler.FileRequest{Filename: target})
 	if err != nil {
+		// TODO: add mutex to prevent multiple writes to errs map,
+		// which can occur when a race condition happens.
 		(*errs)[target] = err
 	}
 }
@@ -102,6 +104,8 @@ func (fc *FClient) mfuWorker(target string, errs *map[string]error, wg *sync.Wai
 
 	err = fc.UploadFile(target)
 	if err != nil {
+		// TODO: add mutex to prevent multiple writes to errs map,
+		// which can occur when a race condition happens.
 		(*errs)[target] = err
 	}
 }
