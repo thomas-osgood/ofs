@@ -63,9 +63,7 @@ func (ae *AESEncryptor) EncryptBytes(plaintext []byte) (ciphertext []byte, err e
 		return nil, err
 	}
 
-	ciphertext = gcm.Seal(nonce, nonce, plaintext, nil)
-
-	return ciphertext, nil
+	return gcm.Seal(nonce, nonce, plaintext, nil), nil
 }
 
 // function designed to encrypt a file using AES encryption.
