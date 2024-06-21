@@ -27,7 +27,15 @@ func (rsae *RSAEncryptor) constructPrivKey() (key *rsa.PrivateKey, err error) {
 		return nil, fmt.Errorf(rsamessages.ERR_PRIVKEY_DEC)
 	}
 
-	key, err = x509.ParsePKCS1PrivateKey(der.Bytes)
+	switch der.Type {
+	case rsaconsts.KEY_TYPE_CERT:
+		err = fmt.Errorf(rsamessages.ERR_KEY_TYPE_UNSUPPORTED, der.Type)
+	case rsaconsts.RSA_TYPE_PRIVKEY:
+		key, err = x509.ParsePKCS1PrivateKey(der.Bytes)
+	default:
+		err = fmt.Errorf(rsamessages.ERR_KEY_TYPE, der.Type)
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -37,6 +45,10 @@ func (rsae *RSAEncryptor) constructPrivKey() (key *rsa.PrivateKey, err error) {
 
 // function designed to build and return an RSA public key object using
 // the public key bytes saved by the RSAEncryptor.
+//
+// references:
+//
+// https://stackoverflow.com/questions/62965006/how-to-parse-collection-of-pem-certs
 func (rsae *RSAEncryptor) constructPublicKey() (key *rsa.PublicKey, err error) {
 	var der *pem.Block
 
@@ -49,7 +61,15 @@ func (rsae *RSAEncryptor) constructPublicKey() (key *rsa.PublicKey, err error) {
 		return nil, fmt.Errorf(rsamessages.ERR_PUBKEY_DEC)
 	}
 
-	key, err = x509.ParsePKCS1PublicKey(der.Bytes)
+	switch der.Type {
+	case rsaconsts.KEY_TYPE_CERT:
+		err = fmt.Errorf(rsamessages.ERR_KEY_TYPE_UNSUPPORTED, der.Type)
+	case rsaconsts.KEY_TYPE_PUBKEY:
+		key, err = x509.ParsePKCS1PublicKey(der.Bytes)
+	default:
+		err = fmt.Errorf(rsamessages.ERR_KEY_TYPE, der.Type)
+	}
+
 	if err != nil {
 		return nil, err
 	}
