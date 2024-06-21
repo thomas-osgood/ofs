@@ -34,11 +34,7 @@ func (rsae *RSAEncryptor) constructPrivKey() (key *rsa.PrivateKey, err error) {
 		err = fmt.Errorf(rsamessages.ERR_KEY_TYPE_UNSUPPORTED, der.Type)
 	}
 
-	if err != nil {
-		return nil, err
-	}
-
-	return key, nil
+	return key, err
 }
 
 // function designed to build and return an RSA public key object using
@@ -66,11 +62,7 @@ func (rsae *RSAEncryptor) constructPublicKey() (key *rsa.PublicKey, err error) {
 		err = fmt.Errorf(rsamessages.ERR_KEY_TYPE_UNSUPPORTED, der.Type)
 	}
 
-	if err != nil {
-		return nil, err
-	}
-
-	return key, nil
+	return key, err
 }
 
 // func designed to manipulate the data contained within
