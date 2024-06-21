@@ -61,7 +61,7 @@ func (fc *FClient) increaseActiveUploads() {
 // worker function designed to be used by MultifileDownload
 // to spawn multiple go routines to download files in a
 // concurrent manner.
-func (fc *FClient) mfdWorker(target string, errs *map[string]error, wg *sync.WaitGroup) {
+func (fc *FClient) mfdWorker(target string, errs *map[string]error, wg *sync.WaitGroup, mut *sync.Mutex) {
 	defer wg.Done()
 
 	var err error
@@ -79,16 +79,16 @@ func (fc *FClient) mfdWorker(target string, errs *map[string]error, wg *sync.Wai
 	// attach it to the filename via the map.
 	err = fc.DownloadFile(&filehandler.FileRequest{Filename: target})
 	if err != nil {
-		// TODO: add mutex to prevent multiple writes to errs map,
-		// which can occur when a race condition happens.
+		mut.Lock()
 		(*errs)[target] = err
+		mut.Unlock()
 	}
 }
 
 // worker function designed to be used by MultifileUpload
 // to spawn multiple go routines to upload files in a
 // concurrent manner.
-func (fc *FClient) mfuWorker(target string, errs *map[string]error, wg *sync.WaitGroup) {
+func (fc *FClient) mfuWorker(target string, errs *map[string]error, wg *sync.WaitGroup, mut *sync.Mutex) {
 	defer wg.Done()
 
 	var err error
@@ -104,8 +104,8 @@ func (fc *FClient) mfuWorker(target string, errs *map[string]error, wg *sync.Wai
 
 	err = fc.UploadFile(target)
 	if err != nil {
-		// TODO: add mutex to prevent multiple writes to errs map,
-		// which can occur when a race condition happens.
+		mut.Lock()
 		(*errs)[target] = err
+		mut.Unlock()
 	}
 }

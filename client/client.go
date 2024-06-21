@@ -234,6 +234,7 @@ func (fc *FClient) MakeDirectory(dirname string) (err error) {
 // this will return a map containing the filenames and an associated
 // error. if no errors occurred, the map will be empty.
 func (fc *FClient) MultifileDownload(targets []string) (errs map[string]error) {
+	var mut sync.Mutex
 	var target string
 	var wg sync.WaitGroup
 
@@ -246,7 +247,7 @@ func (fc *FClient) MultifileDownload(targets []string) (errs map[string]error) {
 	// filename via the errs map.
 	for _, target = range targets {
 		wg.Add(1)
-		go fc.mfdWorker(target, &errs, &wg)
+		go fc.mfdWorker(target, &errs, &wg, &mut)
 	}
 
 	// wait for all go routines to complete before returning.
@@ -260,6 +261,7 @@ func (fc *FClient) MultifileDownload(targets []string) (errs map[string]error) {
 // this will return a map containing the filenames and an associated
 // error. if no errors occurred, the map will be empty.
 func (fc *FClient) MultifileUpload(targets []string) (errs map[string]error) {
+	var mut sync.Mutex
 	var target string
 	var wg sync.WaitGroup
 
@@ -271,7 +273,7 @@ func (fc *FClient) MultifileUpload(targets []string) (errs map[string]error) {
 	// map connecting the filename and error.
 	for _, target = range targets {
 		wg.Add(1)
-		go fc.mfuWorker(target, &errs, &wg)
+		go fc.mfuWorker(target, &errs, &wg, &mut)
 	}
 
 	// wait for all go routines to complete before returning.
