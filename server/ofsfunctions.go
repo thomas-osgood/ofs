@@ -139,6 +139,14 @@ func WithDownloadsDir(dirname string) FSrvOptFunc {
 	}
 }
 
+// set the encryptor the fileserver will use.
+func WithEncryptor(encryptor OFSEncryptor) FSrvOptFunc {
+	return func(fo *FServerOption) error {
+		fo.Encryptor = encryptor
+		return nil
+	}
+}
+
 // set the maximum number of concurrent downloads allowed
 // at one time.
 func WithMaxDownloads(max int) FSrvOptFunc {
