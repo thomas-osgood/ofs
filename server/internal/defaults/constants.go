@@ -2,6 +2,11 @@ package defaults
 
 import "time"
 
+const (
+	ACT_DECRYPT = iota
+	ACT_ENCRYPT
+)
+
 const DEFAULT_DEBUG bool = false
 const DEFAULT_LISTENADDR string = "0.0.0.0"
 const DEFAULT_LISTENPORT int = 8999
