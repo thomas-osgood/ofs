@@ -26,6 +26,8 @@ This software is distributed under the [General Public License v3.0](LICENSE). A
 - **Multi-File Download**: This allows the client to download multiple files with one function call.
 - **Multi-File Upload**: This allows the client to upload multiple files with one function call.
 - **Storage Breakdown**: This allows the client to see the amount of space consumed in the server's upload and download directories.
+- **Decrypt File**: This allows the client to decrypt an encrypted file on the fileserver.
+- **Encrypt File**: This allows the client to encrypt a file hosted on the fileserver.
 
 ## Example
 
