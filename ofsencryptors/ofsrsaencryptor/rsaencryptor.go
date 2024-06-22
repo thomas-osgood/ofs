@@ -67,6 +67,10 @@ func (rsae *RSAEncryptor) EncryptFile(filename string) (err error) {
 
 // function designed to generate and return the signature of
 // a given set of bytes.
+//
+// reference:
+//
+// https://medium.com/@matt.wiater/golang-verifying-integrity-by-signing-binaries-9b4497d5d761
 func (rsae *RSAEncryptor) SignBytes(content []byte) (signature []byte, err error) {
 	var hashed [32]byte
 	var privkey *rsa.PrivateKey
@@ -83,6 +87,10 @@ func (rsae *RSAEncryptor) SignBytes(content []byte) (signature []byte, err error
 
 // function designed to generate and return the signature of
 // a given file. this can be used to verify the file's integrity.
+//
+// reference:
+//
+// https://medium.com/@matt.wiater/golang-verifying-integrity-by-signing-binaries-9b4497d5d761
 func (rsae *RSAEncryptor) SignFile(filename string) (signature []byte, err error) {
 	var content []byte
 
@@ -98,6 +106,10 @@ func (rsae *RSAEncryptor) SignFile(filename string) (signature []byte, err error
 // slice of bytes.
 //
 // if the bytes pass verification, nil will be returned.
+//
+// reference:
+//
+// https://medium.com/@matt.wiater/golang-verifying-integrity-by-signing-binaries-9b4497d5d761
 func (rsae *RSAEncryptor) VerifyBytes(content []byte, signature []byte) (err error) {
 	var hashed [32]byte
 	var pubkey *rsa.PublicKey
@@ -111,6 +123,10 @@ func (rsae *RSAEncryptor) VerifyBytes(content []byte, signature []byte) (err err
 // file.
 //
 // if the file passes verification, nil will be returned.
+//
+// reference:
+//
+// https://medium.com/@matt.wiater/golang-verifying-integrity-by-signing-binaries-9b4497d5d761
 func (rsae *RSAEncryptor) VerifyFile(filename string, signature []byte) (err error) {
 	var content []byte
 
