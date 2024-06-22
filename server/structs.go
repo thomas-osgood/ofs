@@ -18,6 +18,7 @@ type FServer struct {
 
 	debug        bool
 	downloadsdir string
+	encryptor    OFSEncryptor
 	printer      *output.Outputter
 	rootdir      string
 	transferCfg  ofstypes.TransferConfig
@@ -33,6 +34,8 @@ type FServerOption struct {
 	// subdirectory within the rootdir where uploaded
 	// files will be saved.
 	Downloadsdir string
+	// encryptor the fileserver will use.
+	Encryptor OFSEncryptor
 	// number of maximum concurrent downloads the server is
 	// allowed to have active at one time.
 	MaxDownloads int
