@@ -1,10 +1,25 @@
 package client
 
 import (
+	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 )
+
+// function designed to create a filepath inside subdirectories.
+//
+// reference:
+//
+// https://stackoverflow.com/questions/59961510/golang-os-create-path-with-nested-directories
+func (fc *FClient) createFilepath(fpath string) (fptr *os.File, err error) {
+	err = os.MkdirAll(filepath.Dir(fpath), os.FileMode(0770))
+	if err != nil {
+		return nil, err
+	}
+	return os.Create(fpath)
+}
 
 // function designed to deccrement the number of "activedownloads"
 // for the client.
