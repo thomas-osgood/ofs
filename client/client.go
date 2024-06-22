@@ -36,6 +36,33 @@ func (fc *FClient) initConnection() (conn *grpc.ClientConn, client filehandler.F
 	return conn, client, nil
 }
 
+// function designed to request a file on the server be decrypted.
+func (fc *FClient) DecryptFile(filename string) (err error) {
+	var cancel context.CancelFunc
+	var client filehandler.FileserviceClient
+	var conn *grpc.ClientConn
+	var ctx context.Context
+	var status *protocommon.StatusMessage
+
+	conn, client, err = fc.initConnection()
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
+	defer cancel()
+
+	status, err = client.DecryptFile(ctx, &filehandler.FileRequest{Filename: filename})
+	if err != nil {
+		return err
+	} else if status.Code >= http.StatusBadRequest {
+		return fmt.Errorf(status.GetMessage())
+	}
+
+	return nil
+}
+
 // function designed to request a file be deleted from the server's
 // uploads directory.
 func (fc *FClient) DeleteFile(targetfile string) (err error) {
