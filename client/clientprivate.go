@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
 	"github.com/thomas-osgood/ofs/client/internal/ofcconstants"
+	genmessages "github.com/thomas-osgood/ofs/internal/messages"
 	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	"google.golang.org/grpc"
@@ -52,7 +52,7 @@ func (fc *FClient) cryptoAction(filename string, action int) (err error) {
 	case ofcconstants.CRYPTO_ENCRYPT:
 		status, err = client.EncryptFile(ctx, &filehandler.FileRequest{Filename: filename})
 	default:
-		err = fmt.Errorf(ofcmessages.ERR_ACTION_INVALID)
+		err = fmt.Errorf(genmessages.ERR_ACTION_INVALID)
 	}
 
 	if err != nil {
