@@ -93,3 +93,31 @@ func (rsae *RSAEncryptor) SignFile(filename string) (signature []byte, err error
 
 	return rsae.SignBytes(content)
 }
+
+// function designed to verify the signature for a given
+// slice of bytes.
+//
+// if the bytes pass verification, nil will be returned.
+func (rsae *RSAEncryptor) VerifyBytes(content []byte, signature []byte) (err error) {
+	var hashed [32]byte
+	var pubkey *rsa.PublicKey
+
+	hashed = sha256.Sum256(content)
+
+	return rsa.VerifyPKCS1v15(pubkey, crypto.SHA256, hashed[:], signature)
+}
+
+// function designed to verify the signature for a given
+// file.
+//
+// if the file passes verification, nil will be returned.
+func (rsae *RSAEncryptor) VerifyFile(filename string, signature []byte) (err error) {
+	var content []byte
+
+	content, err = ofscommon.ReadFileBytes(filename)
+	if err != nil {
+		return err
+	}
+
+	return rsae.VerifyBytes(content, signature)
+}
