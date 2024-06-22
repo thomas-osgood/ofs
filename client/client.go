@@ -88,7 +88,7 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 	// get a file pointer pointing to the destination. this will
 	// open the destination file in WRITE mode and TRUNC mode, clearing
 	// out any data if the file already exists.
-	fptr, err = os.OpenFile(req.GetFilename(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0644))
+	fptr, err = fc.createFilepath(req.GetFilename())
 	if err != nil {
 		log.Printf(ofcmessages.ERR_OPEN_FILE, err.Error())
 		return err
