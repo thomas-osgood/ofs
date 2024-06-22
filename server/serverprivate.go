@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
+	genmessages "github.com/thomas-osgood/ofs/internal/messages"
 	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
@@ -80,8 +81,9 @@ func (fsrv *FServer) calculateDirectoryConsumption(targetdir string) (consumptio
 // information and give it an absolute path within the directory
 // associated with the type of file specified (download, upload, etc).
 func (fsrv *FServer) cleanFilename(filename string, ftype string) (cleaned string) {
-	var fnsplit []string
 	var subdir string
+
+	filename = strings.Replace(filepath.Clean(filepath.FromSlash(filename)), fsrv.rootdir, "", 1)
 
 	switch strings.ToLower(ftype) {
 	case ofsdefaults.FTYPE_DOWNLOAD:
@@ -92,11 +94,34 @@ func (fsrv *FServer) cleanFilename(filename string, ftype string) (cleaned strin
 		subdir = ""
 	}
 
-	filename = filepath.Clean(filename)
-	fnsplit = strings.Split(filename, fmt.Sprintf("%c", os.PathSeparator))
-	cleaned = filepath.Join(fsrv.rootdir, subdir, fnsplit[len(fnsplit)-1])
+	filename = strings.Replace(filename, subdir, "", 1)
+	cleaned = filepath.Join(fsrv.rootdir, subdir, filename)
 
 	return cleaned
+}
+
+// function designed to perform a cryptographic action on a specified
+// file. this action (encrypt/decrypt) will be specified by the caller.
+func (fsrv *FServer) cryptoAction(filename string, action int) (err error) {
+	if fsrv.encryptor == nil {
+		return fmt.Errorf(ofsmessages.ERR_ENCRYPTOR_NIL)
+	}
+
+	filename = fsrv.cleanFilename(filename, ofsdefaults.FTYPE_ROOT)
+	if len(filename) < 1 {
+		return fmt.Errorf(ofsmessages.ERR_EMPTY_FILENAME)
+	}
+
+	switch action {
+	case ofsdefaults.ACT_DECRYPT:
+		err = fsrv.encryptor.DecryptFile(filename)
+	case ofsdefaults.ACT_ENCRYPT:
+		err = fsrv.encryptor.EncryptFile(filename)
+	default:
+		err = fmt.Errorf(genmessages.ERR_ACTION_INVALID)
+	}
+
+	return err
 }
 
 // helper function for outputting a debug message to STDOUT. this

@@ -1,10 +1,68 @@
 package client
 
 import (
+	"context"
+	"fmt"
+	"net/http"
+	"os"
+	"path/filepath"
 	"sync"
 
+	"github.com/thomas-osgood/ofs/client/internal/ofcconstants"
+	genmessages "github.com/thomas-osgood/ofs/internal/messages"
+	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
+	"google.golang.org/grpc"
 )
+
+// function designed to create a filepath inside subdirectories.
+//
+// reference:
+//
+// https://stackoverflow.com/questions/59961510/golang-os-create-path-with-nested-directories
+func (fc *FClient) createFilepath(fpath string) (fptr *os.File, err error) {
+	err = os.MkdirAll(filepath.Dir(fpath), os.FileMode(0770))
+	if err != nil {
+		return nil, err
+	}
+	return os.Create(fpath)
+}
+
+// function designed to request the encryption or decryption of
+// a target file.
+func (fc *FClient) cryptoAction(filename string, action int) (err error) {
+	var cancel context.CancelFunc
+	var client filehandler.FileserviceClient
+	var conn *grpc.ClientConn
+	var ctx context.Context
+	var status *protocommon.StatusMessage
+
+	conn, client, err = fc.initConnection()
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
+	defer cancel()
+
+	switch action {
+	case ofcconstants.CRYPTO_DECRYPT:
+		status, err = client.DecryptFile(ctx, &filehandler.FileRequest{Filename: filename})
+	case ofcconstants.CRYPTO_ENCRYPT:
+		status, err = client.EncryptFile(ctx, &filehandler.FileRequest{Filename: filename})
+	default:
+		err = fmt.Errorf(genmessages.ERR_ACTION_INVALID)
+	}
+
+	if err != nil {
+		return err
+	} else if status.Code >= http.StatusBadRequest {
+		return fmt.Errorf(status.GetMessage())
+	}
+
+	return nil
+}
 
 // function designed to deccrement the number of "activedownloads"
 // for the client.

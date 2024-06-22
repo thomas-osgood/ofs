@@ -30,6 +30,10 @@ type FileserviceClient interface {
 	// rpc designed to upload a file from the machine the
 	// agent is running on to the control server.
 	DownloadFile(ctx context.Context, opts ...grpc.CallOption) (Fileservice_DownloadFileClient, error)
+	// rpc designed to request a file on the server be decrypted.
+	DecryptFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*common.StatusMessage, error)
+	// rpc designed to request a file on the server be encrypted.
+	EncryptFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*common.StatusMessage, error)
 	// rpc designed to gather and return a list of files
 	// that can be downloaded by the client.
 	ListFiles(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (Fileservice_ListFilesClient, error)
@@ -99,6 +103,24 @@ func (x *fileserviceDownloadFileClient) CloseAndRecv() (*common.StatusMessage, e
 		return nil, err
 	}
 	return m, nil
+}
+
+func (c *fileserviceClient) DecryptFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*common.StatusMessage, error) {
+	out := new(common.StatusMessage)
+	err := c.cc.Invoke(ctx, "/filehandler.Fileservice/DecryptFile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *fileserviceClient) EncryptFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*common.StatusMessage, error) {
+	out := new(common.StatusMessage)
+	err := c.cc.Invoke(ctx, "/filehandler.Fileservice/EncryptFile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *fileserviceClient) ListFiles(ctx context.Context, in *common.Empty, opts ...grpc.CallOption) (Fileservice_ListFilesClient, error) {
@@ -211,6 +233,10 @@ type FileserviceServer interface {
 	// rpc designed to upload a file from the machine the
 	// agent is running on to the control server.
 	DownloadFile(Fileservice_DownloadFileServer) error
+	// rpc designed to request a file on the server be decrypted.
+	DecryptFile(context.Context, *FileRequest) (*common.StatusMessage, error)
+	// rpc designed to request a file on the server be encrypted.
+	EncryptFile(context.Context, *FileRequest) (*common.StatusMessage, error)
 	// rpc designed to gather and return a list of files
 	// that can be downloaded by the client.
 	ListFiles(*common.Empty, Fileservice_ListFilesServer) error
@@ -241,6 +267,12 @@ func (UnimplementedFileserviceServer) DeleteFile(context.Context, *FileRequest) 
 }
 func (UnimplementedFileserviceServer) DownloadFile(Fileservice_DownloadFileServer) error {
 	return status.Errorf(codes.Unimplemented, "method DownloadFile not implemented")
+}
+func (UnimplementedFileserviceServer) DecryptFile(context.Context, *FileRequest) (*common.StatusMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DecryptFile not implemented")
+}
+func (UnimplementedFileserviceServer) EncryptFile(context.Context, *FileRequest) (*common.StatusMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EncryptFile not implemented")
 }
 func (UnimplementedFileserviceServer) ListFiles(*common.Empty, Fileservice_ListFilesServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListFiles not implemented")
@@ -315,6 +347,42 @@ func (x *fileserviceDownloadFileServer) Recv() (*FileChunk, error) {
 		return nil, err
 	}
 	return m, nil
+}
+
+func _Fileservice_DecryptFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileserviceServer).DecryptFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/filehandler.Fileservice/DecryptFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileserviceServer).DecryptFile(ctx, req.(*FileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Fileservice_EncryptFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileserviceServer).EncryptFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/filehandler.Fileservice/EncryptFile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileserviceServer).EncryptFile(ctx, req.(*FileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Fileservice_ListFiles_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -441,6 +509,14 @@ var Fileservice_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteFile",
 			Handler:    _Fileservice_DeleteFile_Handler,
+		},
+		{
+			MethodName: "DecryptFile",
+			Handler:    _Fileservice_DecryptFile_Handler,
+		},
+		{
+			MethodName: "EncryptFile",
+			Handler:    _Fileservice_EncryptFile_Handler,
 		},
 		{
 			MethodName: "MakeDirectory",

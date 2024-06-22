@@ -13,6 +13,7 @@ import (
 	"time"
 
 	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
+	"github.com/thomas-osgood/ofs/client/internal/ofcconstants"
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
@@ -34,6 +35,11 @@ func (fc *FClient) initConnection() (conn *grpc.ClientConn, client filehandler.F
 	client = filehandler.NewFileserviceClient(conn)
 
 	return conn, client, nil
+}
+
+// function designed to request a file on the server be decrypted.
+func (fc *FClient) DecryptFile(filename string) (err error) {
+	return fc.cryptoAction(filename, ofcconstants.CRYPTO_DECRYPT)
 }
 
 // function designed to request a file be deleted from the server's
@@ -88,7 +94,7 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 	// get a file pointer pointing to the destination. this will
 	// open the destination file in WRITE mode and TRUNC mode, clearing
 	// out any data if the file already exists.
-	fptr, err = os.OpenFile(req.GetFilename(), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0644))
+	fptr, err = fc.createFilepath(req.GetFilename())
 	if err != nil {
 		log.Printf(ofcmessages.ERR_OPEN_FILE, err.Error())
 		return err
@@ -144,6 +150,11 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 	}
 
 	return nil
+}
+
+// function designed to request a file on the server be encrypted.
+func (fc *FClient) EncryptFile(filename string) (err error) {
+	return fc.cryptoAction(filename, ofcconstants.CRYPTO_ENCRYPT)
 }
 
 // function designed to get the list of files the client

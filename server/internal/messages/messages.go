@@ -21,6 +21,8 @@ const ERR_ACK string = "[ACK] %s"
 const ERR_CHUNK_BIG string = "chunk size must be less than or equal to %d"
 const ERR_CHUNK_SMALL string = "chunksize must be larger than zero"
 const ERR_COPY_FILE string = "[COPY] %s"
+const ERR_EMPTY_FILENAME string = "filename cannot be an empty string"
+const ERR_ENCRYPTOR_NIL string = "no encryptor present"
 const ERR_FILE_EXISTS string = "destination file already exists"
 const ERR_DIRSTRING_EMPTY string = "directory name must be a non-zero length string"
 const ERR_HEADER_FILENAME string = "filename not found in metadata"
@@ -41,6 +43,9 @@ const FILE_DELETED string = "file successfully deleted"
 const FILE_SENT string = "file successfully transmitted"
 
 const SERVER_LISTEN_INFO string = "server listening on \"%s\"\n"
+
+const SUCCESS_DECRYPTED string = "file succesfully decrypted"
+const SUCCESS_ENCRYPTED string = "file succesfully encrypted"
 
 const TEMP_REMOVED string = "temp file removed"
 

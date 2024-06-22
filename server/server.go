@@ -23,6 +23,15 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+// function designed to encrypt a file as requested by the client.
+func (fsrv *FServer) DecryptFile(ctx context.Context, fr *filehandler.FileRequest) (response *protocommon.StatusMessage, err error) {
+	err = fsrv.cryptoAction(fr.GetFilename(), ofsdefaults.ACT_DECRYPT)
+	if err != nil {
+		return &protocommon.StatusMessage{Code: http.StatusInternalServerError, Message: err.Error()}, err
+	}
+	return &protocommon.StatusMessage{Code: http.StatusOK, Message: ofsmessages.SUCCESS_DECRYPTED}, nil
+}
+
 // function designed to delete a file in the uploads directory
 // as requested by the client.
 func (fsrv *FServer) DeleteFile(ctx context.Context, req *filehandler.FileRequest) (resp *protocommon.StatusMessage, err error) {
@@ -102,6 +111,15 @@ func (fsrv *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer
 	fsrv.debugMessageSuc(ofsmessages.TEMP_REMOVED)
 
 	return nil
+}
+
+// function designed to encrypt a file as requested by the client.
+func (fsrv *FServer) EncryptFile(ctx context.Context, fr *filehandler.FileRequest) (response *protocommon.StatusMessage, err error) {
+	err = fsrv.cryptoAction(fr.GetFilename(), ofsdefaults.ACT_ENCRYPT)
+	if err != nil {
+		return &protocommon.StatusMessage{Code: http.StatusInternalServerError, Message: err.Error()}, err
+	}
+	return &protocommon.StatusMessage{Code: http.StatusOK, Message: ofsmessages.SUCCESS_ENCRYPTED}, nil
 }
 
 // function designed to list out the files in the directory the client has
