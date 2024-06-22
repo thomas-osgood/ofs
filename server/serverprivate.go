@@ -80,8 +80,9 @@ func (fsrv *FServer) calculateDirectoryConsumption(targetdir string) (consumptio
 // information and give it an absolute path within the directory
 // associated with the type of file specified (download, upload, etc).
 func (fsrv *FServer) cleanFilename(filename string, ftype string) (cleaned string) {
-	var fnsplit []string
 	var subdir string
+
+	filename = strings.Replace(filepath.Clean(filepath.FromSlash(filename)), fsrv.rootdir, "", 1)
 
 	switch strings.ToLower(ftype) {
 	case ofsdefaults.FTYPE_DOWNLOAD:
@@ -92,9 +93,8 @@ func (fsrv *FServer) cleanFilename(filename string, ftype string) (cleaned strin
 		subdir = ""
 	}
 
-	filename = filepath.Clean(filename)
-	fnsplit = strings.Split(filename, fmt.Sprintf("%c", os.PathSeparator))
-	cleaned = filepath.Join(fsrv.rootdir, subdir, fnsplit[len(fnsplit)-1])
+	filename = strings.Replace(filename, subdir, "", 1)
+	cleaned = filepath.Join(fsrv.rootdir, subdir, filename)
 
 	return cleaned
 }
