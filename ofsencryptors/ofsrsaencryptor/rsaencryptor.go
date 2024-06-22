@@ -12,10 +12,12 @@
 package ofsrsaencryptor
 
 import (
+	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
 
+	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	consts "github.com/thomas-osgood/ofs/ofsencryptors/internal/constants"
 )
 
@@ -61,4 +63,33 @@ func (rsae *RSAEncryptor) EncryptBytes(plaintext []byte) (ciphertext []byte, err
 // encrypt the file.
 func (rsae *RSAEncryptor) EncryptFile(filename string) (err error) {
 	return rsae.manipulateFileData(filename, consts.ACT_ENCRYPT)
+}
+
+// function designed to generate and return the signature of
+// a given set of bytes.
+func (rsae *RSAEncryptor) SignBytes(content []byte) (signature []byte, err error) {
+	var hashed [32]byte
+	var privkey *rsa.PrivateKey
+
+	privkey, err = rsae.constructPrivKey()
+	if err != nil {
+		return nil, err
+	}
+
+	hashed = sha256.Sum256(content)
+
+	return rsa.SignPKCS1v15(rand.Reader, privkey, crypto.SHA256, hashed[:])
+}
+
+// function designed to generate and return the signature of
+// a given file. this can be used to verify the file's integrity.
+func (rsae *RSAEncryptor) SignFile(filename string) (signature []byte, err error) {
+	var content []byte
+
+	content, err = ofscommon.ReadFileBytes(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	return rsae.SignBytes(content)
 }
