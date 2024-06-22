@@ -146,6 +146,33 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 	return nil
 }
 
+// function designed to request a file on the server be encrypted.
+func (fc *FClient) EncryptFile(filename string) (err error) {
+	var cancel context.CancelFunc
+	var client filehandler.FileserviceClient
+	var conn *grpc.ClientConn
+	var ctx context.Context
+	var status *protocommon.StatusMessage
+
+	conn, client, err = fc.initConnection()
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
+	defer cancel()
+
+	status, err = client.EncryptFile(ctx, &filehandler.FileRequest{Filename: filename})
+	if err != nil {
+		return err
+	} else if status.Code >= http.StatusBadRequest {
+		return fmt.Errorf(status.GetMessage())
+	}
+
+	return nil
+}
+
 // function designed to get the list of files the client
 // is able to download from the server.
 func (fc *FClient) ListFiles() (files []*filehandler.FileInfo, err error) {
