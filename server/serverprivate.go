@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
+	genmessages "github.com/thomas-osgood/ofs/internal/messages"
 	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
@@ -97,6 +98,30 @@ func (fsrv *FServer) cleanFilename(filename string, ftype string) (cleaned strin
 	cleaned = filepath.Join(fsrv.rootdir, subdir, filename)
 
 	return cleaned
+}
+
+// function designed to perform a cryptographic action on a specified
+// file. this action (encrypt/decrypt) will be specified by the caller.
+func (fsrv *FServer) cryptoAction(filename string, action int) (err error) {
+	if fsrv.encryptor == nil {
+		return fmt.Errorf(ofsmessages.ERR_ENCRYPTOR_NIL)
+	}
+
+	filename = fsrv.cleanFilename(filename, ofsdefaults.FTYPE_ROOT)
+	if len(filename) < 1 {
+		return fmt.Errorf(ofsmessages.ERR_EMPTY_FILENAME)
+	}
+
+	switch action {
+	case ofsdefaults.ACT_DECRYPT:
+		err = fsrv.encryptor.DecryptFile(filename)
+	case ofsdefaults.ACT_ENCRYPT:
+		err = fsrv.encryptor.EncryptFile(filename)
+	default:
+		err = fmt.Errorf(genmessages.ERR_ACTION_INVALID)
+	}
+
+	return err
 }
 
 // helper function for outputting a debug message to STDOUT. this
