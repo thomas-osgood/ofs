@@ -66,6 +66,7 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	srv = new(FServer)
 	srv.debug = defaults.Debug
 	srv.downloadsdir = defaults.Downloadsdir
+	srv.encryptor = defaults.Encryptor
 	srv.rootdir = defaults.Rootdir
 	srv.transferCfg.ActiveDownloads = 0
 	srv.transferCfg.ActiveUploads = 0
