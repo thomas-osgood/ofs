@@ -25,17 +25,10 @@ import (
 
 // function designed to encrypt a file as requested by the client.
 func (fsrv *FServer) DecryptFile(ctx context.Context, fr *filehandler.FileRequest) (response *protocommon.StatusMessage, err error) {
-	var filename string = fsrv.cleanFilename(fr.GetFilename(), ofsdefaults.FTYPE_ROOT)
-
-	if len(filename) < 1 {
-		return nil, fmt.Errorf(ofsmessages.ERR_EMPTY_FILENAME)
-	}
-
-	err = fsrv.encryptor.DecryptFile(filename)
+	err = fsrv.cryptoAction(fr.GetFilename(), ofsdefaults.ACT_DECRYPT)
 	if err != nil {
-		return nil, err
+		return &protocommon.StatusMessage{Code: http.StatusInternalServerError, Message: err.Error()}, err
 	}
-
 	return &protocommon.StatusMessage{Code: http.StatusOK, Message: ofsmessages.SUCCESS_DECRYPTED}, nil
 }
 
@@ -122,17 +115,10 @@ func (fsrv *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer
 
 // function designed to encrypt a file as requested by the client.
 func (fsrv *FServer) EncryptFile(ctx context.Context, fr *filehandler.FileRequest) (response *protocommon.StatusMessage, err error) {
-	var filename string = fsrv.cleanFilename(fr.GetFilename(), ofsdefaults.FTYPE_ROOT)
-
-	if len(filename) < 1 {
-		return nil, fmt.Errorf(ofsmessages.ERR_EMPTY_FILENAME)
-	}
-
-	err = fsrv.encryptor.EncryptFile(filename)
+	err = fsrv.cryptoAction(fr.GetFilename(), ofsdefaults.ACT_ENCRYPT)
 	if err != nil {
-		return nil, err
+		return &protocommon.StatusMessage{Code: http.StatusInternalServerError, Message: err.Error()}, err
 	}
-
 	return &protocommon.StatusMessage{Code: http.StatusOK, Message: ofsmessages.SUCCESS_ENCRYPTED}, nil
 }
 
