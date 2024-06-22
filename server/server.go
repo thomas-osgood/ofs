@@ -25,10 +25,7 @@ import (
 
 // function designed to encrypt a file as requested by the client.
 func (fsrv *FServer) DecryptFile(ctx context.Context, fr *filehandler.FileRequest) (response *protocommon.StatusMessage, err error) {
-	var filename string = fr.GetFilename()
-
-	// TODO: add logic to build the absolute filepath to prevent
-	// LFI and decryption of critical (non-server) files.
+	var filename string = fsrv.cleanFilename(fr.GetFilename(), ofsdefaults.FTYPE_ROOT)
 
 	if len(filename) < 1 {
 		return nil, fmt.Errorf(ofsmessages.ERR_EMPTY_FILENAME)
@@ -125,10 +122,7 @@ func (fsrv *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer
 
 // function designed to encrypt a file as requested by the client.
 func (fsrv *FServer) EncryptFile(ctx context.Context, fr *filehandler.FileRequest) (response *protocommon.StatusMessage, err error) {
-	var filename string = fr.GetFilename()
-
-	// TODO: add logic to build the absolute filepath to prevent
-	// LFI and encryption of critical (non-server) files.
+	var filename string = fsrv.cleanFilename(fr.GetFilename(), ofsdefaults.FTYPE_ROOT)
 
 	if len(filename) < 1 {
 		return nil, fmt.Errorf(ofsmessages.ERR_EMPTY_FILENAME)
