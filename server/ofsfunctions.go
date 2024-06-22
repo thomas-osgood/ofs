@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/thomas-osgood/OGOR/output"
+	"github.com/thomas-osgood/ofs/ofsencryptors/ofsaesencryptor"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
@@ -59,6 +60,15 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	err = ofsutils.CheckDirPerms(defaults.Rootdir)
 	if err != nil {
 		return nil, err
+	}
+
+	// if no encryptor has been specified, use an OFSAESEncryptor
+	// with an auto-generated key.
+	if defaults.Encryptor == nil {
+		defaults.Encryptor, err = ofsaesencryptor.NewAesEncryptor()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// assign the server configuration to the server object
