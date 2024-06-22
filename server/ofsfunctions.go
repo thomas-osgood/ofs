@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/thomas-osgood/OGOR/output"
+	"github.com/thomas-osgood/ofs/ofsencryptors/ofsaesencryptor"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
 	ofsutils "github.com/thomas-osgood/ofs/server/internal/utils"
@@ -37,6 +38,7 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	defaults = FServerOption{
 		Debug:           ofsdefaults.DEFAULT_DEBUG,
 		Downloadsdir:    ofsdefaults.DIR_DOWNLOADS,
+		Encryptor:       nil,
 		MaxDownloads:    ofsdefaults.DEFAULT_MAX_DOWNLOADS,
 		MaxUploads:      ofsdefaults.DEFAULT_MAX_UPLOADS,
 		Rootdir:         rootdir,
@@ -61,11 +63,21 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 		return nil, err
 	}
 
+	// if no encryptor has been specified, use an OFSAESEncryptor
+	// with an auto-generated key.
+	if defaults.Encryptor == nil {
+		defaults.Encryptor, err = ofsaesencryptor.NewAesEncryptor()
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// assign the server configuration to the server object
 	// that will be returned.
 	srv = new(FServer)
 	srv.debug = defaults.Debug
 	srv.downloadsdir = defaults.Downloadsdir
+	srv.encryptor = defaults.Encryptor
 	srv.rootdir = defaults.Rootdir
 	srv.transferCfg.ActiveDownloads = 0
 	srv.transferCfg.ActiveUploads = 0
@@ -135,6 +147,14 @@ func WithDownloadsDir(dirname string) FSrvOptFunc {
 
 		fo.Downloadsdir = dirname
 
+		return nil
+	}
+}
+
+// set the encryptor the fileserver will use.
+func WithEncryptor(encryptor OFSEncryptor) FSrvOptFunc {
+	return func(fo *FServerOption) error {
+		fo.Encryptor = encryptor
 		return nil
 	}
 }

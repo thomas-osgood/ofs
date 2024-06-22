@@ -158,3 +158,41 @@ func MoveFile(source string, destination string) (err error) {
 
 	return nil
 }
+
+// function designed to read and return the content of
+// a given filename.
+func ReadFileBytes(filename string) (content []byte, err error) {
+	var fptr *os.File
+
+	fptr, err = os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer fptr.Close()
+
+	content, err = io.ReadAll(fptr)
+	if err != nil {
+		return nil, err
+	}
+
+	return content, nil
+}
+
+// function designed to create (or overwrite) a given file
+// and write the provided content to it.
+func WriteFileBytes(filename string, content []byte) (err error) {
+	var fptr *os.File
+
+	fptr, err = os.OpenFile(filename, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	defer fptr.Close()
+
+	_, err = fptr.Write(content)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
