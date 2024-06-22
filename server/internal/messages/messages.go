@@ -43,6 +43,9 @@ const FILE_SENT string = "file successfully transmitted"
 
 const SERVER_LISTEN_INFO string = "server listening on \"%s\"\n"
 
+const SUCCESS_DECRYPTED string = "file succesfully decrypted"
+const SUCCESS_ENCRYPTED string = "file succesfully encrypted"
+
 const TEMP_REMOVED string = "temp file removed"
 
 const UPLOAD_COMPLETE string = "data upload complete."
