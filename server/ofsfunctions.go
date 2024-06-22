@@ -38,6 +38,7 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	defaults = FServerOption{
 		Debug:           ofsdefaults.DEFAULT_DEBUG,
 		Downloadsdir:    ofsdefaults.DIR_DOWNLOADS,
+		Encryptor:       nil,
 		MaxDownloads:    ofsdefaults.DEFAULT_MAX_DOWNLOADS,
 		MaxUploads:      ofsdefaults.DEFAULT_MAX_UPLOADS,
 		Rootdir:         rootdir,
