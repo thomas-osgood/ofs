@@ -1,5 +1,6 @@
 package messages
 
+const ERR_ACTION_INVALID string = "invalid action selected"
 const ERR_EMPTY_ADDR string = "address must be non-empty string"
 const ERR_FILENAME_EMPTY string = "filename cannot be an empty string"
 const ERR_MAXTRANSFER_LOW string = "maximum allowed must be greater than zero"
