@@ -105,6 +105,25 @@ func (fsrv *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer
 }
 
 // function designed to encrypt a file as requested by the client.
+func (fsrv *FServer) DecryptFile(ctx context.Context, fr *filehandler.FileRequest) (response *protocommon.StatusMessage, err error) {
+	var filename string = fr.GetFilename()
+
+	// TODO: add logic to build the absolute filepath to prevent
+	// LFI and decryption of critical (non-server) files.
+
+	if len(filename) < 1 {
+		return nil, fmt.Errorf(ofsmessages.ERR_EMPTY_FILENAME)
+	}
+
+	err = fsrv.encryptor.DecryptFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	return &protocommon.StatusMessage{Code: http.StatusOK, Message: ofsmessages.SUCCESS_DECRYPTED}, nil
+}
+
+// function designed to encrypt a file as requested by the client.
 func (fsrv *FServer) EncryptFile(ctx context.Context, fr *filehandler.FileRequest) (response *protocommon.StatusMessage, err error) {
 	var filename string = fr.GetFilename()
 
