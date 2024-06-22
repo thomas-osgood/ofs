@@ -13,6 +13,7 @@ import (
 	"time"
 
 	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
+	"github.com/thomas-osgood/ofs/client/internal/ofcconstants"
 	ofscommon "github.com/thomas-osgood/ofs/internal/general"
 	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
@@ -38,29 +39,7 @@ func (fc *FClient) initConnection() (conn *grpc.ClientConn, client filehandler.F
 
 // function designed to request a file on the server be decrypted.
 func (fc *FClient) DecryptFile(filename string) (err error) {
-	var cancel context.CancelFunc
-	var client filehandler.FileserviceClient
-	var conn *grpc.ClientConn
-	var ctx context.Context
-	var status *protocommon.StatusMessage
-
-	conn, client, err = fc.initConnection()
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
-	defer cancel()
-
-	status, err = client.DecryptFile(ctx, &filehandler.FileRequest{Filename: filename})
-	if err != nil {
-		return err
-	} else if status.Code >= http.StatusBadRequest {
-		return fmt.Errorf(status.GetMessage())
-	}
-
-	return nil
+	return fc.cryptoAction(filename, ofcconstants.CRYPTO_DECRYPT)
 }
 
 // function designed to request a file be deleted from the server's
@@ -175,29 +154,7 @@ func (fc *FClient) DownloadFile(req *filehandler.FileRequest) (err error) {
 
 // function designed to request a file on the server be encrypted.
 func (fc *FClient) EncryptFile(filename string) (err error) {
-	var cancel context.CancelFunc
-	var client filehandler.FileserviceClient
-	var conn *grpc.ClientConn
-	var ctx context.Context
-	var status *protocommon.StatusMessage
-
-	conn, client, err = fc.initConnection()
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
-	defer cancel()
-
-	status, err = client.EncryptFile(ctx, &filehandler.FileRequest{Filename: filename})
-	if err != nil {
-		return err
-	} else if status.Code >= http.StatusBadRequest {
-		return fmt.Errorf(status.GetMessage())
-	}
-
-	return nil
+	return fc.cryptoAction(filename, ofcconstants.CRYPTO_ENCRYPT)
 }
 
 // function designed to get the list of files the client
