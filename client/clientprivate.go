@@ -1,11 +1,18 @@
 package client
 
 import (
+	"context"
+	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
 
+	ofcmessages "github.com/thomas-osgood/ofs/client/internal/messages"
+	"github.com/thomas-osgood/ofs/client/internal/ofcconstants"
+	protocommon "github.com/thomas-osgood/ofs/protobufs/common"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
+	"google.golang.org/grpc"
 )
 
 // function designed to create a filepath inside subdirectories.
@@ -19,6 +26,42 @@ func (fc *FClient) createFilepath(fpath string) (fptr *os.File, err error) {
 		return nil, err
 	}
 	return os.Create(fpath)
+}
+
+// function designed to request the encryption or decryption of
+// a target file.
+func (fc *FClient) cryptoAction(filename string, action int) (err error) {
+	var cancel context.CancelFunc
+	var client filehandler.FileserviceClient
+	var conn *grpc.ClientConn
+	var ctx context.Context
+	var status *protocommon.StatusMessage
+
+	conn, client, err = fc.initConnection()
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	ctx, cancel = context.WithTimeout(context.Background(), fc.timeout)
+	defer cancel()
+
+	switch action {
+	case ofcconstants.CRYPTO_DECRYPT:
+		status, err = client.DecryptFile(ctx, &filehandler.FileRequest{Filename: filename})
+	case ofcconstants.CRYPTO_ENCRYPT:
+		status, err = client.EncryptFile(ctx, &filehandler.FileRequest{Filename: filename})
+	default:
+		err = fmt.Errorf(ofcmessages.ERR_ACTION_INVALID)
+	}
+
+	if err != nil {
+		return err
+	} else if status.Code >= http.StatusBadRequest {
+		return fmt.Errorf(status.GetMessage())
+	}
+
+	return nil
 }
 
 // function designed to deccrement the number of "activedownloads"
