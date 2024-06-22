@@ -10,6 +10,7 @@ const DIR_UPLOADS string = ""
 const DIR_DOWNLOADS string = ""
 
 const FTYPE_DOWNLOAD string = "download"
+const FTYPE_ROOT string = "root"
 const FTYPE_UPLOAD string = "upload"
 
 const DEFAULT_MAX_DOWNLOADS int = 20
