@@ -19,6 +19,12 @@ service Fileservice {
         // agent is running on to the control server.
         rpc DownloadFile(stream FileChunk) returns (common.StatusMessage) {};
 
+        // rpc designed to request a file on the server be decrypted.
+        rpc DecryptFile(FileRequest) returns (common.StatusMessage) {};
+
+        // rpc designed to request a file on the server be encrypted.
+        rpc EncryptFile(FileRequest) returns (common.StatusMessage) {};
+
         // rpc designed to gather and return a list of files
         // that can be downloaded by the client.
         rpc ListFiles(common.Empty) returns (stream FileInfo) {};
