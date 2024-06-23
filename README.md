@@ -108,6 +108,16 @@ func main() {
 			}
 		}
 
+		err = clnt.EncryptFile("in/multiu1.txt")
+		if err != nil {
+			log.Printf("[ENCRYPTFILE] %s\n", err.Error())
+		}
+
+		err = clnt.DecryptFile("in/multiu1.txt")
+		if err != nil {
+			log.Printf("[DECRYPTFILE] %s\n", err.Error())
+		}
+
 		breakdown, err := clnt.StorageBreakdown()
 		if err != nil {
 			log.Printf("[BREAKDOWN] %s\n", err.Error())
