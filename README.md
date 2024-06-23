@@ -26,6 +26,8 @@ This software is distributed under the [General Public License v3.0](LICENSE). A
 - **Multi-File Download**: This allows the client to download multiple files with one function call.
 - **Multi-File Upload**: This allows the client to upload multiple files with one function call.
 - **Storage Breakdown**: This allows the client to see the amount of space consumed in the server's upload and download directories.
+- **Decrypt File**: This allows the client to decrypt an encrypted file on the fileserver.
+- **Encrypt File**: This allows the client to encrypt a file hosted on the fileserver.
 
 ## Example
 
@@ -104,6 +106,16 @@ func main() {
 			for mres, errmsg := range multiresult {
 				log.Printf("[MULTIFILEUERROR] %s: %s\n", mres, errmsg.Error())
 			}
+		}
+
+		err = clnt.EncryptFile("in/multiu1.txt")
+		if err != nil {
+			log.Printf("[ENCRYPTFILE] %s\n", err.Error())
+		}
+
+		err = clnt.DecryptFile("in/multiu1.txt")
+		if err != nil {
+			log.Printf("[DECRYPTFILE] %s\n", err.Error())
 		}
 
 		breakdown, err := clnt.StorageBreakdown()
