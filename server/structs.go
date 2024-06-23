@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/thomas-osgood/OGOR/output"
+	"github.com/thomas-osgood/ofs/ofsauthenticators"
 	"github.com/thomas-osgood/ofs/protobufs/filehandler"
 	"github.com/thomas-osgood/ofs/server/internal/ofstypes"
 	"google.golang.org/grpc"
@@ -16,18 +17,21 @@ import (
 type FServer struct {
 	filehandler.UnimplementedFileserviceServer
 
-	debug        bool
-	downloadsdir string
-	encryptor    OFSEncryptor
-	printer      *output.Outputter
-	rootdir      string
-	transferCfg  ofstypes.TransferConfig
-	uploadsdir   string
+	authenticator ofsauthenticators.OFSAuthenticator
+	debug         bool
+	downloadsdir  string
+	encryptor     OFSEncryptor
+	printer       *output.Outputter
+	rootdir       string
+	transferCfg   ofstypes.TransferConfig
+	uploadsdir    string
 }
 
 // object used to set the confiruation options for
 // a new fileserver.
 type FServerOption struct {
+	// authenticator to use while processing requests.
+	Authenticator ofsauthenticators.OFSAuthenticator
 	// if this is set to true, output will be printed to
 	// STDOUT while the server is running.
 	Debug bool
