@@ -69,6 +69,19 @@ func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthent
 	return pga, nil
 }
 
+// set the auth table information.
+func WithAuthTable(tableinfo dbauthenticators.AuthTableInfo) PostGresAuthOptFunc {
+	return func(pgao *PostGresAuthOption) error {
+		if tableinfo.IsNil() {
+			return fmt.Errorf(dbamessages.ERR_TABLEINFO_EMPTY)
+		}
+
+		pgao.TableInfo = tableinfo
+
+		return nil
+	}
+}
+
 // set the database name the authenticator will use.
 func WithDBName(dbname string) PostGresAuthOptFunc {
 	return func(pgao *PostGresAuthOption) error {
@@ -113,19 +126,6 @@ func WithSchema(schemaname string) PostGresAuthOptFunc {
 			return fmt.Errorf(dbamessages.ERR_SCHEMA_BLANK)
 		}
 		pgao.Schema = schemaname
-		return nil
-	}
-}
-
-// set the auth table information.
-func WithAuthTable(tableinfo dbauthenticators.AuthTableInfo) PostGresAuthOptFunc {
-	return func(pgao *PostGresAuthOption) error {
-		if tableinfo.IsNil() {
-			return fmt.Errorf(dbamessages.ERR_TABLEINFO_EMPTY)
-		}
-
-		pgao.TableInfo = tableinfo
-
 		return nil
 	}
 }
