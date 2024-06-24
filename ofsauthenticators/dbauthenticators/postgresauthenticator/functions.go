@@ -40,6 +40,18 @@ func WithDBName(dbname string) PostGresAuthOptFunc {
 	}
 }
 
+// set the database name the authenticator will use.
+func WithSchema(schemaname string) PostGresAuthOptFunc {
+	return func(pgao *PostGresAuthOption) error {
+		schemaname = strings.TrimSpace(schemaname)
+		if len(schemaname) < 1 {
+			return fmt.Errorf(dbamessages.ERR_SCHEMA_BLANK)
+		}
+		pgao.Schema = schemaname
+		return nil
+	}
+}
+
 // set SSL usage for connection.
 func WithSSL(pgao *PostGresAuthOption) error {
 	pgao.SSL = true
