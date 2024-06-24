@@ -25,6 +25,10 @@ import (
 
 // function designed to encrypt a file as requested by the client.
 func (fsrv *FServer) DecryptFile(ctx context.Context, fr *filehandler.FileRequest) (response *protocommon.StatusMessage, err error) {
+	// insure the request is valid.
+	if err = fsrv.validateRequest(ctx); err != nil {
+		return nil, err
+	}
 	err = fsrv.cryptoAction(fr.GetFilename(), ofsdefaults.ACT_DECRYPT)
 	if err != nil {
 		return &protocommon.StatusMessage{Code: http.StatusInternalServerError, Message: err.Error()}, err
@@ -36,6 +40,11 @@ func (fsrv *FServer) DecryptFile(ctx context.Context, fr *filehandler.FileReques
 // as requested by the client.
 func (fsrv *FServer) DeleteFile(ctx context.Context, req *filehandler.FileRequest) (resp *protocommon.StatusMessage, err error) {
 	var targetpath string = strings.TrimSpace(req.GetFilename())
+
+	// insure the request is valid.
+	if err = fsrv.validateRequest(ctx); err != nil {
+		return nil, err
+	}
 
 	resp = &protocommon.StatusMessage{
 		Code:    http.StatusOK,
@@ -70,6 +79,11 @@ func (fsrv *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer
 	var ctx context.Context
 	var filename string
 	var tmpname string
+
+	// insure the request is valid.
+	if err = fsrv.validateRequest(srv.Context()); err != nil {
+		return err
+	}
 
 	fsrv.increaseActiveDownloads()
 	defer fsrv.decreaseActiveDownloads()
@@ -115,6 +129,10 @@ func (fsrv *FServer) DownloadFile(srv filehandler.Fileservice_DownloadFileServer
 
 // function designed to encrypt a file as requested by the client.
 func (fsrv *FServer) EncryptFile(ctx context.Context, fr *filehandler.FileRequest) (response *protocommon.StatusMessage, err error) {
+	// insure the request is valid.
+	if err = fsrv.validateRequest(ctx); err != nil {
+		return nil, err
+	}
 	err = fsrv.cryptoAction(fr.GetFilename(), ofsdefaults.ACT_ENCRYPT)
 	if err != nil {
 		return &protocommon.StatusMessage{Code: http.StatusInternalServerError, Message: err.Error()}, err
@@ -129,6 +147,11 @@ func (fsrv *FServer) EncryptFile(ctx context.Context, fr *filehandler.FileReques
 func (fsrv *FServer) ListFiles(mpty *protocommon.Empty, srv filehandler.Fileservice_ListFilesServer) (err error) {
 	var curfile *filehandler.FileInfo
 	var files []*filehandler.FileInfo
+
+	// insure the request is valid.
+	if err = fsrv.validateRequest(srv.Context()); err != nil {
+		return err
+	}
 
 	// gather all files in the uploads directory.
 	files, err = fsrv.listUploadsDir()
@@ -156,6 +179,11 @@ func (fsrv *FServer) ListFiles(mpty *protocommon.Empty, srv filehandler.Fileserv
 // failure code: 500 Internal Server Error
 func (fsrv *FServer) MakeDirectory(ctx context.Context, dirreq *filehandler.MakeDirectoryRequest) (retstatus *protocommon.StatusMessage, err error) {
 	var subdir string = fsrv.buildUploadFilename(dirreq.GetDirname())
+
+	// insure the request is valid.
+	if err = fsrv.validateRequest(ctx); err != nil {
+		return nil, err
+	}
 
 	// initialize the successful StatusMessage. if everything
 	// works as expected, this will not be modified.
@@ -202,6 +230,11 @@ func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFi
 	var absdest string = fsrv.buildUploadFilename(rnreq.GetNewfilename())
 	var abssrc string = fsrv.buildUploadFilename(rnreq.GetOldfilename())
 
+	// insure the request is valid.
+	if err = fsrv.validateRequest(ctx); err != nil {
+		return nil, err
+	}
+
 	resp = new(protocommon.StatusMessage)
 
 	// check for the existence of the destination file. if the
@@ -230,6 +263,11 @@ func (fsrv *FServer) RenameFile(ctx context.Context, rnreq *filehandler.RenameFi
 // function designed to calculate and return the amount of storage (in bytes)
 // consumed by the uploads and downloads directories.
 func (fsrv *FServer) StorageBreakdown(ctx context.Context, mpty *protocommon.Empty) (consumption *filehandler.StorageInfo, err error) {
+
+	// insure the request is valid.
+	if err = fsrv.validateRequest(ctx); err != nil {
+		return nil, err
+	}
 
 	// initialize return object. this is required so a nil reference error
 	// is not thrown.
@@ -274,6 +312,11 @@ func (fsrv *FServer) UploadFile(req *filehandler.FileRequest, srv filehandler.Fi
 	var fptr *os.File
 	var md metadata.MD = make(metadata.MD)
 	var targetfile string = fsrv.cleanFilename(req.GetFilename(), ofsdefaults.FTYPE_UPLOAD)
+
+	// insure the request is valid.
+	if err = fsrv.validateRequest(srv.Context()); err != nil {
+		return err
+	}
 
 	fsrv.increaseActiveUploads()
 	defer fsrv.decreaseActiveUploads()
