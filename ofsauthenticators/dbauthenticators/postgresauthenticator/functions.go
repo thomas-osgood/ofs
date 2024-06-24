@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators"
 	dbamessages "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/internal/messages"
 	pgaconsts "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/postgresauthenticator/internal/constants"
 )
@@ -15,7 +16,9 @@ import (
 func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthenticator, err error) {
 	var connstr string
 	var curopt PostGresAuthOptFunc
-	var defaults PostGresAuthOption = PostGresAuthOption{}
+	var defaults PostGresAuthOption = PostGresAuthOption{
+		TableInfo: dbauthenticators.AuthTableInfo{},
+	}
 	var sslstr string
 
 	for _, curopt = range opts {
@@ -99,7 +102,7 @@ func WithSchema(schemaname string) PostGresAuthOptFunc {
 }
 
 // set the auth table information.
-func WithAuthTable(tableinfo AuthTableInfo) PostGresAuthOptFunc {
+func WithAuthTable(tableinfo dbauthenticators.AuthTableInfo) PostGresAuthOptFunc {
 	return func(pgao *PostGresAuthOption) error {
 		if tableinfo.IsNil() {
 			return fmt.Errorf(dbamessages.ERR_TABLEINFO_EMPTY)

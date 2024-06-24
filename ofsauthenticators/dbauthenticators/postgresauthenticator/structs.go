@@ -3,11 +3,13 @@ package postgresauthenticator
 import (
 	"database/sql"
 	"time"
+
+	"github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators"
 )
 
 type PostGresAuthenticator struct {
 	db        *sql.DB
-	tableinfo AuthTableInfo
+	tableinfo dbauthenticators.AuthTableInfo
 	timeout   time.Duration
 }
 
@@ -19,15 +21,6 @@ type PostGresAuthOption struct {
 	User      string
 	Schema    string
 	SSL       bool
-	TableInfo AuthTableInfo
+	TableInfo dbauthenticators.AuthTableInfo
 	Timeout   time.Duration
-}
-
-type AuthTableInfo struct {
-	// name of the table that holds the verification info.
-	Tablename string
-	// column name of the column that holds the username.
-	Usercolumn string
-	// column name of the column that holds the password.
-	Passcolumn string
 }

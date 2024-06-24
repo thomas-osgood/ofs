@@ -1,4 +1,4 @@
-package postgresauthenticator
+package dbauthenticators
 
 // function designed to determine if the AuthTableInfo
 // struct is nil. this will be set to true if all fields

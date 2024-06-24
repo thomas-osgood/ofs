@@ -1,4 +1,4 @@
-package postgresauthenticator
+package dbauthenticators
 
 import "strings"
 
