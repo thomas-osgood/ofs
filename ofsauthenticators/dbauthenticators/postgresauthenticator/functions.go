@@ -1,5 +1,12 @@
 package postgresauthenticator
 
+import (
+	"fmt"
+	"strings"
+
+	dbamessages "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/internal/messages"
+)
+
 // function designed to create, initialize and return a
 // new PostGresAuthenticator object.
 func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthenticator, err error) {
@@ -19,4 +26,16 @@ func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthent
 	pga.ssl = defaults.SSL
 
 	return pga, nil
+}
+
+// set the database name the authenticator will use.
+func WithDBName(dbname string) PostGresAuthOptFunc {
+	return func(pgao *PostGresAuthOption) error {
+		dbname = strings.TrimSpace(dbname)
+		if len(dbname) < 1 {
+			return fmt.Errorf(dbamessages.ERR_DBNAME_BLANK)
+		}
+		pgao.Dbname = dbname
+		return nil
+	}
 }
