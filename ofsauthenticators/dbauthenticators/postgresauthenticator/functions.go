@@ -97,6 +97,19 @@ func WithSchema(schemaname string) PostGresAuthOptFunc {
 	}
 }
 
+// set the auth table information.
+func WithAuthTable(tableinfo AuthTableInfo) PostGresAuthOptFunc {
+	return func(pgao *PostGresAuthOption) error {
+		if tableinfo.IsNil() {
+			return fmt.Errorf(dbamessages.ERR_TABLEINFO_EMPTY)
+		}
+
+		pgao.TableInfo = tableinfo
+
+		return nil
+	}
+}
+
 // set db user.
 func WithUser(username string) PostGresAuthOptFunc {
 	return func(pgao *PostGresAuthOption) error {
