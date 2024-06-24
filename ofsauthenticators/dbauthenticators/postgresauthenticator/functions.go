@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/thomas-osgood/ofs/ofsauthenticators"
 	"github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators"
 	dbadefaults "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/internal/defaults"
 	dbamessages "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/internal/messages"
@@ -20,6 +21,7 @@ func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthent
 	var connstr string
 	var curopt PostGresAuthOptFunc
 	var defaults PostGresAuthOption = PostGresAuthOption{
+		Hasher: nil,
 		TableInfo: dbauthenticators.AuthTableInfo{
 			Tablename:  dbadefaults.DEFAULT_AUTHTABLE,
 			Passcolumn: dbadefaults.DEFAULT_AUTHPASSCOL,
@@ -54,6 +56,7 @@ func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthent
 	)
 
 	pga = new(PostGresAuthenticator)
+	pga.hasher = defaults.Hasher
 	pga.tableinfo = defaults.TableInfo
 
 	pga.db, err = sql.Open(dbamessages.DRIVER_POSTGRES, connstr)
@@ -90,6 +93,15 @@ func WithDBName(dbname string) PostGresAuthOptFunc {
 			return fmt.Errorf(dbamessages.ERR_DBNAME_BLANK)
 		}
 		pgao.Dbname = dbname
+		return nil
+	}
+}
+
+// set the hasher the authenticator will use when comparing
+// passwords and hashes.
+func WithHasher(hasher ofsauthenticators.Hasher) PostGresAuthOptFunc {
+	return func(pgao *PostGresAuthOption) error {
+		pgao.Hasher = hasher
 		return nil
 	}
 }
