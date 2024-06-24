@@ -42,7 +42,16 @@ func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthent
 		sslstr = pgaconsts.SSL_DISABLE
 	}
 
-	connstr = fmt.Sprintf(pgaconsts.CONNECTION_STRING, defaults.Host, defaults.Port, defaults.User, defaults.Password, defaults.Dbname, sslstr)
+	connstr = fmt.Sprintf(
+		pgaconsts.CONNECTION_STRING,
+		defaults.Host,
+		defaults.Port,
+		defaults.User,
+		defaults.Password,
+		defaults.Dbname,
+		sslstr,
+		defaults.Schema,
+	)
 
 	pga = new(PostGresAuthenticator)
 	pga.tableinfo = defaults.TableInfo
