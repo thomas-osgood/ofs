@@ -29,6 +29,10 @@ func NewBCryptHasher(opts ...BCryptHasherOptFunc) (hasher *BCryptHasher, err err
 }
 
 // set the hash cost.
+//
+// reference:
+//
+// https://pkg.go.dev/golang.org/x/crypto/bcrypt
 func WithCost(cost int) BCryptHasherOptFunc {
 	return func(bho *BCryptHasherOption) error {
 		if (cost < bcrypt.MinCost) || (cost > bcrypt.MaxCost) {
