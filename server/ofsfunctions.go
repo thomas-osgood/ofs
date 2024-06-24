@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/thomas-osgood/OGOR/output"
+	"github.com/thomas-osgood/ofs/ofsauthenticators"
 	"github.com/thomas-osgood/ofs/ofsencryptors/ofsaesencryptor"
 	ofsdefaults "github.com/thomas-osgood/ofs/server/internal/defaults"
 	ofsmessages "github.com/thomas-osgood/ofs/server/internal/messages"
@@ -36,6 +37,7 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	}
 
 	defaults = FServerOption{
+		Authenticator:   nil,
 		Debug:           ofsdefaults.DEFAULT_DEBUG,
 		Downloadsdir:    ofsdefaults.DIR_DOWNLOADS,
 		Encryptor:       nil,
@@ -75,6 +77,7 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	// assign the server configuration to the server object
 	// that will be returned.
 	srv = new(FServer)
+	srv.authenticator = defaults.Authenticator
 	srv.debug = defaults.Debug
 	srv.downloadsdir = defaults.Downloadsdir
 	srv.encryptor = defaults.Encryptor
@@ -94,6 +97,15 @@ func NewOFS(opts ...FSrvOptFunc) (srv *FServer, err error) {
 	}
 
 	return srv, nil
+}
+
+// set the authenticator to use while processing
+// requests from clients.
+func WithAuthenticator(authenticator ofsauthenticators.OFSAuthenticator) FSrvOptFunc {
+	return func(fo *FServerOption) error {
+		fo.Authenticator = authenticator
+		return nil
+	}
 }
 
 // turn server debug mode on. this will cause messages to be printed
