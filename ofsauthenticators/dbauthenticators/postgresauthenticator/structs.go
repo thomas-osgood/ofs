@@ -1,9 +1,13 @@
 package postgresauthenticator
 
-import "database/sql"
+import (
+	"database/sql"
+	"time"
+)
 
 type PostGresAuthenticator struct {
-	db *sql.DB
+	db      *sql.DB
+	timeout time.Duration
 }
 
 type PostGresAuthOption struct {
@@ -14,4 +18,5 @@ type PostGresAuthOption struct {
 	User     string
 	Schema   string
 	SSL      bool
+	Timeout  time.Duration
 }
