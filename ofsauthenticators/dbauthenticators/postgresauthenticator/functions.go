@@ -1,17 +1,21 @@
 package postgresauthenticator
 
 import (
+	"database/sql"
 	"fmt"
 	"strings"
 
 	dbamessages "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/internal/messages"
+	pgaconsts "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/postgresauthenticator/internal/constants"
 )
 
 // function designed to create, initialize and return a
 // new PostGresAuthenticator object.
 func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthenticator, err error) {
+	var connstr string
 	var curopt PostGresAuthOptFunc
 	var defaults PostGresAuthOption = PostGresAuthOption{}
+	var sslstr string
 
 	for _, curopt = range opts {
 		err = curopt(&defaults)
@@ -20,10 +24,26 @@ func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthent
 		}
 	}
 
+	switch defaults.SSL {
+	case true:
+		sslstr = "enable"
+	default:
+		sslstr = "disable"
+	}
+
+	connstr = fmt.Sprintf(pgaconsts.CONNECTION_STRING, defaults.Host, defaults.Port, defaults.User, defaults.Password, defaults.Dbname, sslstr)
+
 	pga = new(PostGresAuthenticator)
-	pga.dbname = defaults.Dbname
-	pga.schema = defaults.Schema
-	pga.ssl = defaults.SSL
+
+	pga.db, err = sql.Open(dbamessages.DRIVER_POSTGRES, connstr)
+	if err != nil {
+		return nil, err
+	}
+	pga.timeout = defaults.Timeout
+
+	if err = pga.checkConnection(); err != nil {
+		return nil, fmt.Errorf(dbamessages.ERR_TIMEOUT)
+	}
 
 	return pga, nil
 }
