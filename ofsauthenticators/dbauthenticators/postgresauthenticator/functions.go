@@ -61,6 +61,18 @@ func WithDBName(dbname string) PostGresAuthOptFunc {
 	}
 }
 
+// set the database host.
+func WithHost(host string) PostGresAuthOptFunc {
+	return func(pgao *PostGresAuthOption) error {
+		host = strings.TrimSpace(host)
+		if len(host) < 1 {
+			return fmt.Errorf(dbamessages.ERR_DBHOST_BLANK)
+		}
+		pgao.Host = host
+		return nil
+	}
+}
+
 // set the database name the authenticator will use.
 func WithSchema(schemaname string) PostGresAuthOptFunc {
 	return func(pgao *PostGresAuthOption) error {
