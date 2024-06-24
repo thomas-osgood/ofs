@@ -73,6 +73,18 @@ func WithHost(host string) PostGresAuthOptFunc {
 	}
 }
 
+// set db user.
+func WithPassword(password string) PostGresAuthOptFunc {
+	return func(pgao *PostGresAuthOption) error {
+		password = strings.TrimSpace(password)
+		if len(password) < 1 {
+			return fmt.Errorf(dbamessages.ERR_DBPASS_BLANK)
+		}
+		pgao.Password = password
+		return nil
+	}
+}
+
 // set the database name the authenticator will use.
 func WithSchema(schemaname string) PostGresAuthOptFunc {
 	return func(pgao *PostGresAuthOption) error {
@@ -81,6 +93,18 @@ func WithSchema(schemaname string) PostGresAuthOptFunc {
 			return fmt.Errorf(dbamessages.ERR_SCHEMA_BLANK)
 		}
 		pgao.Schema = schemaname
+		return nil
+	}
+}
+
+// set db user.
+func WithUser(username string) PostGresAuthOptFunc {
+	return func(pgao *PostGresAuthOption) error {
+		username = strings.TrimSpace(username)
+		if len(username) < 1 {
+			return fmt.Errorf(dbamessages.ERR_DBUSER_BLANK)
+		}
+		pgao.User = username
 		return nil
 	}
 }
