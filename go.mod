@@ -3,6 +3,7 @@ module github.com/thomas-osgood/ofs
 go 1.21.0
 
 require (
+	github.com/lib/pq v1.10.9
 	github.com/thomas-osgood/OGOR v0.0.51
 	google.golang.org/grpc v1.57.0
 	google.golang.org/protobuf v1.31.0
