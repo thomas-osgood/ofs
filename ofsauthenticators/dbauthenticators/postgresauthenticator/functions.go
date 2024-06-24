@@ -39,3 +39,9 @@ func WithDBName(dbname string) PostGresAuthOptFunc {
 		return nil
 	}
 }
+
+// set SSL usage for connection.
+func WithSSL(pgao *PostGresAuthOption) error {
+	pgao.SSL = true
+	return nil
+}
