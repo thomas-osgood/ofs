@@ -130,18 +130,6 @@ func WithSchema(schemaname string) PostGresAuthOptFunc {
 	}
 }
 
-// set db user.
-func WithUser(username string) PostGresAuthOptFunc {
-	return func(pgao *PostGresAuthOption) error {
-		username = strings.TrimSpace(username)
-		if len(username) < 1 {
-			return fmt.Errorf(dbamessages.ERR_DBUSER_BLANK)
-		}
-		pgao.User = username
-		return nil
-	}
-}
-
 // set SSL usage for connection.
 func WithSSL(pgao *PostGresAuthOption) error {
 	pgao.SSL = true
@@ -155,6 +143,18 @@ func WithTimeout(timeout time.Duration) PostGresAuthOptFunc {
 			return fmt.Errorf(dbamessages.ERR_TIMEOUT_SMALL)
 		}
 		pgao.Timeout = timeout
+		return nil
+	}
+}
+
+// set db user.
+func WithUser(username string) PostGresAuthOptFunc {
+	return func(pgao *PostGresAuthOption) error {
+		username = strings.TrimSpace(username)
+		if len(username) < 1 {
+			return fmt.Errorf(dbamessages.ERR_DBUSER_BLANK)
+		}
+		pgao.User = username
 		return nil
 	}
 }
