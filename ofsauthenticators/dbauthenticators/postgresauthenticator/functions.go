@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators"
+	dbadefaults "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/internal/defaults"
 	dbamessages "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/internal/messages"
 	pgaconsts "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/postgresauthenticator/internal/constants"
 )
@@ -17,7 +18,11 @@ func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthent
 	var connstr string
 	var curopt PostGresAuthOptFunc
 	var defaults PostGresAuthOption = PostGresAuthOption{
-		TableInfo: dbauthenticators.AuthTableInfo{},
+		TableInfo: dbauthenticators.AuthTableInfo{
+			Tablename:  dbadefaults.DEFAULT_AUTHTABLE,
+			Passcolumn: dbadefaults.DEFAULT_AUTHPASSCOL,
+			Usercolumn: dbadefaults.DEFAULT_AUTHUSERCOL,
+		},
 	}
 	var sslstr string
 
