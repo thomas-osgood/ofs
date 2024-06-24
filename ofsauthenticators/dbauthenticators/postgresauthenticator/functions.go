@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"time"
 
 	dbamessages "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/internal/messages"
 	pgaconsts "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/postgresauthenticator/internal/constants"
@@ -76,4 +77,15 @@ func WithSchema(schemaname string) PostGresAuthOptFunc {
 func WithSSL(pgao *PostGresAuthOption) error {
 	pgao.SSL = true
 	return nil
+}
+
+// set connection timeout.
+func WithTimeout(timeout time.Duration) PostGresAuthOptFunc {
+	return func(pgao *PostGresAuthOption) error {
+		if timeout < 1*time.Second {
+			return fmt.Errorf(dbamessages.ERR_TIMEOUT_SMALL)
+		}
+		pgao.Timeout = timeout
+		return nil
+	}
 }
