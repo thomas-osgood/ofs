@@ -6,19 +6,21 @@ import (
 )
 
 type PostGresAuthenticator struct {
-	db      *sql.DB
-	timeout time.Duration
+	db        *sql.DB
+	tableinfo AuthTableInfo
+	timeout   time.Duration
 }
 
 type PostGresAuthOption struct {
-	Dbname   string
-	Host     string
-	Password string
-	Port     int
-	User     string
-	Schema   string
-	SSL      bool
-	Timeout  time.Duration
+	Dbname    string
+	Host      string
+	Password  string
+	Port      int
+	User      string
+	Schema    string
+	SSL       bool
+	TableInfo AuthTableInfo
+	Timeout   time.Duration
 }
 
 type AuthTableInfo struct {
