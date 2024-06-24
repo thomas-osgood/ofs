@@ -35,6 +35,7 @@ func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthent
 	connstr = fmt.Sprintf(pgaconsts.CONNECTION_STRING, defaults.Host, defaults.Port, defaults.User, defaults.Password, defaults.Dbname, sslstr)
 
 	pga = new(PostGresAuthenticator)
+	pga.tableinfo = defaults.TableInfo
 
 	pga.db, err = sql.Open(dbamessages.DRIVER_POSTGRES, connstr)
 	if err != nil {
