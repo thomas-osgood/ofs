@@ -106,6 +106,22 @@ func WithHasher(hasher ofsauthenticators.Hasher) PostGresAuthOptFunc {
 	}
 }
 
+// set the username/password headers the authenticator should
+// read from the metadata.
+func WithHeaders(headers ofsauthenticators.MetadataInfo) PostGresAuthOptFunc {
+	return func(pgao *PostGresAuthOption) error {
+		headers.HDRUsername = strings.TrimSpace(headers.HDRUsername)
+		headers.HDRPassword = strings.TrimSpace(headers.HDRPassword)
+
+		if (len(headers.HDRPassword) < 1) || (len(headers.HDRUsername) < 1) {
+			return fmt.Errorf(dbamessages.ERR_HEADER_BLANK)
+		}
+
+		pgao.Headers = headers
+		return nil
+	}
+}
+
 // set the database host.
 func WithHost(host string) PostGresAuthOptFunc {
 	return func(pgao *PostGresAuthOption) error {
