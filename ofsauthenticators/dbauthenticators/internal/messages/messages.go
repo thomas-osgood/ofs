@@ -2,6 +2,7 @@ package messages
 
 const DRIVER_POSTGRES string = "postgres"
 
+const ERR_COLUMN_NULL string = "one or more columns returned a null"
 const ERR_DBHOST_BLANK string = "database host cannot be an empty string"
 const ERR_DBNAME_BLANK string = "database name cannot be an empty string"
 const ERR_DBPASS_BLANK string = "database password cannot be an empty string"
