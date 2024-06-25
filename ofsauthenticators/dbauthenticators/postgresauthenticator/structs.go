@@ -11,6 +11,7 @@ import (
 type PostGresAuthenticator struct {
 	db        *sql.DB
 	hasher    ofsauthenticators.Hasher
+	headers   ofsauthenticators.MetadataInfo
 	tableinfo dbauthenticators.AuthTableInfo
 	timeout   time.Duration
 }
@@ -18,6 +19,7 @@ type PostGresAuthenticator struct {
 type PostGresAuthOption struct {
 	Dbname    string
 	Hasher    ofsauthenticators.Hasher
+	Headers   ofsauthenticators.MetadataInfo
 	Host      string
 	Password  string
 	Port      int
