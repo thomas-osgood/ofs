@@ -57,6 +57,7 @@ func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthent
 
 	pga = new(PostGresAuthenticator)
 	pga.hasher = defaults.Hasher
+	pga.headers = defaults.Headers
 	pga.tableinfo = defaults.TableInfo
 
 	pga.db, err = sql.Open(dbamessages.DRIVER_POSTGRES, connstr)
