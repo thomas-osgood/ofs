@@ -22,6 +22,10 @@ func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthent
 	var curopt PostGresAuthOptFunc
 	var defaults PostGresAuthOption = PostGresAuthOption{
 		Hasher: nil,
+		Headers: ofsauthenticators.MetadataInfo{
+			HDRUsername: dbadefaults.DEFAULT_HEADER_USERNAME,
+			HDRPassword: dbadefaults.DEFAULT_HEADER_PASSWORD,
+		},
 		TableInfo: dbauthenticators.AuthTableInfo{
 			Tablename:  dbadefaults.DEFAULT_AUTHTABLE,
 			Passcolumn: dbadefaults.DEFAULT_AUTHPASSCOL,
