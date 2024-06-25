@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	dbamessages "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/internal/messages"
@@ -69,5 +70,16 @@ func (pga *PostGresAuthenticator) execStringQuery(query string, sqlargs []any) (
 // function designed to read the username and password information
 // from the provided metadata.
 func (pga *PostGresAuthenticator) readMetadataInfo(md metadata.MD) (username string, password string, err error) {
+	password = strings.TrimSpace(md.Get(pga.headers.HDRPassword)[0])
+	username = strings.TrimSpace(md.Get(pga.headers.HDRUsername)[0])
+
+	if len(password) < 1 {
+		return "", "", fmt.Errorf(dbamessages.ERR_PASSWORD_BLANK)
+	}
+
+	if len(username) < 1 {
+		return "", "", fmt.Errorf(dbamessages.ERR_USERNAME_BLANK)
+	}
+
 	return username, password, nil
 }
