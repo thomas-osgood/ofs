@@ -7,6 +7,7 @@ import (
 	"time"
 
 	dbamessages "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/internal/messages"
+	"google.golang.org/grpc/metadata"
 )
 
 // function designed to ping the database and make sure the
@@ -63,4 +64,10 @@ func (pga *PostGresAuthenticator) execStringQuery(query string, sqlargs []any) (
 	}
 
 	return value1, value2, nil
+}
+
+// function designed to read the username and password information
+// from the provided metadata.
+func (pga *PostGresAuthenticator) readMetadataInfo(md metadata.MD) (username string, password string, err error) {
+	return username, password, nil
 }
