@@ -1,6 +1,5 @@
 package ofssha256
 
-func NewSha256Hasher() (hasher *SHA256Hasher, err error) {
-	hasher = new(SHA256Hasher)
-	return hasher, nil
+func NewSha256Hasher() (*SHA256Hasher, error) {
+	return &SHA256Hasher{}, nil
 }
