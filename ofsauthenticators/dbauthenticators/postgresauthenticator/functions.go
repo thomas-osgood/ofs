@@ -11,6 +11,7 @@ import (
 	dbadefaults "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/internal/defaults"
 	dbamessages "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/internal/messages"
 	pgaconsts "github.com/thomas-osgood/ofs/ofsauthenticators/dbauthenticators/postgresauthenticator/internal/constants"
+	"github.com/thomas-osgood/ofs/ofsauthenticators/hashers/ofsnohash"
 
 	_ "github.com/lib/pq"
 )
@@ -36,6 +37,13 @@ func NewPostGresAuthenticator(opts ...PostGresAuthOptFunc) (pga *PostGresAuthent
 
 	for _, curopt = range opts {
 		err = curopt(&defaults)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if defaults.Hasher == nil {
+		defaults.Hasher, err = ofsnohash.NewNoHasher()
 		if err != nil {
 			return nil, err
 		}
