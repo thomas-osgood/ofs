@@ -18,7 +18,7 @@ type Hasher interface {
 	// and compare the two.
 	//
 	// if the password and hash match, nil will be returned.
-	ComparePassHash([]byte, []byte) error
+	ComparePassHash(password []byte, hash []byte) error
 	// function designed to calculate and return the hash
 	// of a given password.
 	HashPassword([]byte) ([]byte, error)
