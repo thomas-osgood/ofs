@@ -1,3 +1,6 @@
+// module designed to define a SHA256 hasher that can be used with
+// the Osgood File Server's Authenticators. this will fit the Hasher
+// interface defined in ofsauthenticators/interfaces.
 package ofssha256
 
 import (
