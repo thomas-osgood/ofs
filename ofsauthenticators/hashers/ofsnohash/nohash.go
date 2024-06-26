@@ -16,3 +16,9 @@ func (nh *NoHasher) ComparePassHash(password []byte, hash []byte) error {
 		return nil
 	}
 }
+
+// function designed to mimic hashing a password. this will
+// return the password back to the caller.
+func (nh *NoHasher) HashPassword(password []byte) (hash []byte, err error) {
+	return password, nil
+}
