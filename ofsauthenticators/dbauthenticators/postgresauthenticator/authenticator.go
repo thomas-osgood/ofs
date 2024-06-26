@@ -7,6 +7,8 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// function designed to validate the user by looking up the
+// user's password in the database and comparing the passwords.
 func (pga *PostGresAuthenticator) ValidateUser(md metadata.MD) (err error) {
 	var hashedpw string
 	var password string
