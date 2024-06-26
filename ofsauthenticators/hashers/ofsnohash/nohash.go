@@ -1,3 +1,10 @@
+// module designed to define a NoHasher hasher that can be used with
+// the Osgood File Server's Authenticators. this will fit the Hasher
+// interface defined in ofsauthenticators/interfaces.
+//
+// this hasher does not actually generate any hashes and is meant to
+// be used as a default in the case a user does not specify any hasher
+// to use with the authenticator.
 package ofsnohash
 
 import (
