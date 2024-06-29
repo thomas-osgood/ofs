@@ -1,4 +1,4 @@
-package microsoftauthenticators
+package pubclientauthenticator
 
 import (
 	"fmt"
