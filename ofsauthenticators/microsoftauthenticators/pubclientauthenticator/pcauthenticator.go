@@ -1,3 +1,5 @@
+// module designed to define a Microsoft Public Client Authenticator that
+// can be used by OFS to verify a user.
 package pubclientauthenticator
 
 import "google.golang.org/grpc/metadata"
