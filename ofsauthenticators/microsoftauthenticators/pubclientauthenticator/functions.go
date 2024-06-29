@@ -39,6 +39,7 @@ func NewPublicClientAuthenticator(opts ...PubClientAuthOptFunc) (authenticator *
 		return nil, err
 	}
 
+	authenticator.headerInfo = defaults.HeaderInfo
 	authenticator.scope = defaults.Scope
 
 	return authenticator, nil
