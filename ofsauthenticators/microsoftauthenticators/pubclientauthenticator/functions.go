@@ -29,6 +29,18 @@ func NewPublicClientAuthenticator(opts ...PubClientAuthOptFunc) (authenticator *
 	return authenticator, nil
 }
 
+// set the authority to use when contacting Microsoft.
+func WithAuthority(authority string) PubClientAuthOptFunc {
+	return func(pcao *PubClientAuthOption) error {
+		authority = strings.TrimSpace(authority)
+		if len(authority) < 1 {
+			return fmt.Errorf(mamessages.ERR_AUTHORITY_NULL)
+		}
+		pcao.Authority = authority
+		return nil
+	}
+}
+
 // set the clientid to use when contacting Microsoft.
 func WithClientID(clientid string) PubClientAuthOptFunc {
 	return func(pcao *PubClientAuthOption) error {
