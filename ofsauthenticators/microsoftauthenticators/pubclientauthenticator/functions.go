@@ -40,3 +40,15 @@ func WithClientID(clientid string) PubClientAuthOptFunc {
 		return nil
 	}
 }
+
+// set the client secret to use when contacting Microsoft.
+func WithClientSecret(clientsecret string) PubClientAuthOptFunc {
+	return func(pcao *PubClientAuthOption) error {
+		clientsecret = strings.TrimSpace(clientsecret)
+		if len(clientsecret) < 1 {
+			return fmt.Errorf(mamessages.ERR_CLIENTID_NULL)
+		}
+		pcao.Clientsecret = clientsecret
+		return nil
+	}
+}
