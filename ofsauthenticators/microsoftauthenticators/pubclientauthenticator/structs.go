@@ -13,6 +13,8 @@ type PublicClientAuthenticator struct {
 type PubClientAuthOption struct {
 	// ClientID that will be used when creating the public client.
 	Clientid string
+	// Headers to read from metadata.
+	HeaderInfo AuthHeaders
 	// Secret that will be used when creating the public client.
 	Tenantid string
 	// Permissions for the public client.
