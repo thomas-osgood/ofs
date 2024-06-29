@@ -64,3 +64,14 @@ func WithClientSecret(clientsecret string) PubClientAuthOptFunc {
 		return nil
 	}
 }
+
+// set the authorization scope to for the user.
+func WithScope(scope []string) PubClientAuthOptFunc {
+	return func(pcao *PubClientAuthOption) error {
+		if len(scope) < 1 {
+			return fmt.Errorf(mamessages.ERR_SCOPE_NULL)
+		}
+		pcao.Scope = scope
+		return nil
+	}
+}
