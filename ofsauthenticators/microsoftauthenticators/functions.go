@@ -1,5 +1,12 @@
 package microsoftauthenticators
 
+import (
+	"fmt"
+	"strings"
+
+	mamessages "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/messages"
+)
+
 // function designed to create, initialize and return a new
 // public client authenticator object.
 func NewPublicClientAuthenticator(opts ...PubClientAuthOptFunc) (authenticator *PublicClientAuthenticator, err error) {
@@ -20,4 +27,16 @@ func NewPublicClientAuthenticator(opts ...PubClientAuthOptFunc) (authenticator *
 	authenticator.scope = defaults.Scope
 
 	return authenticator, nil
+}
+
+// set the clientid to use when contacting Microsoft.
+func WithClientID(clientid string) PubClientAuthOptFunc {
+	return func(pcao *PubClientAuthOption) error {
+		clientid = strings.TrimSpace(clientid)
+		if len(clientid) < 1 {
+			return fmt.Errorf(mamessages.ERR_CLIENTID_NULL)
+		}
+		pcao.Clientid = clientid
+		return nil
+	}
 }
