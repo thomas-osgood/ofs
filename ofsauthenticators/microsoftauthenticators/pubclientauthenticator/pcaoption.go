@@ -9,7 +9,7 @@ import (
 
 func (pcao *PubClientAuthOption) validate() (err error) {
 	var curscope string
-	var tmpscope []string
+	var tmpscope []string = make([]string, 0)
 
 	pcao.Clientid = strings.TrimSpace(pcao.Clientid)
 	pcao.Tenantid = strings.TrimSpace(pcao.Tenantid)
