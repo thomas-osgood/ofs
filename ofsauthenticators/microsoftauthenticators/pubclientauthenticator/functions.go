@@ -23,6 +23,11 @@ func NewPublicClientAuthenticator(opts ...PubClientAuthOptFunc) (authenticator *
 		}
 	}
 
+	err = defaults.validate()
+	if err != nil {
+		return nil, err
+	}
+
 	authenticator = new(PublicClientAuthenticator)
 
 	// construct the authority url based on the tenant passed in.
