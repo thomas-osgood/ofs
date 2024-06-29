@@ -6,6 +6,7 @@ import (
 
 	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/public"
 	maconsts "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/constants"
+	madefaults "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/defaults"
 	mamessages "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/messages"
 )
 
@@ -14,7 +15,12 @@ import (
 func NewPublicClientAuthenticator(opts ...PubClientAuthOptFunc) (authenticator *PublicClientAuthenticator, err error) {
 	var authority string
 	var curopt PubClientAuthOptFunc
-	var defaults PubClientAuthOption = PubClientAuthOption{}
+	var defaults PubClientAuthOption = PubClientAuthOption{
+		HeaderInfo: AuthHeaders{
+			HdrPassword: madefaults.DEFAULT_HEADER_PASSWORD,
+			HdrUsername: madefaults.DEFAULT_HEADER_USERNAME,
+		},
+	}
 
 	for _, curopt = range opts {
 		err = curopt(&defaults)
