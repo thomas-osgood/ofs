@@ -58,6 +58,19 @@ func WithClientID(clientid string) PubClientAuthOptFunc {
 
 // set the authorization scope to for the user.
 func WithScope(scope []string) PubClientAuthOptFunc {
+	var curscope string
+	var tmpscope []string = make([]string, 0)
+
+	for _, curscope = range scope {
+		curscope = strings.TrimSpace(curscope)
+		if len(curscope) < 1 {
+			continue
+		}
+		tmpscope = append(tmpscope, curscope)
+	}
+
+	scope = tmpscope
+
 	return func(pcao *PubClientAuthOption) error {
 		if len(scope) < 1 {
 			return fmt.Errorf(mamessages.ERR_SCOPE_NULL)
