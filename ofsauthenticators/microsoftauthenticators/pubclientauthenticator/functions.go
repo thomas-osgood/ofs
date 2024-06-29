@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/public"
+	maconsts "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/constants"
 	mamessages "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/messages"
 )
 
 // function designed to create, initialize and return a new
 // public client authenticator object.
 func NewPublicClientAuthenticator(opts ...PubClientAuthOptFunc) (authenticator *PublicClientAuthenticator, err error) {
+	var authority string
 	var curopt PubClientAuthOptFunc
 	var defaults PubClientAuthOption = PubClientAuthOption{}
 
@@ -21,24 +24,19 @@ func NewPublicClientAuthenticator(opts ...PubClientAuthOptFunc) (authenticator *
 	}
 
 	authenticator = new(PublicClientAuthenticator)
-	authenticator.authority = defaults.Authority
-	authenticator.clientid = defaults.Clientid
-	authenticator.clientsecret = defaults.Clientsecret
+
+	// construct the authority url based on the tenant passed in.
+	authority = fmt.Sprintf(maconsts.AUTHORITY_FORMAT, defaults.Tenantid)
+
+	// create the public client application to use for authentication.
+	authenticator.app, err = public.New(defaults.Clientid, public.WithAuthority(authority))
+	if err != nil {
+		return nil, err
+	}
+
 	authenticator.scope = defaults.Scope
 
 	return authenticator, nil
-}
-
-// set the authority to use when contacting Microsoft.
-func WithAuthority(authority string) PubClientAuthOptFunc {
-	return func(pcao *PubClientAuthOption) error {
-		authority = strings.TrimSpace(authority)
-		if len(authority) < 1 {
-			return fmt.Errorf(mamessages.ERR_AUTHORITY_NULL)
-		}
-		pcao.Authority = authority
-		return nil
-	}
 }
 
 // set the clientid to use when contacting Microsoft.
@@ -53,18 +51,6 @@ func WithClientID(clientid string) PubClientAuthOptFunc {
 	}
 }
 
-// set the client secret to use when contacting Microsoft.
-func WithClientSecret(clientsecret string) PubClientAuthOptFunc {
-	return func(pcao *PubClientAuthOption) error {
-		clientsecret = strings.TrimSpace(clientsecret)
-		if len(clientsecret) < 1 {
-			return fmt.Errorf(mamessages.ERR_CLIENTID_NULL)
-		}
-		pcao.Clientsecret = clientsecret
-		return nil
-	}
-}
-
 // set the authorization scope to for the user.
 func WithScope(scope []string) PubClientAuthOptFunc {
 	return func(pcao *PubClientAuthOption) error {
@@ -72,6 +58,18 @@ func WithScope(scope []string) PubClientAuthOptFunc {
 			return fmt.Errorf(mamessages.ERR_SCOPE_NULL)
 		}
 		pcao.Scope = scope
+		return nil
+	}
+}
+
+// set the tenant to use when contacting Microsoft.
+func WithTenantID(tenantid string) PubClientAuthOptFunc {
+	return func(pcao *PubClientAuthOption) error {
+		tenantid = strings.TrimSpace(tenantid)
+		if len(tenantid) < 1 {
+			return fmt.Errorf(mamessages.ERR_TENANTID_NULL)
+		}
+		pcao.Tenantid = tenantid
 		return nil
 	}
 }
