@@ -6,8 +6,9 @@ import "github.com/AzureAD/microsoft-authentication-library-for-go/apps/public"
 //
 // https://learn.microsoft.com/en-us/entra/msal/go/
 type PublicClientAuthenticator struct {
-	app   public.Client
-	scope []string
+	app        public.Client
+	headerInfo AuthHeaders
+	scope      []string
 }
 
 type PubClientAuthOption struct {
