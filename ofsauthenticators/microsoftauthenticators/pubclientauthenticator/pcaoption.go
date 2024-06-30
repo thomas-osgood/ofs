@@ -3,6 +3,7 @@ package pubclientauthenticator
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	mamessages "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/messages"
 )
@@ -20,6 +21,10 @@ func (pcao *PubClientAuthOption) validate() (err error) {
 
 	if len(pcao.Tenantid) < 1 {
 		return fmt.Errorf(mamessages.ERR_TENANTID_NULL)
+	}
+
+	if pcao.ReqTimeout < time.Second {
+		return fmt.Errorf(mamessages.ERR_TIMEOUT_SMALL)
 	}
 
 	for _, curscope = range pcao.Scope {
