@@ -3,6 +3,7 @@ package pubclientauthenticator
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	maconsts "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/constants"
 	madefaults "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/defaults"
@@ -18,6 +19,7 @@ func NewPublicClientAuthenticator(opts ...PubClientAuthOptFunc) (authenticator *
 			HdrToken:    madefaults.DEFAULT_HEADER_TOKEN,
 			HdrUsername: madefaults.DEFAULT_HEADER_USERNAME,
 		},
+		ReqTimeout: madefaults.DEFAULT_TIMEOUT,
 	}
 
 	for _, curopt = range opts {
@@ -85,6 +87,17 @@ func WithTenantID(tenantid string) PubClientAuthOptFunc {
 			return fmt.Errorf(mamessages.ERR_TENANTID_NULL)
 		}
 		pcao.Tenantid = tenantid
+		return nil
+	}
+}
+
+// set the request timeout.
+func WithTimeout(reqTimeout time.Duration) PubClientAuthOptFunc {
+	return func(pcao *PubClientAuthOption) error {
+		if reqTimeout < time.Second {
+			return fmt.Errorf(mamessages.ERR_TIMEOUT_SMALL)
+		}
+		pcao.ReqTimeout = reqTimeout
 		return nil
 	}
 }
