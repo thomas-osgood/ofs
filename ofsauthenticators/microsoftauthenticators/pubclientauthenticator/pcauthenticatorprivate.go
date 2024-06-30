@@ -51,6 +51,10 @@ func (pca *PublicClientAuthenticator) readPublicKey() (pubkey string, err error)
 
 // function designed to determine whether a given JWT is valid based on the
 // JWT and public key provided.
+//
+// reference:
+//
+// https://stackoverflow.com/questions/51834234/i-have-a-public-key-and-a-jwt-how-do-i-check-if-its-valid-in-go
 func (pca *PublicClientAuthenticator) validJWT(jwt string, pubkey string) (err error) {
 	var jwtbody []byte
 	var jwtheader []byte
