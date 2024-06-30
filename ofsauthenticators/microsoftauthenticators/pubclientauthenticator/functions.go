@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/AzureAD/microsoft-authentication-library-for-go/apps/public"
 	maconsts "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/constants"
 	madefaults "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/defaults"
 	mamessages "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/messages"
@@ -13,11 +12,10 @@ import (
 // function designed to create, initialize and return a new
 // public client authenticator object.
 func NewPublicClientAuthenticator(opts ...PubClientAuthOptFunc) (authenticator *PublicClientAuthenticator, err error) {
-	var authority string
 	var curopt PubClientAuthOptFunc
 	var defaults PubClientAuthOption = PubClientAuthOption{
 		HeaderInfo: AuthHeaders{
-			HdrPassword: madefaults.DEFAULT_HEADER_PASSWORD,
+			HdrToken:    madefaults.DEFAULT_HEADER_TOKEN,
 			HdrUsername: madefaults.DEFAULT_HEADER_USERNAME,
 		},
 	}
@@ -36,15 +34,7 @@ func NewPublicClientAuthenticator(opts ...PubClientAuthOptFunc) (authenticator *
 
 	authenticator = new(PublicClientAuthenticator)
 
-	// construct the authority url based on the tenant passed in.
-	authority = fmt.Sprintf(maconsts.AUTHORITY_FORMAT, defaults.Tenantid)
-
-	// create the public client application to use for authentication.
-	authenticator.app, err = public.New(defaults.Clientid, public.WithAuthority(authority))
-	if err != nil {
-		return nil, err
-	}
-
+	authenticator.authUrl = fmt.Sprintf(maconsts.AUTHORITY_FORMAT, defaults.Tenantid, defaults.Clientid)
 	authenticator.headerInfo = defaults.HeaderInfo
 	authenticator.scope = defaults.Scope
 
