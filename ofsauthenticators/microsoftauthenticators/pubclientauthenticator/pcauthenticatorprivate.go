@@ -43,3 +43,9 @@ func (pca *PublicClientAuthenticator) readPublicKey() (pubkey string, err error)
 
 	return pubkey, nil
 }
+
+// function designed to determine whether a given JWT is valid based on the
+// JWT and public key provided.
+func (pca *PublicClientAuthenticator) validJWT(jwt string, pubkey string) (err error) {
+	return nil
+}
