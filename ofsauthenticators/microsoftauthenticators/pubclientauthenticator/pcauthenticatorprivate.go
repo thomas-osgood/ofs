@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	madefaults "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/defaults"
 	mamessages "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/messages"
 	"google.golang.org/grpc/metadata"
 )
@@ -29,7 +28,7 @@ func (pca *PublicClientAuthenticator) readPublicKey() (pubkey string, err error)
 	var req *http.Request
 	var resp *http.Response
 
-	client.Timeout = madefaults.DEFAULT_TIMEOUT
+	client.Timeout = pca.reqTimeout
 
 	req, err = http.NewRequest(http.MethodGet, pca.authUrl, nil)
 	if err != nil {
