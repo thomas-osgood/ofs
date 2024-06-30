@@ -14,6 +14,8 @@ import (
 // https://learn.microsoft.com/en-us/entra/msal/go/
 //
 // https://learn.microsoft.com/en-us/answers/questions/793793/azure-ad-validate-access-token
+//
+// https://www.voitanos.io/blog/validating-entra-id-generated-oauth-tokens/
 func (pca *PublicClientAuthenticator) ValidateUser(md metadata.MD) (err error) {
 	var pubkey string
 	var token string
