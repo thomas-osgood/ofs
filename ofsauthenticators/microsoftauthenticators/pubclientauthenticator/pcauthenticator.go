@@ -3,9 +3,8 @@
 package pubclientauthenticator
 
 import (
-	"context"
+	"log"
 
-	madefaults "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/defaults"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -15,24 +14,24 @@ import (
 // ref:
 //
 // https://learn.microsoft.com/en-us/entra/msal/go/
+//
+// https://learn.microsoft.com/en-us/answers/questions/793793/azure-ad-validate-access-token
 func (pca *PublicClientAuthenticator) ValidateUser(md metadata.MD) (err error) {
-	var cancel context.CancelFunc
-	var ctx context.Context
-	var password string
-	var username string
+	var pubkey string
+	var token string
 
-	username, password, err = pca.readMetadata(md)
+	token, err = pca.readMetadata(md)
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel = context.WithTimeout(context.Background(), madefaults.DEFAULT_TIMEOUT)
-	defer cancel()
-
-	_, err = pca.app.AcquireTokenByUsernamePassword(ctx, pca.scope, username, password)
+	pubkey, err = pca.readPublicKey()
 	if err != nil {
 		return err
 	}
+
+	log.Printf("Token: %s\n", token)
+	log.Printf("Pubkey: %s\n", pubkey)
 
 	return nil
 }
