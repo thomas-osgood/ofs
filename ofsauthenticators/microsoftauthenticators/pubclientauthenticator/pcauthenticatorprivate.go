@@ -1,7 +1,9 @@
 package pubclientauthenticator
 
 import (
+	"encoding/base64"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -50,5 +52,33 @@ func (pca *PublicClientAuthenticator) readPublicKey() (pubkey string, err error)
 // function designed to determine whether a given JWT is valid based on the
 // JWT and public key provided.
 func (pca *PublicClientAuthenticator) validJWT(jwt string, pubkey string) (err error) {
+	var jwtbody []byte
+	var jwtheader []byte
+	var jwtsig []byte
+	var jwtsplit []string = strings.Split(jwt, ".")
+
+	if len(jwtsplit) != 3 {
+		return fmt.Errorf(mamessages.ERR_JWT_INVALID)
+	}
+
+	jwtheader, err = base64.RawURLEncoding.DecodeString(jwtsplit[0])
+	if err != nil {
+		return err
+	}
+
+	jwtbody, err = base64.RawURLEncoding.DecodeString(jwtsplit[1])
+	if err != nil {
+		return err
+	}
+
+	jwtsig, err = base64.RawURLEncoding.DecodeString(jwtsplit[2])
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Header: %s\n", string(jwtheader))
+	log.Printf("Body: %s\n", string(jwtbody))
+	log.Printf("Sig Len: %d\n", len(jwtsig))
+
 	return nil
 }
