@@ -41,6 +41,9 @@ func (pca *PublicClientAuthenticator) readPublicKey() (pubkey string, err error)
 	}
 	defer resp.Body.Close()
 
+	// TODO: parse response body and extract returned public key information.
+	// this public key info will, most likely, be Base64 encoded.
+
 	return pubkey, nil
 }
 
