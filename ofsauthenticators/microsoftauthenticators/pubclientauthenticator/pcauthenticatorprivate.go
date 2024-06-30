@@ -2,8 +2,10 @@ package pubclientauthenticator
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
+	madefaults "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/defaults"
 	mamessages "github.com/thomas-osgood/ofs/ofsauthenticators/microsoftauthenticators/internal/messages"
 	"google.golang.org/grpc/metadata"
 )
@@ -18,4 +20,27 @@ func (pca *PublicClientAuthenticator) readMetadata(md metadata.MD) (token string
 	}
 
 	return token, nil
+}
+
+// function designed to reach out to Microsoft and pull down the public key
+// generated for the client. this will help verify a JWT.
+func (pca *PublicClientAuthenticator) readPublicKey() (pubkey string, err error) {
+	var client *http.Client = http.DefaultClient
+	var req *http.Request
+	var resp *http.Response
+
+	client.Timeout = madefaults.DEFAULT_TIMEOUT
+
+	req, err = http.NewRequest(http.MethodGet, pca.authUrl, nil)
+	if err != nil {
+		return "", err
+	}
+
+	resp, err = client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	return pubkey, nil
 }
