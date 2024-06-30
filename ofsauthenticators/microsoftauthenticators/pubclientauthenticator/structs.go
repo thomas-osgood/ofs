@@ -1,12 +1,10 @@
 package pubclientauthenticator
 
-import "github.com/AzureAD/microsoft-authentication-library-for-go/apps/public"
-
 // reference:
 //
 // https://learn.microsoft.com/en-us/entra/msal/go/
 type PublicClientAuthenticator struct {
-	app        public.Client
+	authUrl    string
 	headerInfo AuthHeaders
 	scope      []string
 }
@@ -25,6 +23,6 @@ type PubClientAuthOption struct {
 // struct defining the header names for the username and
 // password headers that will be read from the metadata.
 type AuthHeaders struct {
-	HdrPassword string
+	HdrToken    string
 	HdrUsername string
 }
