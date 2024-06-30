@@ -6,8 +6,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-// function designed to utilize MSAL to contact Microsoft and
-// verify the login/authorization request.
+// function designed to verify the login/authorization request.
 //
 // ref:
 //
