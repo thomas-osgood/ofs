@@ -3,8 +3,6 @@
 package pubclientauthenticator
 
 import (
-	"log"
-
 	"google.golang.org/grpc/metadata"
 )
 
@@ -30,8 +28,10 @@ func (pca *PublicClientAuthenticator) ValidateUser(md metadata.MD) (err error) {
 		return err
 	}
 
-	log.Printf("Token: %s\n", token)
-	log.Printf("Pubkey: %s\n", pubkey)
+	err = pca.validJWT(token, pubkey)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
