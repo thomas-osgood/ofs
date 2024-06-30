@@ -31,3 +31,11 @@ type AuthHeaders struct {
 	HdrToken    string
 	HdrUsername string
 }
+
+// struct defining the values that are of interest in the JWT header.
+type JWTHeader struct {
+	Alg string `json:"alg" xml:"alg"`
+	Kid string `json:"kid" xml:"kid"`
+	Typ string `json:"typ" xml:"typ"`
+	X5t string `json:"x5t" xml:"x5t"`
+}
