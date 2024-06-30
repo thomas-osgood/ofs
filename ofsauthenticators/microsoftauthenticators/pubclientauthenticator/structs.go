@@ -39,3 +39,15 @@ type JWTHeader struct {
 	Typ string `json:"typ" xml:"typ"`
 	X5t string `json:"x5t" xml:"x5t"`
 }
+
+// struct defining the values that are of interest in the JWT key
+// information returned by the keys endpoint.
+type JTWKey struct {
+	E   string   `json:"e" xml:"e"`
+	Kid string   `json:"kid" xml:"kid"`
+	Kty string   `json:"kty" xml:"kty"`
+	N   string   `json:"n" xml:"n"`
+	Use string   `json:"use" xml:"use"`
+	X5c []string `json:"x5c" xml:"x5c"`
+	X5t string   `json:"x5t" xml:"x5t"`
+}
